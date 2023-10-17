@@ -1,0 +1,24 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
+1               VERSIONINFO
+FILEVERSION     @CZICOMPRESS_RCVersion@
+PRODUCTVERSION  @CZICOMPRESS_RCVersion@
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "FileVersion",       "@CZICOMPRESS_RCVersion@\0"
+            VALUE "ProductVersion",    "@CZICOMPRESS_RCVersion_STR@\0"
+            Value "ProductName",       "@TARGET_NAME@\0"
+            Value "LegalCopyright",    "Carl Zeiss Microscopy GmbH 2023\0"
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 65001
+    END
+END

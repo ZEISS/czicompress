@@ -1,0 +1,22 @@
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+//
+// SPDX-License-Identifier: MIT
+
+#pragma once
+
+#define CZICOMPRESS_UNIX_ENVIRONMENT @CZICompress_UNIX_ENVIRONMENT@
+#define CZICOMPRESS_WIN32_ENVIRONMENT @CZICompress_WIN32_ENVIRONMENT@
+
+// those numbers define the version of CZIcompress - it is set in the root CMakeLists.txt (with the project declaration) 
+// as well as in the cmake/SemVer.Cmake file
+#define CZICOMPRESS_VERSION_MAJOR u8"@czicompress_VERSION_MAJOR@"
+#define CZICOMPRESS_VERSION_MINOR u8"@czicompress_VERSION_MINOR@"
+#define CZICOMPRESS_VERSION_PATCH u8"@czicompress_VERSION_PATCH@"
+#define CZICOMPRESS_VERSION_TWEAK u8"@czicompress_VERSION_TWEAK@"
+#define CZICOMPRESS_VERSION_PATCH_STR u8"@czicompress_VERSION_PATCH_STR@"
+
+#ifdef NDEBUG
+#define CZICOMPRESS_VERSION_TWEAK_STR u8"@czicompress_VERSION_TWEAK_STR@"
+#else
+#define CZICOMPRESS_VERSION_TWEAK_STR u8"@czicompress_VERSION_TWEAK_STR@-DEBUG"
+#endif

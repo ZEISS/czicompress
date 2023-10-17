@@ -1,0 +1,7 @@
+# Format Style Options - Created with Clang Power Tools
+---
+BasedOnStyle: Google
+BreakBeforeBraces: Allman
+ColumnLimit: 140
+AccessModifierOffset: -2
+...

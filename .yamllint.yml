@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+#
+# SPDX-License-Identifier: MIT
+
+# Configuration file for yamllint
+# See all available variables at https://yamllint.readthedocs.io/en/stable/configuration.html#configuration
+---
+extends: default
+rules:
+  truthy: disable
+  line-length: disable

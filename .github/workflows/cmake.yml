@@ -1,0 +1,141 @@
+---
+name: CMake Build
+
+on:
+  push:
+    branches: ["main"]  # run only when merge with main branch
+  pull_request:
+    branches: ["main"]  # run only when merge with main branch
+
+permissions:
+  contents: read
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  # or setup build type in the matrix
+  BUILD_TYPE: Release
+
+jobs:
+  build-tests:
+    name: ${{matrix.config.name}}
+    runs-on: ${{matrix.config.os}}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:  # Create matrix with combinations of compiler and options.
+          # Notes:
+          # - the property 'package' is controlling whether the build-time-dependencies (i.e. eigen3, cli11, catch2) are pulled in via the
+          #    system's package manager or via CMake at build-time.
+          # - {
+          #   name: windows-64-release-msvc-package-off,
+          #   os: windows-latest,
+          #   platform: x64-windows,
+          #   package: OFF
+          # }
+          # - {
+          #   name: ubuntu-release-package-off,
+          #   os: ubuntu-latest,
+          #   platform: x64-linux,
+          #   package: OFF
+          # }
+          - {
+            name: windows-64-release-msvc-package-on,
+            os: windows-latest,
+            platform: x64-windows-static,
+            package: ON
+          }
+          - {
+            name: ubuntu-release-package-on,
+            os: ubuntu-latest,
+            platform: x64-linux,
+            package: ON
+          }
+
+    steps:
+
+      - name: Checkout the source codes.
+        uses: actions/checkout@v3
+
+      - name: Cache vcpkg for Linux if use of external packages is set ON
+        if: matrix.config.os == 'ubuntu-latest' && matrix.config.package == 'ON'
+        uses: actions/cache@v3
+        with:
+          path: '/usr/local/share/vcpkg/installed'
+          key: vcpkg-x64-linux-
+          restore-keys: vcpkg-x64-linux-
+
+      - name: Cache vcpkg for Windows if use of external packages is set ON
+        if: matrix.config.os == 'windows-latest' && matrix.config.package == 'ON'
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}\vcpkg\installed
+          key: vcpkg-x64-windows-
+          restore-keys: vcpkg-x64-windows-
+
+      - name: Set toolchain path for Linux
+        if: matrix.config.os == 'ubuntu-latest'
+        shell: bash
+        run: echo "TOOLCHAIN_PATH=/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_ENV"
+
+      - name: Set toolchain path for Windows
+        if: matrix.config.os == 'windows-latest'
+        shell: bash
+        run: echo "TOOLCHAIN_PATH=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_ENV"
+
+      - name: Install dependencies if use of external packages is set ON
+        if: matrix.config.package == 'ON'
+        shell: bash
+        run: |
+           # We install the following packages: eigen3, catch2, cli11. Installing them with vcpkg (and caching them)
+           # is faster than downloading and building them from source (which is the default behavior of the CZICompress-build-system).
+           vcpkg install --triplet ${{matrix.config.platform}} eigen3 catch2 cli11
+
+      - name: Configure CMake
+        # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+        #
+        # Instruct to use eigen3, cli11 and catch2 from vcpkg - this way the build is faster (both are installed above with vcpkg-package-manager, which is also cached).
+        run: |
+           cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{matrix.config.package}}  -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{matrix.config.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CATCH2=${{matrix.config.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CLI11=${{matrix.config.package}} -DCMAKE_TOOLCHAIN_FILE=${{env.TOOLCHAIN_PATH}} -DVCPKG_TARGET_TRIPLET=${{matrix.config.platform}}
+
+      - name: Build software
+        # Build your program with the given configuration
+        run: |
+           cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: Run unit tests
+        working-directory: ${{github.workspace}}/build
+        # Execute tests defined by the CMake configuration.
+        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+        run: ctest -C ${{env.BUILD_TYPE}}
+
+      - name: Prepare licenses
+        working-directory: ${{github.workspace}}
+        shell: bash
+        run: |
+            mkdir ./czicompress-${{matrix.config.name}}
+            cp -R ./THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt ./czicompress-${{matrix.config.name}}/
+            cp -R ./build/app/THIRD_PARTY_LICENSES.txt ./czicompress-${{matrix.config.name}}/
+
+      # gather the binaries
+      - name: Prepare Linux binaries
+        if: matrix.config.os == 'ubuntu-latest'
+        working-directory: ${{github.workspace}}
+        shell: bash
+        run: |
+            cp ./build/app/czicompress ./build/capi/libczicompressc.so ./czicompress-${{matrix.config.name}}/
+
+      - name: Prepare Windows binaries
+        if: matrix.config.os == 'windows-latest'
+        working-directory: ${{github.workspace}}
+        shell: bash
+        run: |
+            cp ./build/app/${{env.BUILD_TYPE}}/*.exe ./build/capi/${{env.BUILD_TYPE}}/libczicompressc.dll ./czicompress-${{matrix.config.name}}/
+
+      # upload the build-results to artifacts-store
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: czicompress-${{matrix.config.name}}
+          path: czicompress-${{matrix.config.name}}/

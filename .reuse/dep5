@@ -1,0 +1,12 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: czicompress
+Upstream-Contact: Carl Zeiss Microscopy GmbH <github.microscopy@zeiss.com>
+Source: https://github.com/ZEISS/czicompress
+
+Files: cla_*.txt CMakeSettings.json CODE_OF_CONDUCT.md CONTRIBUTING.md README.md SECURITY.md THIRD_PARTY_LICENSES*.txt
+Copyright: 2023 Carl Zeiss Microscopy GmbH
+License: MIT
+
+Files: .github/* .gitignore .editorconfig .runsettings CPPLINT.cfg .clang-format
+Copyright: 2023 Carl Zeiss Microscopy GmbH
+License: CC0-1.0
