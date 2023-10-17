@@ -49,9 +49,9 @@ runs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       #
       # Instruct to use eigen3, cli11 and catch2 from vcpkg - this way the build is faster (both are installed above with vcpkg-package-manager, which is also cached).
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{inputs.build-type}} -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{inputs.package}} -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{inputs.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CATCH2=${{inputs.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CLI11=${{inputs.package}} -DCMAKE_TOOLCHAIN_FILE=${{inputs.path-toolchain}} -DVCPKG_TARGET_TRIPLET=${{inputs.platform}}
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{inputs.build-type}} -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{inputs.package}} -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{inputs.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CATCH2=${{inputs.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CLI11=${{inputs.package}} -DCMAKE_TOOLCHAIN_FILE=${{inputs.path-toolchain}} -DVCPKG_TARGET_TRIPLET=${{inputs.platform}}
 
     - name: Build software
       shell: bash
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{inputs.build-type}}
+      run: cmake --build build --config ${{inputs.build-type}}
