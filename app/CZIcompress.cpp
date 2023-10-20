@@ -95,11 +95,11 @@ int main(int argc, char** argv)
 
     // Create an "output-stream-object"
     const auto output_stream =
-        libCZI::CreateOutputStreamForFile(utils::utf8::WidenUtf8(command_line_options.GetOutputFileName()).c_str(), false);
+        libCZI::CreateOutputStreamForFile(utils::utf8::WidenUtf8(command_line_options.GetOutputFileName()).c_str(), command_line_options.GetOverwriteExistingFile());
 
-    // create the "CZI-writer"-object
+    // create (and configure) the "CZI-writer"-object
     libCZI::CZIWriterOptions czi_writer_options;
-    czi_writer_options.allow_duplicate_subblocks = true;
+    czi_writer_options.allow_duplicate_subblocks = command_line_options.GetIgnoreDuplicateSubblocks();
     const auto writer = libCZI::CreateCZIWriter(&czi_writer_options);
 
     // GUID_NULL here means that a new Guid is created
