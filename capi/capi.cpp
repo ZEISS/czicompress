@@ -53,7 +53,7 @@ public:
     const auto writer = libCZI::CreateCZIWriter();
 
     // GUID_NULL here means that a new Guid is created
-    const auto czi_writer_info = std::make_shared<libCZI::CCziWriterInfo>(GUID{0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}});
+    const auto czi_writer_info = std::make_shared<libCZI::CCziWriterInfo>(libCZI::GUID{0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}});
 
     // TODO(JBL): it might be desirable to make reservations for the
     // subblock-directory-/attachments-directory-/metadata-segment

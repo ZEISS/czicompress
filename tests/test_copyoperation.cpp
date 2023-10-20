@@ -40,7 +40,7 @@ static tuple<shared_ptr<void>, size_t> CreateCziWithFourSubblockInMosaicArrangem
   auto writer = libCZI::CreateCZIWriter();
   auto outStream = make_shared<CMemOutputStream>(0);
 
-  auto spWriterInfo = make_shared<libCZI::CCziWriterInfo>(GUID{0x1234567, 0x89ab, 0xcdef, {1, 2, 3, 4, 5, 6, 7, 8}},  // NOLINT
+  auto spWriterInfo = make_shared<libCZI::CCziWriterInfo>(libCZI::GUID{0x1234567, 0x89ab, 0xcdef, {1, 2, 3, 4, 5, 6, 7, 8}},  // NOLINT
                                                           libCZI::CDimBounds{{libCZI::DimensionIndex::C, 0, 1}},      // set a bounds for C
                                                           0, 3);  // set a bounds M : 0<=m<=0
   writer->Create(outStream, spWriterInfo);
@@ -162,7 +162,7 @@ TEST_CASE("copyczi.1: run compression on simple synthetic document", "[copyczi]"
   // create a CZI-writer object on a new memory stream
   auto writer = libCZI::CreateCZIWriter();
   const auto memory_backed_stream_destination_document = make_shared<CMemInputOutputStream>(0);
-  const auto writer_info = make_shared<libCZI::CCziWriterInfo>(GUID{0x0, 0x0, 0x0, {0, 0, 0, 0, 0, 0, 0, 0}});
+  const auto writer_info = make_shared<libCZI::CCziWriterInfo>(libCZI::GUID{0x0, 0x0, 0x0, {0, 0, 0, 0, 0, 0, 0, 0}});
   writer->Create(memory_backed_stream_destination_document, writer_info);
 
   // act
@@ -218,7 +218,7 @@ TEST_CASE("copyczi.2: run compression on simple synthetic document changes compr
   // create a CZI-writer object on a new memory stream
   auto writer = libCZI::CreateCZIWriter();
   const auto memory_backed_stream_destination_document = make_shared<CMemInputOutputStream>(0);
-  const auto writer_info = make_shared<libCZI::CCziWriterInfo>(GUID{0x0, 0x0, 0x0, {0, 0, 0, 0, 0, 0, 0, 0}});
+  const auto writer_info = make_shared<libCZI::CCziWriterInfo>(libCZI::GUID{0x0, 0x0, 0x0, {0, 0, 0, 0, 0, 0, 0, 0}});
   writer->Create(memory_backed_stream_destination_document, writer_info);
 
   // act
@@ -280,7 +280,7 @@ TEST_CASE("copyczi.3: run decompression on simple synthetically compressed docum
   // create a CZI-writer object on a new memory stream
   auto writer = libCZI::CreateCZIWriter();
   const auto memory_backed_stream_destination_document = make_shared<CMemInputOutputStream>(0);
-  const auto writer_info = make_shared<libCZI::CCziWriterInfo>(GUID{0x0, 0x0, 0x0, {0, 0, 0, 0, 0, 0, 0, 0}});
+  const auto writer_info = make_shared<libCZI::CCziWriterInfo>(libCZI::GUID{0x0, 0x0, 0x0, {0, 0, 0, 0, 0, 0, 0, 0}});
   writer->Create(memory_backed_stream_destination_document, writer_info);
 
   // act
@@ -309,7 +309,7 @@ TEST_CASE("copyczi.3: run decompression on simple synthetically compressed docum
   // create a CZI-writer object on a new memory stream
   auto writer_2 = libCZI::CreateCZIWriter();
   const auto memory_backed_stream_destination_document_2 = make_shared<CMemInputOutputStream>(0);
-  const auto writer_info_2 = make_shared<libCZI::CCziWriterInfo>(GUID{0x0, 0x0, 0x0, {0, 0, 0, 0, 0, 0, 0, 0}});
+  const auto writer_info_2 = make_shared<libCZI::CCziWriterInfo>(libCZI::GUID{0x0, 0x0, 0x0, {0, 0, 0, 0, 0, 0, 0, 0}});
   writer_2->Create(memory_backed_stream_destination_document_2, writer_info_2);
 
   // act

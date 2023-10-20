@@ -98,10 +98,12 @@ int main(int argc, char** argv)
         libCZI::CreateOutputStreamForFile(utils::utf8::WidenUtf8(command_line_options.GetOutputFileName()).c_str(), false);
 
     // create the "CZI-writer"-object
-    const auto writer = libCZI::CreateCZIWriter();
+    libCZI::CZIWriterOptions czi_writer_options;
+    czi_writer_options.allow_duplicate_subblocks = true;
+    const auto writer = libCZI::CreateCZIWriter(&czi_writer_options);
 
     // GUID_NULL here means that a new Guid is created
-    const auto czi_writer_info = std::make_shared<libCZI::CCziWriterInfo>(GUID{0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}});
+    const auto czi_writer_info = std::make_shared<libCZI::CCziWriterInfo>(libCZI::GUID{0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}});
 
     // TODO(JBL): it might be desirable to make reservations for the
     //            subblock-directory-/attachments-directory-/metadata-segment
