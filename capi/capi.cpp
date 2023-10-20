@@ -46,10 +46,12 @@ public:
     open_options.ignore_sizem_for_pyramid_subblocks = true;
     reader->Open(stream, &open_options);
 
-    // create the "CZI-writer"-object
+    // create (and configure) the "CZI-writer"-object
     const std::string output_string(output_path);
     const auto output_stream = libCZI::CreateOutputStreamForFile(utils::utf8::WidenUtf8(output_string).c_str(), false);
 
+    libCZI::CZIWriterOptions czi_writer_options;
+    czi_writer_options.allow_duplicate_subblocks = true;
     const auto writer = libCZI::CreateCZIWriter();
 
     // GUID_NULL here means that a new Guid is created
