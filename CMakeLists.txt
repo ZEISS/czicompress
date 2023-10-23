@@ -28,11 +28,8 @@ message (STATUS "[${PROJECT_NAME}] Processing ${CMAKE_CURRENT_LIST_FILE}")
 include(FetchContent)
 FetchContent_Declare(
   libczi
-  GIT_REPOSITORY https://github.com/ptahmose/libczi-zeiss
-  GIT_TAG  jbl/1036970-more_lax_checking_for_duplicte_subblocks
-  # ***** CHANGE BEFORE MERGING INTO MAINLINE *****
-  #GIT_REPOSITORY https://github.com/ZEISS/libczi.git
-  #GIT_TAG        c9954d58759ef6dd7d7c6a53c163ea8349855392
+  GIT_REPOSITORY https://github.com/ZEISS/libczi.git
+  GIT_TAG        05bc1ebdca520ba2c5bfc3b9fcde76c548e98545
 )
 
 if(NOT libCZI_POPULATED)
