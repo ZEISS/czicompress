@@ -43,13 +43,19 @@ jobs:
             name: windows-64-release-msvc-package-on,
             os: windows-latest,
             platform: x64-windows-static,
-            package: ON
+            package: ON,
+            path-cache: '${{ github.workspace }}\vcpkg\installed',
+            path-toolchain: 'C:/vcpkg/scripts/buildsystems/vcpkg.cmake',
+            os-id: 'linux'
           }
           - {
             name: ubuntu-release-package-on,
             os: ubuntu-latest,
             platform: x64-linux,
-            package: ON
+            package: ON,
+            path-cache: '/usr/local/share/vcpkg/installed',
+            path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake',
+            os-id: 'windows'
           }
 
     steps:
@@ -57,52 +63,14 @@ jobs:
       - name: Checkout the source codes.
         uses: actions/checkout@v3
 
-      - name: Cache vcpkg for Linux if use of external packages is set ON
-        if: matrix.config.os == 'ubuntu-latest' && matrix.config.package == 'ON'
-        uses: actions/cache@v3
+      - uses: ./.github/actions/cmake-build
         with:
-          path: '/usr/local/share/vcpkg/installed'
-          key: vcpkg-x64-linux-
-          restore-keys: vcpkg-x64-linux-
-
-      - name: Cache vcpkg for Windows if use of external packages is set ON
-        if: matrix.config.os == 'windows-latest' && matrix.config.package == 'ON'
-        uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}\vcpkg\installed
-          key: vcpkg-x64-windows-
-          restore-keys: vcpkg-x64-windows-
-
-      - name: Set toolchain path for Linux
-        if: matrix.config.os == 'ubuntu-latest'
-        shell: bash
-        run: echo "TOOLCHAIN_PATH=/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_ENV"
-
-      - name: Set toolchain path for Windows
-        if: matrix.config.os == 'windows-latest'
-        shell: bash
-        run: echo "TOOLCHAIN_PATH=C:/vcpkg/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_ENV"
-
-      - name: Install dependencies if use of external packages is set ON
-        if: matrix.config.package == 'ON'
-        shell: bash
-        run: |
-           # We install the following packages: eigen3, catch2, cli11. Installing them with vcpkg (and caching them)
-           # is faster than downloading and building them from source (which is the default behavior of the CZICompress-build-system).
-           vcpkg install --triplet ${{matrix.config.platform}} eigen3 catch2 cli11
-
-      - name: Configure CMake
-        # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-        #
-        # Instruct to use eigen3, cli11 and catch2 from vcpkg - this way the build is faster (both are installed above with vcpkg-package-manager, which is also cached).
-        run: |
-           cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{matrix.config.package}}  -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{matrix.config.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CATCH2=${{matrix.config.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CLI11=${{matrix.config.package}} -DCMAKE_TOOLCHAIN_FILE=${{env.TOOLCHAIN_PATH}} -DVCPKG_TARGET_TRIPLET=${{matrix.config.platform}}
-
-      - name: Build software
-        # Build your program with the given configuration
-        run: |
-           cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+          path-cache: ${{matrix.config.path-cache}}
+          path-toolchain: ${{matrix.config.path-toolchain}}
+          os-id: ${{matrix.config.os-id}}
+          build-type: ${{env.BUILD_TYPE}}
+          package: ${{matrix.config.package}}
+          platform: ${{matrix.config.platform}}
 
       - name: Run unit tests
         working-directory: ${{github.workspace}}/build
