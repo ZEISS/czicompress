@@ -11,6 +11,12 @@ add_library (${TARGET_NAME} SHARED
     capi.cpp
 )
 
+# with GCC (on Linux) we want to link statically to libstd++ - this should increase the likelihood that the
+# binary works on various distros (c.f. https://stackoverflow.com/questions/13636513/linking-libstdc-statically-any-gotchas)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_link_options(${TARGET_NAME} PRIVATE -static-libstdc++)
+endif()
+
 if(WIN32)
   set(CZICOMPRESS_RCVersion ${czicompress_VERSION_MAJOR},${czicompress_VERSION_MINOR},${czicompress_VERSION_PATCH},${czicompress_VERSION_TWEAK})
   set(CZICOMPRESS_RCVersion_STR ${czicompress_VERSION_MAJOR_STR},${czicompress_VERSION_MINOR_STR},${czicompress_VERSION_PATCH_STR},${czicompress_VERSION_TWEAK_STR})
