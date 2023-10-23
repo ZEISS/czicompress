@@ -50,7 +50,7 @@ jobs:
           }
           - {
             name: ubuntu-release-package-on,
-            os: ubuntu-latest,
+            os: ubuntu-20.04,   # we want to use an older version in order to increase likelihood that binaries work on other distros
             platform: x64-linux,
             package: ON,
             path-cache: '/usr/local/share/vcpkg/installed',

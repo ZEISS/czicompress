@@ -14,12 +14,6 @@ add_executable (${TARGET_NAME}
                                    # CMake will merge the manifest with a linker generated one (and ignore it on non-windows platforms)
 )
 
-# with GCC (on Linux) we want to link statically to libstd++ - this should increase the likelihood that the
-# binary works on various distros
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_link_options(${TARGET_NAME} PRIVATE -static-libstdc++)
-endif()
-
 target_compile_options(${TARGET_NAME} PUBLIC "$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 target_compile_options(${TARGET_NAME} PUBLIC "$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
