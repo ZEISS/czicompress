@@ -46,7 +46,7 @@ jobs:
             package: ON,
             path-cache: '${{ github.workspace }}\vcpkg\installed',
             path-toolchain: 'C:/vcpkg/scripts/buildsystems/vcpkg.cmake',
-            os-id: 'linux'
+            os-id: 'windows'
           }
           - {
             name: ubuntu-release-package-on,
@@ -55,7 +55,7 @@ jobs:
             package: ON,
             path-cache: '/usr/local/share/vcpkg/installed',
             path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake',
-            os-id: 'windows'
+            os-id: 'linux'
           }
 
     steps:
@@ -88,7 +88,7 @@ jobs:
 
       # gather the binaries
       - name: Prepare Linux binaries
-        if: matrix.config.os == 'ubuntu-latest'
+        if: matrix.config.os == 'ubuntu-20.04'
         working-directory: ${{github.workspace}}
         shell: bash
         run: |
