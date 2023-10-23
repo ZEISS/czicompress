@@ -1,0 +1,57 @@
+---
+name: 'CMake-Build'
+description: 'Install Dependencies + Configure CMake + Build'
+inputs:
+  path-cache:
+    description: 'Path to vcpkg cache directory'
+    required: true
+  path-toolchain:
+    description: 'Path to vcpkg tool chain file'
+    required: true
+  os-id:
+    description: 'Operating System Identifier'
+    required: true
+  build-type:
+    description: 'Build Configuration'
+    required: true
+  package:
+    description: 'Using package manager for external dependencies'
+    required: true
+  platform:
+    description: 'OS platform'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Cache vcpkg
+      uses: actions/cache@v3
+      if: inputs.package == 'ON'
+      with:
+        path: ${{inputs.path-cache}}
+        key: vcpkg-x64-${{inputs.os-id}}-
+        restore-keys: vcpkg-x64-${{inputs.os-id}}-
+
+    - name: Set toolchain path
+      shell: bash
+      run: echo "TOOLCHAIN_PATH=${{inputs.path-toolchain}}" >> "$GITHUB_ENV"
+
+    - name: Install dependencies
+      if: inputs.package == 'ON'
+      shell: bash
+      run: |
+         # We install the following packages: eigen3, catch2, cli11. Installing them with vcpkg (and caching them)
+         # is faster than downloading and building them from source (which is the default behavior of the CZICompress-build-system).
+         vcpkg install --triplet ${{inputs.platform}} eigen3 catch2 cli11
+
+    - name: Configure CMake
+      shell: bash
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      #
+      # Instruct to use eigen3, cli11 and catch2 from vcpkg - this way the build is faster (both are installed above with vcpkg-package-manager, which is also cached).
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{inputs.build-type}} -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{inputs.package}} -DLIBCZI_BUILD_PREFER_EXTERNALPACKAGE_EIGEN3=${{inputs.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CATCH2=${{inputs.package}} -DCZICOMPRESS_BUILD_PREFER_EXTERNALPACKAGE_CLI11=${{inputs.package}} -DCMAKE_TOOLCHAIN_FILE=${{inputs.path-toolchain}} -DVCPKG_TARGET_TRIPLET=${{inputs.platform}}
+
+    - name: Build software
+      shell: bash
+      # Build your program with the given configuration
+      run: cmake --build build --config ${{inputs.build-type}}
