@@ -49,8 +49,6 @@ Start the executable from the command line, providing the required command line 
 ```
 Usage: czicompress.exe [OPTIONS]
 
-  version: 0.4.2.0
-
 Options:
   -h,--help         Print this help message and exit
 
