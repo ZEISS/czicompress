@@ -42,8 +42,9 @@ public:
     usage << result_from_stock_implementation << endl
           << "  version: " << CZICOMPRESS_VERSION_MAJOR << "." << CZICOMPRESS_VERSION_MINOR << "." << CZICOMPRESS_VERSION_PATCH;
     std::string tweak(CZICOMPRESS_VERSION_TWEAK);
-    if (!tweak.empty()) {
-       usage << "." << tweak;
+    if (!tweak.empty())
+    {
+      usage << "." << tweak;
     }
     usage << endl;
     return usage.str();
@@ -144,6 +145,18 @@ CommandLineOptions::ParseResult CommandLineOptions::Parse(int argc, const char* 
   string source_filename;           // NOLINT(misc-const-correctness)
   string destination_filename;      // NOLINT(misc-const-correctness)
   string compression_options_text;  // NOLINT(misc-const-correctness)
+  bool overwrite_existing_file{false};
+  bool ignore_duplicate_subblocks{false};
+
+  // specify the string-to-enum-mapping for a boolean option
+  std::map<std::string, bool> map_string_to_boolean{
+      {"0", false},
+      {"false", false},
+      {"no", false},
+      {"1", true},
+      {"true", true},
+      {"yes", true},
+  };
 
   // specify the string-to-enum-mapping for "command"
   const std::map<std::string, Command> map_string_to_command{{"compress", Command::kCompress}, {"decompress", Command::kDecompress}};
@@ -188,6 +201,14 @@ CommandLineOptions::ParseResult CommandLineOptions::Parse(int argc, const char* 
       ->option_text("COMPRESSION_OPTIONS")
       ->default_val(CommandLineOptions::kDefaultCompressionOptions);
 
+  app.add_flag("-w,--overwrite", overwrite_existing_file, "If the output file exists, try to overwrite it.");
+  app.add_option("--ignore_duplicate_subblocks", ignore_duplicate_subblocks,
+                 "If this option is enabled, the operation will ignore if duplicate subblocks are encountered in the source document. "
+                 "Otherwise, an error will be reported. The default is 'on'.")
+      ->option_text("BOOLEAN")
+      ->default_val(true)
+      ->transform(CLI::CheckedTransformer(map_string_to_boolean, CLI::ignore_case));
+
   const auto formatter = make_shared<CustomFormatter>();
   app.formatter(formatter);
   app.footer(CommandLineOptions::GetFooterText());
@@ -216,6 +237,9 @@ CommandLineOptions::ParseResult CommandLineOptions::Parse(int argc, const char* 
     this->compression_strategy_ = compression_strategy;
     this->compression_option_ = libCZI::Utils::ParseCompressionOptions(compression_options_text);
   }
+
+  this->overwrite_existing_file_ = overwrite_existing_file;
+  this->ignore_duplicate_subblocks_ = ignore_duplicate_subblocks;
 
   return CommandLineOptions::ParseResult::kOk;
 }

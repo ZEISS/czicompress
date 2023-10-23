@@ -48,7 +48,7 @@ Clicking on these artifacts will download a ZIP file with the executable. The ex
 Start the executable from the command line, providing the required command line arguments.
 
 ```
-Usage: czicompress [OPTIONS]
+Usage: czicompress.exe [OPTIONS]
 
 Options:
   -h,--help         Print this help message and exit
@@ -72,6 +72,13 @@ Options:
   -t,--compression_options COMPRESSION_OPTIONS
                     Specify compression parameters. The default is
                     'zstd1:ExplicitLevel=1;PreProcess=HiLoByteUnpack'.
+
+  -w,--overwrite    If the output file exists, try to overwrite it.
+
+  --ignore_duplicate_subblocks BOOLEAN
+                    If this option is enabled, the operation will ignore if
+                    duplicate subblocks are encountered in the source document.
+                    Otherwise, an error will be reported. The default is 'on'.
 
 
 Copies the content of a CZI-file into another CZI-file changing the compression

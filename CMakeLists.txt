@@ -9,7 +9,7 @@ cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (htt
 # Note that the CMake-variables <Projectname>_VERSION_MAJOR, <Projectname>_VERSION_MINOR, ... are defined by this statement,
 #  which are used in the build (so that - if changing the name here, change also the usage of those variables).
 project ("czicompress"
-         VERSION 0.4.1)
+         VERSION 0.5.0)
 
 set(czicompress_VERSION_PATCH_FLAGS "-alpha")
 set(czicompress_VERSION_TWEAK_FLAGS "")
@@ -29,7 +29,7 @@ include(FetchContent)
 FetchContent_Declare(
   libczi
   GIT_REPOSITORY https://github.com/ZEISS/libczi.git
-  GIT_TAG        c9954d58759ef6dd7d7c6a53c163ea8349855392
+  GIT_TAG        05bc1ebdca520ba2c5bfc3b9fcde76c548e98545
 )
 
 if(NOT libCZI_POPULATED)

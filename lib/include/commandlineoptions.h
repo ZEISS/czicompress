@@ -29,7 +29,8 @@ private:
   std::string output_filename_;
   CompressionStrategy compression_strategy_{CompressionStrategy::kInvalid};
   libCZI::Utils::CompressionOption compression_option_;
-
+  bool overwrite_existing_file_{false};
+  bool ignore_duplicate_subblocks_{true};
 public:
   /// Values that represent the result of the "Parse"-operation.
   enum class ParseResult
@@ -90,6 +91,16 @@ public:
   ///
   /// \returns    The compression option.
   const libCZI::Utils::CompressionOption& GetCompressionOption() const { return this->compression_option_; }
+
+  /// Gets a boolean indicating whether when creating the output file, it is to be overwritten if it already exists.
+  ///
+  /// \returns  True if an existing file is to be overwritten (if it exists); false otherwise.
+  bool GetOverwriteExistingFile() const { return this->overwrite_existing_file_; }
+
+  /// Gets a boolean indicating whether the CZIWriter object should be configured to ignore duplicate subblocks.
+  ///
+  /// \returns  True if duplicate subblocks are to be ignored (with the CZIWriter object); false otherwise.
+  bool GetIgnoreDuplicateSubblocks() const { return this->ignore_duplicate_subblocks_; }
 
 private:
   static std::string GetFooterText();
