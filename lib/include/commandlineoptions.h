@@ -99,7 +99,7 @@ public:
 
   /// Gets a boolean indicating whether the CZIWriter object should be configured to ignore duplicate subblocks.
   ///
-  /// \returns  True if duplicate subblocks are to be ignore (with the CZIWriter object); false otherwise.
+  /// \returns  True if duplicate subblocks are to be ignored (with the CZIWriter object); false otherwise.
   bool GetIgnoreDuplicateSubblocks() const { return this->ignore_duplicate_subblocks_; }
 
 private:
