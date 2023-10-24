@@ -46,16 +46,16 @@ jobs:
             package: ON,
             path-cache: '${{ github.workspace }}\vcpkg\installed',
             path-toolchain: 'C:/vcpkg/scripts/buildsystems/vcpkg.cmake',
-            os-id: 'linux'
+            os-id: 'windows'
           }
           - {
             name: ubuntu-release-package-on,
-            os: ubuntu-latest,
+            os: ubuntu-20.04,   # we want to use an older version in order to increase likelihood that binaries work on other distros
             platform: x64-linux,
             package: ON,
             path-cache: '/usr/local/share/vcpkg/installed',
             path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake',
-            os-id: 'windows'
+            os-id: 'linux'
           }
 
     steps:
@@ -88,7 +88,7 @@ jobs:
 
       # gather the binaries
       - name: Prepare Linux binaries
-        if: matrix.config.os == 'ubuntu-latest'
+        if: matrix.config.os == 'ubuntu-20.04'
         working-directory: ${{github.workspace}}
         shell: bash
         run: |
