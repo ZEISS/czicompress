@@ -17,7 +17,10 @@ permissions:
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze CPP
+    defaults:
+      run:
+        working-directory: ${{github.workspace}}/czicompress
     runs-on: ubuntu-latest
 
     strategy:
@@ -50,6 +53,7 @@ jobs:
           build-type: Release
           package: ON
           platform: x64-linux
+          src-dir: '${{github.workspace}}/czicompress'
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

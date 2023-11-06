@@ -4,8 +4,10 @@ name: CMake Build
 on:
   push:
     branches: ["main"]  # run only when merge with main branch
+    paths: ["czicompress/**"]
   pull_request:
     branches: ["main"]  # run only when merge with main branch
+    paths: ["czicompress/**"]
 
 permissions:
   contents: read
@@ -17,6 +19,9 @@ env:
 
 jobs:
   build-tests:
+    defaults:
+      run:
+        working-directory: ${{github.workspace}}/czicompress
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
 
@@ -46,7 +51,7 @@ jobs:
             package: ON,
             path-cache: '${{ github.workspace }}\vcpkg\installed',
             path-toolchain: 'C:/vcpkg/scripts/buildsystems/vcpkg.cmake',
-            os-id: 'windows'
+            os-id: 'windows',
           }
           - {
             name: ubuntu-release-package-on,
@@ -55,7 +60,7 @@ jobs:
             package: ON,
             path-cache: '/usr/local/share/vcpkg/installed',
             path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake',
-            os-id: 'linux'
+            os-id: 'linux',
           }
 
     steps:
@@ -71,17 +76,18 @@ jobs:
           build-type: ${{env.BUILD_TYPE}}
           package: ${{matrix.config.package}}
           platform: ${{matrix.config.platform}}
+          src-dir: '${{github.workspace}}/czicompress'
 
       - name: Run unit tests
-        working-directory: ${{github.workspace}}/build
+        working-directory: ${{github.workspace}}/czicompress/build
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         run: ctest -C ${{env.BUILD_TYPE}}
 
       - name: Prepare licenses
-        working-directory: ${{github.workspace}}
         shell: bash
         run: |
+            set -e
             mkdir ./czicompress-${{matrix.config.name}}
             cp -R ./THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt ./czicompress-${{matrix.config.name}}/
             cp -R ./build/app/THIRD_PARTY_LICENSES.txt ./czicompress-${{matrix.config.name}}/
@@ -89,14 +95,12 @@ jobs:
       # gather the binaries
       - name: Prepare Linux binaries
         if: matrix.config.os == 'ubuntu-20.04'
-        working-directory: ${{github.workspace}}
         shell: bash
         run: |
             cp ./build/app/czicompress ./build/capi/libczicompressc.so ./czicompress-${{matrix.config.name}}/
 
       - name: Prepare Windows binaries
         if: matrix.config.os == 'windows-latest'
-        working-directory: ${{github.workspace}}
         shell: bash
         run: |
             cp ./build/app/${{env.BUILD_TYPE}}/*.exe ./build/capi/${{env.BUILD_TYPE}}/libczicompressc.dll ./czicompress-${{matrix.config.name}}/
