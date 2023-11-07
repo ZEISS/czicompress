@@ -11,6 +11,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- Version -->
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>alpha.45<!--feature/xmldoc--></VersionSuffix>
+    <VersionSuffix>alpha.46<!--feature/add-czishrink--></VersionSuffix>
   </PropertyGroup>
 </Project>
