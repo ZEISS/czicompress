@@ -45,6 +45,6 @@ public partial class AppComposerTests
         actual.OverallStatus.Should().BeEmpty();
     }
 
-    [GeneratedRegex(@"^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+?[+-]\d\d:\d\d\|netczicompress.App\|INFO\|0\|Starting CZI Shrink 1\.0\.0-alpha\.[1-9]\d* using libczicompressc \d*?\.\d+?\.\d+?.*")]
+    [GeneratedRegex(@"^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+?[+-]\d\d:\d\d\|netczicompress.App\|INFO\|0\|Starting CZI Shrink \d+\.\d+\.\d+.*? using libczicompressc \d+\.\d+\.\d+.*")]
     private static partial Regex ExpectedLogMessagePattern();
 }

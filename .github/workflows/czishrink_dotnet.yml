@@ -49,6 +49,23 @@ jobs:
         with:
           dotnet-version: 7.0.x
 
+      - name: Get Version from Directory.Build.props
+        id: getversion
+        uses: m-ringler/get-xpath@v3
+        with:
+          xml-file: czishrink/Directory.Build.props
+          xpath: 'concat(//VersionPrefix/text(), "-", //VersionSuffix/text())'
+
+      - name: Add build ID to version
+        run: |
+          Write-Output "Add build ID ${{ github.run_id }} to VersionSuffix in Directory.Build.props"
+          $file = Get-Item "Directory.Build.props"
+          $xml = [xml](Get-Content -Path $file.FullName)
+          $versionElement = $xml.SelectSingleNode('//VersionSuffix')
+          $versionElement.'#text' += '+${{ github.run_id }}'
+          $xml.Save($file.FullName)
+        shell: pwsh
+
       - name: Restore dependencies
         run: dotnet restore
 
@@ -110,13 +127,6 @@ jobs:
           -p:PublishReadyToRun=true
           -p:PublishReadyToRunShowWarnings=true
           -o ${{ github.workspace }}/publish
-
-      - name: Get Version from Directory.Build.props
-        id: getversion
-        uses: m-ringler/get-xpath@v3
-        with:
-          xml-file: czishrink/Directory.Build.props
-          xpath: 'concat(//VersionPrefix/text(), "-", //VersionSuffix/text())'
 
       - name: Upload published binaries
         uses: actions/upload-artifact@v3
