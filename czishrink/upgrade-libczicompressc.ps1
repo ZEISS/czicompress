@@ -120,7 +120,7 @@ if ($UseCache -and (Test-Path -Path $LatestRunJson)) {
 	Write-Output "INFO: Getting build info from github.com/$CziCompress."
 	$ActionRunsUri = "https://api.github.com/repos/$CziCompress/actions/runs?branch=main&status=success&per_page=10"
 	$ServerResponse = Invoke-WebRequest -Uri $ActionRunsUri -Headers $GithubApiHeaders | ConvertFrom-Json
-	$RunsOfCmakeBuild = $ServerResponse.workflow_runs | Where-Object Name -eq 'CMake Build'
+	$RunsOfCmakeBuild = $ServerResponse.workflow_runs | Where-Object Name -eq 'CMake Build (czicompress)'
 
 	$LatestRunOfCMakeBuild = $RunsOfCmakeBuild | Sort-Object -Property 'run_number' | Select-Object -Last 1
 	$LatestRunOfCMakeBuild | ConvertTo-Json | Set-Content -Path $LatestRunJson
