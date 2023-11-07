@@ -6,10 +6,10 @@ Reduce the size of existing CZI files by converting them to zstd-compressed CZI 
 
 # Command line tool and C/C++ libraries
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CMake](https://github.com/ZEISS/czicompress/actions/workflows/cmake.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml)
-[![CodeQL](https://github.com/ZEISS/czicompress/actions/workflows/codeql.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_codeql.yml)
+[![CMake](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml)
+[![CodeQL](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_codeql.yml/badge.svg?branch=main&event=push)](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_codeql.yml)
 
-[czicompress](czicompress/README.md) is a cross-platform command line tool to compress CZIs. czicompress and its source code are provided under the [MIT license](LICENSE).
+[czicompress](czicompress/README.md) is a cross-platform command line tool to compress CZIs. czicompress and its source code are provided under the [MIT license](czicompress/LICENSE).
 
 # CziShrink desktop app
 [![License: GPL](https://img.shields.io/badge/License-GPL%203+-yellow.svg)](https://spdx.org/licenses/GPL-3.0-or-later.html)
