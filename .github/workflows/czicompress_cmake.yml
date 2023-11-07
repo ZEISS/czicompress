@@ -111,4 +111,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: czicompress-${{matrix.config.name}}
-          path: czicompress-${{matrix.config.name}}/
+          path: czicompress/czicompress-${{matrix.config.name}}/
