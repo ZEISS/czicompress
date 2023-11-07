@@ -1,5 +1,5 @@
 # CziShrink
-An open source and cross-platform GUI for [CziCompress](https://github.com/zeissmicroscopy/czicompress), made with Avalonia UI and .NET.
+An open source and cross-platform GUI for [CziCompress](https://github.com/ZEISS/czicompress), made with Avalonia UI and .NET.
 
 ## Table of contents
 
