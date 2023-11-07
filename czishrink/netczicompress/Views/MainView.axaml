@@ -1,0 +1,149 @@
+<UserControl
+    x:Class="netczicompress.Views.MainView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:netczicompress.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:netczicompress.ViewModels"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="vm:MainViewModel"
+    mc:Ignorable="d">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Input & Output Selection + Settings  -->
+        <Grid Grid.Row="0" IsEnabled="{Binding !CanStop}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock
+                Grid.Row="0"
+                Margin="0,10,0,10"
+                Text="Compress CZI Files" />
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60*" />
+                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="35*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Column for Input & Output selection  -->
+                <Border Grid.Column="0">
+                    <local:FolderInputOutputView/>
+                </Border>
+
+                <!--  A vertical separator  -->
+                <Border
+                    Grid.Column="1"
+                    Margin="20,0,20,0"
+                    Classes="VerticalSeparator" />
+
+                <!--  Column for the Settings  -->
+                <Border
+                    Grid.Column="2"
+                    BorderBrush="{DynamicResource AreaBorderBrush}"
+                    BorderThickness="0">
+                    <local:SettingsView/>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!--  The Execution Buttons (Start, Stop)  -->
+        <Grid Grid.Row="1">
+            <Border
+                Margin="0,20,0,20"
+                HorizontalAlignment="Center"
+                BoxShadow="1 1 1 1 DimGray"
+                CornerRadius="5">
+                <local:StartStopBarView/>
+            </Border>
+        </Grid>
+
+        <!--  Border Around everything else  -->
+        <Border Grid.Row="2" Classes="AreaBorder">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75*" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="25*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" MinHeight="100" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="200" MinHeight="100" />
+                    </Grid.RowDefinitions>
+
+                    <!--  The Current Tasks View  -->
+                    <local:CurrentTasksView Grid.Row="0" DataContext="{Binding CurrentTasks}" />
+
+                    <!--  Grid-Splitter for user convenience  -->
+                    <GridSplitter
+                        Grid.Row="1"
+                        Margin="3"
+                        ResizeDirection="Rows" />
+
+                    <!--  The Error View  -->
+                    <local:ErrorListView Grid.Row="2" DataContext="{Binding ErrorList}" />
+                </Grid>
+
+                <!--  A vertical separator between the columns  -->
+                <Border
+                    Grid.Column="1"
+                    Margin="0,0,10,0"
+                    Classes="VerticalSeparator" />
+
+                <!--  The Aggregate Statistics  -->
+                <ScrollViewer
+                    Grid.Column="2"
+                    HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto">
+                    <local:AggregateStatisticsView DataContext="{Binding AggregateStatisticsViewModel}" />
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!--  About  -->
+        <Border
+            Grid.RowSpan="3"
+            MaxWidth="450"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            BoxShadow="5 5 10 2 Gray"
+            CornerRadius="3"
+            IsVisible="{Binding About.IsVisible}">
+            <local:AboutView
+                Name="about"
+                MinWidth="100"
+                Background="{Binding $parent[Window].Background}"
+                DataContext="{Binding About}" />
+        </Border>
+
+        <!--  Status Bar  -->
+        <Label Grid.Row="3" Content="{Binding OverallStatus}" />
+        <ToggleButton
+            Grid.Row="3"
+            HorizontalAlignment="Right"
+            IsChecked="{Binding About.IsVisible}">
+            Content="🛈">
+            <ToggleButton.Template>
+                <ControlTemplate>
+                    <TextBlock Text="🛈" />
+                </ControlTemplate>
+            </ToggleButton.Template>
+        </ToggleButton>
+    </Grid>
+</UserControl>

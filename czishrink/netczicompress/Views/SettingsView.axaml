@@ -1,0 +1,85 @@
+﻿<UserControl
+    x:Class="netczicompress.Views.SettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:netczicompress.ViewModels"
+    xmlns:local="clr-namespace:netczicompress.Views"
+    d:DesignHeight="100"
+    d:DesignWidth="400"
+    x:DataType="vm:ISettingsViewModel"
+    mc:Ignorable="d">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="60*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  Sub-grid for the toggle-button(s)  -->
+        <Grid Grid.Row="0" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" VerticalAlignment="Center">
+                Recursive
+            </Label>
+            <ToggleSwitch
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                IsChecked="{Binding Recursive}"
+                ToolTip.Tip="Look for CZI files in the Input directory and all the directories that it contains recursively." />
+        </Grid>
+
+        <Label
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="0,4,0,0"
+            VerticalAlignment="Center"
+            ToolTip.Tip="The kind of operation to perform.">
+            Operation
+        </Label>
+        <ComboBox
+            Grid.Row="1"
+            Grid.Column="2"
+            Margin="0,4,0,0"
+            ItemsSource="{Binding Modes, Mode=OneTime}"
+            SelectedItem="{Binding SelectedMode}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="{x:Type vm:OperationMode}">
+                    <TextBlock Text="{Binding DisplayText}">
+                        <ToolTip.Tip>
+                            <ToolTip Content="{Binding ToolTipText}" />
+                        </ToolTip.Tip>
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Button
+            Grid.Row="0"
+            Grid.Column="2"
+            Margin="0,0,0,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Center"
+            Content="..."
+            FontSize="10"
+            ToolTip.Tip="For experts only...">
+            <Button.Flyout>
+                <Flyout>
+                    <local:AdvancedOptionsView/>
+                </Flyout>
+            </Button.Flyout>
+
+        </Button>
+    </Grid>
+</UserControl>

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<ApplicationIcon>..\netczicompress\Assets\netczicompress.ico</ApplicationIcon>
+		<AssemblyName>CziShrink</AssemblyName>
+		<Platforms>x64</Platforms>
+	</PropertyGroup>
+	<ItemGroup>
+		<Content Include="..\LICENSE.txt" Link="LICENSE.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="..\THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt" Link="THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia.Desktop" />
+		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\netczicompress\netczicompress.csproj" />
+	</ItemGroup>
+</Project>

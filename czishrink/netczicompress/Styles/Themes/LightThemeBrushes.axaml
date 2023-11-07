@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--  Colors  -->
+    <Color x:Key="ThemeBackgroundColor">#FFFFFF</Color>
+    <Color x:Key="AreaBorderColor">#DDE3ED</Color>
+    <Color x:Key="GridSplitterBackgroundColor">#DDE3ED</Color>
+
+    <Color x:Key="ProgressBarForegroundColor">#5895f7</Color>
+    <Color x:Key="ProgressBarTextColor">#FFFFFF</Color>
+
+    <Color x:Key="TextControlBorderColor">#C1CBD9</Color>
+
+    <Color x:Key="ComboBoxHoverOverBackgroundColor">#EDF2F7</Color>
+    <Color x:Key="ComboBoxHoverOverBorderColor">#07090D</Color>
+
+    <Color x:Key="ButtonBackgroundColor">#EDF2F7</Color>
+    <Color x:Key="ButtonHoverOverBackgroundColor">#DDE3ED</Color>
+    <!--<Color x:Key="ButtonPressedBackgroundColor">#0050F2</Color>-->
+    <Color x:Key="ButtonPressedHoverOverBackgroundColor">#D1D9E5</Color>
+    <Color x:Key="ButtonDisabledBackgroundColor">#F6F9FB</Color>
+
+    <Color x:Key="ButtonBorderColor">#C1CBD9</Color>
+    <Color x:Key="ButtonSelectedBorderColor">#A1AAB6</Color>
+
+    <Color x:Key="ToggleSwitchSelectedBorderColor">#A1AAB6</Color>
+
+    <Color x:Key="DataGridColumnHeaderBackgroundColor">#EDF2F7</Color>
+
+    <!--  Brushes  -->
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}" />
+    <SolidColorBrush x:Key="AreaBorderBrush" Color="{DynamicResource AreaBorderColor}" />
+    <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="{DynamicResource GridSplitterBackgroundColor}" />
+
+    <SolidColorBrush x:Key="ProgressBarForegroundBrush" Color="{DynamicResource ProgressBarForegroundColor}" />
+    <SolidColorBrush x:Key="ProgressBarTextBrush" Color="{DynamicResource ProgressBarTextColor}" />
+
+    <SolidColorBrush x:Key="TextControlBorderBrush" Color="{DynamicResource TextControlBorderColor}" />
+
+    <SolidColorBrush x:Key="ComboBoxHoverOverBackgroundBrush" Color="{DynamicResource ComboBoxHoverOverBackgroundColor}" />
+    <SolidColorBrush x:Key="ComboBoxHoverOverBorderBrush" Color="{DynamicResource ComboBoxHoverOverBorderColor}" />
+
+    <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="{DynamicResource ButtonBackgroundColor}" />
+    <SolidColorBrush x:Key="ButtonHoverOverBackgroundBrush" Color="{DynamicResource ButtonHoverOverBackgroundColor}" />
+    <!--<SolidColorBrush x:Key="ButtonPressedBackgroundBrush"
+                   Color="{DynamicResource ButtonPressedBackgroundColor}" />-->
+    <SolidColorBrush x:Key="ButtonPressedHoverOverBackgroundBrush" Color="{DynamicResource ButtonPressedHoverOverBackgroundColor}" />
+    <SolidColorBrush x:Key="ButtonDisabledBackgroundBrush" Color="{DynamicResource ButtonDisabledBackgroundColor}" />
+
+    <SolidColorBrush x:Key="ButtonBorderBrush" Color="{DynamicResource ButtonBorderColor}" />
+    <SolidColorBrush x:Key="ButtonSelectedBorderBrush" Color="{DynamicResource ButtonSelectedBorderColor}" />
+
+    <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundBrush" Color="{DynamicResource DataGridColumnHeaderBackgroundColor}" />
+
+</ResourceDictionary>
