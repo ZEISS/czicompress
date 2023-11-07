@@ -5,7 +5,7 @@ permissions:
   pull-requests: write
   contents: read
 
-name: .NET
+name: .NET Build (CziShrink)
 
 on:
   push:
