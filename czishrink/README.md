@@ -136,7 +136,7 @@ There is no guarantee that any items on this list will be added, rather it is ju
 2. Open a Powershell terminal and run [./upgrade-libczicompressc.ps1](./upgrade-libczicompressc.ps1). Run `get-help ./upgrade-libczicompressc.ps1` for more info.
 
 ## How to upgrade libczicompressc manually
-1. Build libczicompressc.so on linux-x64 and libczicompressc.dll on win-x64 in release mode, or (preferred) get them from the [github CI build](https://github.com/zeissmicroscopy/czicompress/actions/workflows/cmake.yml).
+1. Build libczicompressc.so on linux-x64 and libczicompressc.dll on win-x64 in release mode, or (preferred) get them from the [github CI build](https://github.com/zeissmicroscopy/czicompress/actions/workflows/czicompress_cmake.yml).
 1. Put the binaries into [libczicompressc/runtimes/linux-x64/native](libczicompressc/runtimes/linux-x64/native) and [libczicompressc/runtimes/win-x64/native](libczicompressc/runtimes/win-x64/native)
 1. Update the nuspec file [libczicompressc/libczicompressc.nuspec](libczicompressc/libczicompressc.nuspec):
     * `package/metadata/version` must be the 'ProductVersion' of libczicompressc.dll (explorer: Properties/Details)
@@ -145,7 +145,7 @@ There is no guarantee that any items on this list will be added, rather it is ju
 1. Open a shell in [libczicompressc](libczicompressc), and run `path/to/nuget pack libczicompressc.nuspec`
 1. Move the resulting nupkg into [packages_local](packages_local) and delete the old package from there.
 1. Change the version of libczicompressc in [Directory.Packages.props](Directory.Packages.props)
-1. If major or minor version has changed, change the expected version number in [PInvokeFileProcessor](https://github.com/m-ringler/netczicompress/blob/a254a4a919120ad61aad707f39749709f0a36e1a/netczicompress/Models/PInvokeFileProcessor.cs#L124).
+1. If major or minor version has changed, change the expected version number in [PInvokeFileProcessor](netczicompress/Models/PInvokeFileProcessor.cs).
 1. Rebuild netczicompress.sln
 1. Run netczicompressTests
 1. Undo git changes to the libczicompressc.dll and libczicompressc.so files (no need to commit them, they are in the nupkg).
