@@ -1,0 +1,62 @@
+<UserControl x:Class="netczicompress.Views.AggregateIndicationView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:netczicompress.ViewModels"
+             xmlns:ia="https://github.com/projektanker/icons.avalonia"
+             xmlns:converters="clr-namespace:netczicompress.ViewModels.Converters"
+             d:DesignHeight="450"
+             d:DesignWidth="300"
+             x:DataType="vm:IAggregateIndicationViewModel"
+             mc:Ignorable="d">
+
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <converters:AggregateStatusToIconConverter x:Key="AggregateStatusToIconConverter" />
+      <converters:AggregateStatusToForegroundConverter x:Key="AggregateStatusToForegroundConverter" />
+      <converters:AggregateStatusToAnimationConverter x:Key="AggregateStatusToAnimationConverter" />
+      <converters:AggregateStatusToTextConverter x:Key="AggregateStatusToTextConverter" />
+    </ResourceDictionary>
+  </UserControl.Resources>
+
+  <!--The Aggregate Status-->
+  <!--Please note: We tried using Avalonia Styles which depend on an enum value (i.e. many states)
+			but there seems to be no provision for this.
+			See: https://github.com/AvaloniaUI/Avalonia/discussions/12087
+			-->
+  <!--<Border Margin="0 5 0 5"
+          Padding="3"
+          Background="{DynamicResource ThemeAccentBrush}"
+          ToolTip.Placement="Bottom">-->
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="Auto" />
+    </Grid.ColumnDefinitions>
+
+    <ia:Icon Grid.Column="0"
+             FontSize="50"
+             Margin="20 0 0 0"
+             Value="{Binding IndicationStatus,
+					 Mode=OneWay,
+					 Converter={StaticResource AggregateStatusToIconConverter}}"
+             Foreground="{Binding IndicationStatus,
+					 Mode=OneWay,
+					 Converter={StaticResource AggregateStatusToForegroundConverter}}"
+             Animation="{Binding IndicationStatus,
+					 Mode=OneWay,
+					 Converter={StaticResource AggregateStatusToAnimationConverter}}">
+    </ia:Icon>
+
+    <Label Grid.Column="1"
+           Margin="20 12 5 0"
+           HorizontalAlignment="Left"
+           Content="{Binding IndicationStatus,
+				  Mode=OneWay,
+				  Converter={StaticResource AggregateStatusToTextConverter}}">
+    </Label>
+  </Grid>
+  <!--</Border>-->
+
+</UserControl>

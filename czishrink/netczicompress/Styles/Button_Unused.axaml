@@ -1,0 +1,51 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <!-- Add Controls for Previewer Here -->
+    </Border>
+  </Design.PreviewWith>
+
+
+  <!--
+	This represents the first attempt to style Buttons according to ZUI style.
+	It worked to a point, but things like "Pressed", "Pressed HoverOver", etc.
+	were not completely working.
+	Therefore, we took the original "ControlTheme" for Buttons, and modified that.
+	
+	We've kept it because it is worth a second try to "style buttons solely using style selectors".
+	
+	Please Note: Since there exists no "StyleInclude" for this style-file, there is no chance
+	that the styles contained herein will have an effect.
+	-->
+
+  <Style Selector="Button">
+    <Setter Property="Background" Value="{DynamicResource ButtonBackgroundBrush}" />
+  </Style>
+
+  <!-- PointerOver States -->
+  <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ButtonHoverOverBackgroundBrush}" />
+  </Style>
+
+  <!-- Pressed States -->
+  <Style Selector="Button:pressed">
+    <Setter Property="Background" Value="{DynamicResource ButtonPressedHoverOverBackgroundBrush}" />
+    <!--<Setter Property="RenderTransform" Value="scale(0.98)" />-->
+  </Style>
+
+  <Style Selector="Button:accent">
+    <Setter Property="Background" Value="{DynamicResource ButtonPressedHoverOverBackgroundBrush}" />
+  </Style>
+
+
+  <Style Selector="Button:pressed  /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ButtonPressedHoverOverBackgroundBrush}" />
+  </Style>
+
+
+  <Style Selector="Button:pressed  /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ButtonPressedHoverOverBackgroundBrush}" />
+  </Style>
+
+</Styles>

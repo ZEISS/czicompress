@@ -1,0 +1,41 @@
+<UserControl
+  x:Class="netczicompress.Views.AboutView"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="clr-namespace:netczicompress.ViewModels"
+  d:DesignHeight="450"
+  d:DesignWidth="300"
+  x:DataType="vm:AboutViewModel"
+  mc:Ignorable="d">
+  <DockPanel>
+    <Button
+      HorizontalAlignment="Right"
+      Command="{Binding CloseAboutCommand}"
+      DockPanel.Dock="Top">
+      ✖
+    </Button>
+    <StackPanel Margin="10" Orientation="Vertical">
+      <StackPanel.Styles>
+        <Style Selector="TextBlock">
+          <Setter Property="FontSize" Value="10" />
+          <Setter Property="TextWrapping" Value="Wrap" />
+          <Setter Property="Margin" Value="0 10 0 0" />
+        </Style>
+        <Style Selector="Button">
+          <Setter Property="Margin" Value="0 10 0 0" />
+        </Style>
+      </StackPanel.Styles>
+      <TextBlock Text="{Binding ProgramVersionAndCopyRight}" />
+      <TextBlock Text="{Binding LibraryName, StringFormat='Based on {0}'}" />
+      <TextBlock>
+        This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+      </TextBlock>
+      <Button Command="{Binding ShowTextFileCommand}" CommandParameter="LICENSE.txt">Show License</Button>
+      <TextBlock Text="This programs contains third party libraries" />
+      <Button Command="{Binding ShowTextFileCommand}" CommandParameter="THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt">Show Third Party Licenses</Button>
+    </StackPanel>
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,58 @@
+<UserControl
+  x:Class="netczicompress.Views.CurrentTasksView"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="clr-namespace:netczicompress.ViewModels"
+  d:DesignHeight="450"
+  d:DesignWidth="800"
+  x:DataType="vm:ICurrentTasksViewModel"
+  mc:Ignorable="d">
+
+  <DataGrid
+    CanUserReorderColumns="False"
+    CanUserResizeColumns="True"
+    CanUserSortColumns="True"
+    GridLinesVisibility="All"
+    HorizontalScrollBarVisibility="Auto"
+    IsReadOnly="True"
+    ItemsSource="{Binding CompressionTasks}"
+    RowBackground="Transparent"
+    RowHeight="{DynamicResource DataGridRowHeight}"
+    VerticalScrollBarVisibility="Auto">
+
+    <DataGrid.Columns>
+      <DataGridTemplateColumn Width="75*">
+        <DataGridTemplateColumn.HeaderTemplate>
+          <DataTemplate>
+            <TextBlock Classes="DataGridColumnHeader" Text="Image File" />
+          </DataTemplate>
+        </DataGridTemplateColumn.HeaderTemplate>
+        <DataGridTemplateColumn.CellTemplate>
+          <DataTemplate DataType="vm:ICompressionTaskViewModel">
+            <TextBlock Classes="DataGridCellText" Text="{Binding FileName}" />
+          </DataTemplate>
+        </DataGridTemplateColumn.CellTemplate>
+      </DataGridTemplateColumn>
+
+      <DataGridTemplateColumn Width="25*">
+        <DataGridTemplateColumn.HeaderTemplate>
+          <DataTemplate>
+            <TextBlock Classes="DataGridColumnHeader" Text="Progress" />
+          </DataTemplate>
+        </DataGridTemplateColumn.HeaderTemplate>
+        <DataGridTemplateColumn.CellTemplate>
+          <DataTemplate DataType="vm:ICompressionTaskViewModel">
+            <ProgressBar
+              HorizontalAlignment="Center"
+              IsIndeterminate="{Binding IsIndeterminateProgress}"
+              ShowProgressText="{Binding !IsIndeterminateProgress}"
+              Value="{Binding ProgressPercent}" />
+          </DataTemplate>
+        </DataGridTemplateColumn.CellTemplate>
+      </DataGridTemplateColumn>
+    </DataGrid.Columns>
+  </DataGrid>
+
+</UserControl>

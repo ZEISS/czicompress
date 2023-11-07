@@ -1,0 +1,44 @@
+---
+name: "CodeQL"
+
+on:
+  # push:
+  #   branches: [main]
+  #   paths: ["czishrink/**", ".github/workflows/czishrink_codeql.yml"]
+  # pull_request:
+  #   branches: [main]
+  #   paths: ["czishrink/**", ".github/workflows/czishrink_codeql.yml"]
+  workflow_dispatch: {}
+
+permissions: read-all
+
+jobs:
+  analyze:
+    name: Analyze CziShrink
+    defaults:
+      run:
+        working-directory: ${{github.workspace}}/czishrink
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['csharp']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v1
+        with:
+          working-directory: czishrink
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
