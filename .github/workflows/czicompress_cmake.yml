@@ -1,5 +1,5 @@
 ---
-name: CMake Build
+name: CMake Build (czicompress)
 
 on:
   push:
