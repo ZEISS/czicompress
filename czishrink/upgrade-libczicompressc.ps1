@@ -1,22 +1,22 @@
 <#
 .SYNOPSIS
 
-Upgrades libczicompressc.nupkg in CziShrink with the latest cmake build of main of https://github.com/ZEISS/czicompress.
+Upgrades libczicompressc.nupkg in CziShrink with the latest cmake build of the main branch of czicompress.
 
 .DESCRIPTION
 
-This script should be run in the czishrink directory of a clone of https://github.com/m-ringler/netczicompress.
-Make sure that the working directory is clean. Otherwise the script will stash local changes.
+This script should be run in the czishrink directory of a clone of https://github.com/ZEISS/czicompress.
+Make sure that you do not have any uncommited changes before you run the script. Otherwise the script will stash such changes.
 
 You must have git and dotnet on your path.
 
-The script needs to have access to both the https://github.com/ZEISS/czicompress and the https://github.com/m-ringler/netczicompress github repo,
+The script needs to have access to the https://github.com/ZEISS/czicompress github repo (or your fork of that repo),
 you need to
 	* create a 'classic' personal access token at https://github.com/settings/tokens or with github cli,
 	* and authorize it for the ZEISS organization via the "Configure SSO" button,
 	* and store it in a GITHUB_TOKEN environment variable or pass it as the -GithubToken parameter to this script.
-
-If you specify a -DownloadFolder the script will use the data downloaded to that folder in a previous run. This provides rudimentary resume-on-error functionality.
+ 
+If you specify a -DownloadFolder the script will reuse data downloaded to that folder in a previous run. This provides rudimentary resume-on-error functionality.
 
 .EXAMPLE
 
@@ -186,7 +186,7 @@ if (![string]::IsNullOrEmpty($PSScriptRoot)) {
 	{
 		Set-Location "libczicompressc"
 	}  elseif ("libczicompress" -ne $current_dir_name) {
-		throw "Please CD to the /czishrink directory of a netczicompress clone."
+		throw "Please CD to the /czishrink directory of a czicompress clone."
 	}
 }
 
