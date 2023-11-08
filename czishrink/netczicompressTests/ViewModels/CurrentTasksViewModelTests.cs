@@ -44,7 +44,8 @@ public class CurrentTasksViewModelTests
         // ARRANGE
         var sut = new CurrentTasksViewModel(ImmediateScheduler.Instance);
 
-        var message = new FileStarting(Mock.Of<IFileInfo>(), new BehaviorSubject<int>(100));
+        using var progress = new BehaviorSubject<int>(100);
+        var message = new FileStarting(Mock.Of<IFileInfo>(), progress);
 
         // ACT
         sut.OnNext(message);
@@ -93,7 +94,7 @@ public class CurrentTasksViewModelTests
         var sut = new CurrentTasksViewModel(guiScheduler);
 
         sut.OnNextAll(CreateFixture().CreateMany<FileStarting>(5));
-        var progress = new BehaviorSubject<int>(0);
+        using var progress = new BehaviorSubject<int>(0);
         var completingTask = new FileStarting(
             Mock.Of<IFileInfo>(f => f.FullName == "Foo_Bar_Baz"),
             progress);
@@ -116,7 +117,7 @@ public class CurrentTasksViewModelTests
         beforeSchedulerRun.SequenceEqual(initialTasks).Should().BeTrue();
 
         afterSchedulerRun.Should().HaveCount(10);
-        afterSchedulerRun.SequenceEqual(initialTasks.Where(t => t != taskViewModel)).Should().BeTrue();
+        afterSchedulerRun.SequenceEqual(initialTasks.Where(t => !object.ReferenceEquals(t, taskViewModel))).Should().BeTrue();
     }
 
     private static IFixture CreateFixture()

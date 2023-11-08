@@ -22,10 +22,7 @@ public class ThreadCountTests
     [InlineData(230)]
     public void OutOfRange_ShouldThrowOutOfRangeException(int value)
     {
-        var act = () =>
-        {
-            var sut = new ThreadCount() { Value = value };
-        };
+        var act = () => _ = new ThreadCount { Value = value };
 
         act.Should().Throw<ArgumentOutOfRangeException>();
     }

@@ -143,7 +143,6 @@ public class PInvokeFileProcessorTests
 
         var compressedSize = GetLength(compressed);
         var decompressedSize = GetLength(uncompressed);
-        var originalSize = GetLength(testFile);
 
         // ASSERT
         compressedSize.Should().Be(expectedCompressedSize);

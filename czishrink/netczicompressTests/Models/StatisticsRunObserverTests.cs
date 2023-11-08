@@ -45,7 +45,7 @@ public class StatisticsRunObserverTests
             new(fileMock, 10, 1000, null, "Failed"),
         };
 
-        var observable = new Subject<FileFinished>();
+        using var observable = new Subject<FileFinished>();
         var watch = Stopwatch.StartNew();
 
         var sut = new StatisticsRunObserver(

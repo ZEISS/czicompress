@@ -188,8 +188,8 @@ public partial class MainViewModelTests
                 It.Is<FolderCompressorParameters>(
                     x => x.InputDir.FullName == sut.InputDirectory &&
                         x.OutputDir.FullName == sut.OutputDirectory &&
-                        x.InputDir.FileSystem == fs &&
-                        x.OutputDir.FileSystem == fs &&
+                        object.ReferenceEquals(x.InputDir.FileSystem, fs) &&
+                        object.ReferenceEquals(x.OutputDir.FileSystem, fs) &&
                         x.Recursive == recursive &&
                         x.Mode == selectedMode.Value),
                 It.Is<CancellationToken>(t => !t.IsCancellationRequested)),

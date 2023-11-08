@@ -22,7 +22,7 @@ public class CompressionTaskViewModelTests
     {
         // ARRANGE
         var fileName = CreateFixture().Create<string>();
-        var progress = new BehaviorSubject<int>(0);
+        using var progress = new BehaviorSubject<int>(0);
         var sut = new CompressionTaskViewModel(
             fileName,
             progress);

@@ -23,10 +23,7 @@ public class CompressionLevelTests
     [InlineData(230)]
     public void OutOfRange_ShouldThrowOutOfRangeException(int value)
     {
-        var act = () =>
-        {
-            var sut = new CompressionLevel() { Value = value };
-        };
+        var act = () => _ = new CompressionLevel { Value = value };
 
         act.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -37,7 +34,7 @@ public class CompressionLevelTests
     [InlineData(0)]
     public void InRangeValue_ShouldBeEqual(int value)
     {
-        var sut = new CompressionLevel() { Value = value };
+        var sut = new CompressionLevel { Value = value };
         sut.Value.Should().Be(value);
     }
 }

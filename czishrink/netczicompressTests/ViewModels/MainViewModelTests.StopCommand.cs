@@ -30,7 +30,6 @@ public partial class MainViewModelTests
         _ = fixture.Freeze<Mock<IFolderCompressor>>().WithWaitForCancellation();
 
         var sut = fixture.Create<MainViewModel>();
-        ICommand start = sut.StartCommand;
         ICommand stop = sut.StopCommand;
         SetFolders(sut, fs);
 

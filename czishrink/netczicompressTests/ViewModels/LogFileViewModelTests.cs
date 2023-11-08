@@ -85,7 +85,7 @@ public class LogFileViewModelTests
         }
 
         // ACT
-        var subject = new Subject<CompressorMessage.FileFinished>();
+        using var subject = new Subject<CompressorMessage.FileFinished>();
         sut.ObserveRun(p, subject.AsObservable());
         var messages = fixture.CreateMany<CompressorMessage.FileFinished>();
         subject.OnNextAll(messages);
@@ -317,7 +317,7 @@ public class LogFileViewModelTests
         var fixture = CreateFixture();
         fixture.Inject<IScheduler>(ImmediateScheduler.Instance);
         var loggingStrategyMock = fixture.Freeze<Mock<ILoggingStrategy>>();
-        var logFile = Mock.Of<IFileInfo>(x => x.Exists == true);
+        var logFile = Mock.Of<IFileInfo>(x => x.Exists);
         var sut = fixture.Create<LogFileViewModel>();
 
         var p = fixture.Create<FolderCompressorParameters>();

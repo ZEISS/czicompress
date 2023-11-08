@@ -8,7 +8,6 @@ using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Reactive;
 using System.Reactive.Threading.Tasks;
-using System.Windows.Input;
 
 using AutoFixture;
 
@@ -190,8 +189,6 @@ public partial class MainViewModelTests
         _ = fixture.Freeze<Mock<IFolderCompressor>>().WithWaitForCancellation();
 
         var sut = fixture.Create<MainViewModel>();
-        ICommand start = sut.StartCommand;
-        ICommand stop = sut.StopCommand;
         SetFolders(sut, fs);
 
         Dictionary<string, string> overallStatusWhen = new();

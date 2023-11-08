@@ -414,7 +414,8 @@ public class ErrorListViewModelTests
     private static IObservable<(ErrorItem[] Snapshot, ErrorItem? SelectedItem)> ObserveSelectedItemChanges(ErrorListViewModel sut)
     {
         var changes = sut.ObservableForProperty(vm => vm.SelectedErrorItem);
-        return from change in changes select (sut.Errors.ToArray(), sut.SelectedErrorItem);
+
+        return from change in changes select (sut.Errors.ToArray(), change.Value);
     }
 
     private static string ToString(NotifyCollectionChangedEventArgs e)

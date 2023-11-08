@@ -21,10 +21,11 @@ public class ErrorItemTests
     [Fact]
     public void WritableProperties_AreInitOnly()
     {
-        foreach (var property in WritableProperties())
-        {
-            var setMethod = property.SetMethod;
+        var writablePropertySetters = from p in WritableProperties()
+                                      select p.SetMethod;
 
+        foreach (var setMethod in writablePropertySetters)
+        {
             // Get the modifiers applied to the return parameter.
             var setMethodReturnParameterModifiers = setMethod!.ReturnParameter.GetRequiredCustomModifiers();
 
