@@ -4,10 +4,8 @@ name: CMake Build (czicompress)
 on:
   push:
     branches: ["main"]  # run only when merge with main branch
-    paths: ["czicompress/**"]
   pull_request:
     branches: ["main"]  # run only when merge with main branch
-    paths: ["czicompress/**"]
   workflow_dispatch: {}
 
 permissions:

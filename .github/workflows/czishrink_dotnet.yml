@@ -10,10 +10,8 @@ name: .NET Build (CziShrink)
 on:
   push:
     branches: ["main"]
-    paths: ["czishrink/**"]
   pull_request:
     branches: ["main"]
-    paths: ["czishrink/**"]
   workflow_dispatch: {}
 
 jobs:
