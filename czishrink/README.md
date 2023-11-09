@@ -51,7 +51,7 @@ The intent of the tool is to be a bulk-compression utility.
 | Operation | Description |
 |-----------|-------------|
 | Compress uncompressed data                    |Compresses only uncompresed subblocks and copies others.|
-| Compress uncompressed and Zstd-compressed data|Compresses subblocks that were orginally uncompressed or compressed with zstd. |
+| Compress uncompressed and Zstd-compressed data|Compresses subblocks that were originally uncompressed or compressed with zstd. |
 | Compress all data                             |Compresses all subblocks regardless of current compression method (if possible). |
 | Decompress all data                           |Decompresses all possible subblocks.  |
 | Dry Run                                       |Finds all CZI files in the input folder but does not create any output CZI files. Like the other operations, it creates a CSV report in the output folder.|
