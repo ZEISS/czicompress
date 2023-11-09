@@ -28,11 +28,10 @@ component_management:
       - type: patch
         informational: true
   individual_components:
-    # Placeholder once coverage measured for czicompress
-    # - component_id: "id_czicompress"
-    #   name: czicompress
-    #   paths:
-    #     - "czicompress/"
+    - component_id: "id_czicompress"
+      name: czicompress
+      paths:
+        - "czicompress/"
     - component_id: "id_czishrink"
       name: czishrink
       paths:
