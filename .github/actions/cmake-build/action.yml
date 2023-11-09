@@ -20,6 +20,9 @@ inputs:
   platform:
     description: 'OS platform'
     required: true
+  src-dir:
+    description: 'The directory with the sources'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -33,11 +36,13 @@ runs:
 
     - name: Set toolchain path
       shell: bash
+      working-directory: ${{inputs.src-dir}}
       run: echo "TOOLCHAIN_PATH=${{inputs.path-toolchain}}" >> "$GITHUB_ENV"
 
     - name: Install dependencies
       if: inputs.package == 'ON'
       shell: bash
+      working-directory: ${{inputs.src-dir}}
       run: |
          # We install the following packages: eigen3, catch2, cli11. Installing them with vcpkg (and caching them)
          # is faster than downloading and building them from source (which is the default behavior of the CZICompress-build-system).
@@ -45,6 +50,7 @@ runs:
 
     - name: Configure CMake
       shell: bash
+      working-directory: ${{inputs.src-dir}}
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       #
@@ -53,5 +59,6 @@ runs:
 
     - name: Build software
       shell: bash
+      working-directory: ${{inputs.src-dir}}
       # Build your program with the given configuration
       run: cmake --build build --config ${{inputs.build-type}}

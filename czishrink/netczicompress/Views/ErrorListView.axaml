@@ -1,0 +1,68 @@
+<UserControl
+  x:Class="netczicompress.Views.ErrorListView"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="clr-namespace:netczicompress.ViewModels"
+  d:DesignHeight="450"
+  d:DesignWidth="800"
+  x:DataType="vm:IErrorListViewModel"
+  mc:Ignorable="d">
+
+  <DataGrid
+    Name="dataGrid"
+    CanUserReorderColumns="False"
+    CanUserResizeColumns="True"
+    CanUserSortColumns="True"
+    GridLinesVisibility="All"
+    HorizontalScrollBarVisibility="Auto"
+    IsReadOnly="True"
+    ItemsSource="{Binding Errors}"
+    RowBackground="Transparent"
+    RowHeight="{DynamicResource DataGridRowHeight}"
+    SelectedItem="{Binding SelectedErrorItem, Mode=TwoWay}"
+    SelectionChanged="ErrorListDataGrid_OnSelectionChanged"
+    VerticalScrollBarVisibility="Auto">
+    <DataGrid.ContextMenu>
+      <ContextMenu>
+        <MenuItem
+          Name="openSelectedFileMenuItem"
+          Command="{Binding OpenSelectedFileCommand}"
+          Header="Open" />
+        <MenuItem
+          Name="showSelectedFileMenuItem"
+          Command="{Binding ShowSelectedFileCommand}"
+          Header="Show in File Manager" />
+        <MenuItem Click="CopySelectedFilePaths" Header="Copy Path" />
+      </ContextMenu>
+    </DataGrid.ContextMenu>
+    <DataGrid.Columns>
+      <DataGridTemplateColumn Width="*">
+        <DataGridTemplateColumn.HeaderTemplate>
+          <DataTemplate>
+            <TextBlock Classes="DataGridColumnHeader" Text="Image File" />
+          </DataTemplate>
+        </DataGridTemplateColumn.HeaderTemplate>
+        <DataGridTemplateColumn.CellTemplate>
+          <DataTemplate DataType="vm:ErrorItem">
+            <TextBlock Classes="DataGridCellText" Text="{Binding File}" />
+          </DataTemplate>
+        </DataGridTemplateColumn.CellTemplate>
+      </DataGridTemplateColumn>
+
+      <DataGridTemplateColumn Width="*">
+        <DataGridTemplateColumn.HeaderTemplate>
+          <DataTemplate>
+            <TextBlock Classes="DataGridColumnHeader" Text="Error Message" />
+          </DataTemplate>
+        </DataGridTemplateColumn.HeaderTemplate>
+        <DataGridTemplateColumn.CellTemplate>
+          <DataTemplate DataType="vm:ErrorItem">
+            <TextBlock Classes="DataGridCellText" Text="{Binding ErrorMessage}" />
+          </DataTemplate>
+        </DataGridTemplateColumn.CellTemplate>
+      </DataGridTemplateColumn>
+    </DataGrid.Columns>
+  </DataGrid>
+</UserControl>

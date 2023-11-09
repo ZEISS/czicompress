@@ -1,0 +1,135 @@
+---
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+permissions:
+  pull-requests: write
+  contents: read
+
+name: .NET Build (CziShrink)
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    defaults:
+      run:
+        working-directory: czishrink
+    name: ${{matrix.config.name}}
+    runs-on: ${{matrix.config.os}}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {
+            name: windows,
+            os: windows-latest,
+            osfamily: win,
+          }
+          - {
+            name: ubuntu,
+            os: ubuntu-latest,
+            osfamily: linux,
+          }
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Get Version from Directory.Build.props
+        id: getversion
+        run: |
+          $xml = [xml](Get-Content -Path "Directory.Build.props")
+          $version = $xml.SelectSingleNode('//VersionPrefix').'#text' + "-" + $xml.SelectSingleNode('//VersionSuffix').'#text'
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        shell: pwsh
+
+      - name: Add build ID to version in Directory.Build.props
+        run: |
+          Write-Output "Add build ID ${{ github.run_id }} to VersionSuffix in Directory.Build.props"
+          $file = Get-Item "Directory.Build.props"
+          $xml = [xml](Get-Content -Path $file.FullName)
+          $versionElement = $xml.SelectSingleNode('//VersionSuffix')
+          $versionElement.'#text' += '+${{ github.run_id }}'
+          $xml.Save($file.FullName)
+        shell: pwsh
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore -c Release
+
+      - name: Test
+        run: >
+          dotnet test
+          -c Release
+          --no-build
+          --verbosity normal
+          --logger trx
+          --results-directory "TestResults"
+          -p:CollectCoverage=true
+          -p:CoverletOutputFormat=cobertura
+          -p:CoverletOutput=${{ github.workspace }}/TestResults/coverage.cobertura.xml
+          -p:ExcludeByAttribute=GeneratedCodeAttribute%2cObsoleteAttribute
+          -p:ExcludeByFile=**/*.axaml%2c**/*.g.cs
+          -p:Exclude='[netczicompress]netczicompress.Views.*'
+
+      - name: Upload dotnet test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dotnet-results-${{ matrix.config.name }}
+          path: TestResults
+        # Use always() to also publish test results when there are test failures
+        if: ${{ always() }}
+
+      - name: Code Coverage Report
+        uses: irongut/CodeCoverageSummary@v1.3.0
+        if: matrix.config.name == 'ubuntu'
+        with:
+          filename: TestResults/coverage.cobertura.xml
+          badge: true
+          fail_below_min: false
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: false
+          indicators: true
+          output: both
+          thresholds: '60 80'
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request' && matrix.config.name == 'ubuntu'
+        with:
+          recreate: true
+          path: code-coverage-results.md
+
+      - name: Publish
+        if: github.event_name == 'push'
+        run: >
+          dotnet publish netczicompress.Desktop/netczicompress.Desktop.csproj
+          -c Release
+          -a x64
+          --self-contained
+          -p:PublishSingleFile=true
+          -p:PublishReadyToRun=true
+          -p:PublishReadyToRunShowWarnings=true
+          -o ${{ github.workspace }}/publish
+
+      - name: Upload published binaries
+        uses: actions/upload-artifact@v3
+        if: github.event_name == 'push'
+        with:
+          name: CziShrink_${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
+          path: publish

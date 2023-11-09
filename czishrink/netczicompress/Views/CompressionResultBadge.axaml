@@ -1,0 +1,192 @@
+<Panel
+    x:Class="netczicompress.Views.CompressionResultBadge"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:netczicompress.ViewModels.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:netczicompress.ViewModels"
+    Height="218"
+    x:DataType="viewModels:IAggregateStatisticsViewModel"
+    Background="WhiteSmoke"
+    mc:Ignorable="d">
+    <Panel.Resources>
+        <ResourceDictionary>
+            <converters:BytesToStringConverter x:Key="BytesToStringConverter" />
+            <converters:FloatToCompressionRatioStringConverter x:Key="FloatToCompressionRatioStringConverter" />
+        </ResourceDictionary>
+    </Panel.Resources>
+    <Border BorderBrush="Black" BorderThickness="1">
+        <Grid Margin="5,5,5,5">
+            <Grid.Styles>
+                <Style Selector="TextBlock.StatisticsLabel">
+                    <Setter Property="HorizontalAlignment" Value="Left" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0 4 0 4" />
+                    <Setter Property="FontFamily" Value="FreeMono,Consolas,Monospace,Courier" />
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
+                <Style Selector="TextBlock.StatisticsValue">
+                    <Setter Property="HorizontalAlignment" Value="Left" />
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                    <Setter Property="Margin" Value="0 4 0 4" />
+                    <Setter Property="FontFamily" Value="FreeMono,Consolas,Monospace,Courier" />
+                    <Setter Property="FontSize" Value="12" />
+                </Style>
+            </Grid.Styles>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="10,0"
+                    HorizontalAlignment="Left"
+                    FontWeight="Normal"
+                    Foreground="Black"
+                    Text="I used CZI Shrink to" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="10,0"
+                    HorizontalAlignment="Left"
+                    FontWeight="Normal"
+                    Foreground="Black"
+                    Text="shrink my data:" />
+                <Image
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    Grid.Column="0"
+                    Width="32"
+                    Height="32"
+                    Margin="0,0,0,0"
+                    Source="avares://netczicompress/Assets/Logo.png" />
+            </Grid>
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="0,8,0,8"
+                HorizontalAlignment="Center"
+                FontWeight="Bold"
+                Foreground="Black"
+                Text="Compression Statistics" />
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Classes="StatisticsLabel"
+                Foreground="Black"
+                Text="Files" />
+            <TextBlock
+                x:Name="FilesWithoutErrorsValue"
+                Grid.Row="2"
+                Grid.Column="2"
+                HorizontalAlignment="Left"
+                Classes="StatisticsValue"
+                Foreground="Black"
+                Text="1234" />
+            <TextBlock
+                Grid.Row="3"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Classes="StatisticsLabel"
+                Foreground="Black"
+                Text="Duration" />
+            <TextBlock
+                x:Name="DurationValue"
+                Grid.Row="3"
+                Grid.Column="2"
+                HorizontalAlignment="Left"
+                Classes="StatisticsValue"
+                Foreground="Black"
+                Text="1234" />
+            <TextBlock
+                Grid.Row="4"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Classes="StatisticsLabel"
+                Foreground="Black"
+                Text="Input Size" />
+            <TextBlock
+                x:Name="InputSizeValue"
+                Grid.Row="4"
+                Grid.Column="2"
+                HorizontalAlignment="Left"
+                Classes="StatisticsValue"
+                Foreground="Black"
+                Text="1234" />
+            <TextBlock
+                Grid.Row="5"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Classes="StatisticsLabel"
+                Foreground="Black"
+                Text="Output Size" />
+            <TextBlock
+                x:Name="OutputSizeValue"
+                Grid.Row="5"
+                Grid.Column="2"
+                HorizontalAlignment="Left"
+                Classes="StatisticsValue"
+                Foreground="Black"
+                Text="1234" />
+            <TextBlock
+                Grid.Row="6"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Classes="StatisticsLabel"
+                Foreground="Black"
+                Text="Delta Size" />
+            <TextBlock
+                x:Name="DeltaSizeValue"
+                Grid.Row="6"
+                Grid.Column="2"
+                HorizontalAlignment="Left"
+                Classes="StatisticsValue"
+                Foreground="Black"
+                Text="1234" />
+            <TextBlock
+                Grid.Row="7"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Classes="StatisticsLabel"
+                Foreground="Black"
+                Text="Output/Input Ratio" />
+            <TextBlock
+                x:Name="OutputInputRatioValue"
+                Grid.Row="7"
+                Grid.Column="2"
+                HorizontalAlignment="Left"
+                Classes="StatisticsValue"
+                Foreground="Black"
+                Text="1234" />
+
+        </Grid>
+    </Border>
+</Panel>

@@ -1,0 +1,46 @@
+﻿<UserControl
+    x:Class="netczicompress.Views.FolderInputOutputView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:netczicompress.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:netczicompress.ViewModels"
+    d:DesignHeight="100"
+    d:DesignWidth="400"
+    x:DataType="vm:IFolderInputOutputViewModel"
+    mc:Ignorable="d">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="30" />
+            <ColumnDefinition Width="60*" />
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0">
+            Input
+        </Label>
+        <Label
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="0,4,0,0">
+            Output
+        </Label>
+
+        <local:FolderPicker
+            Grid.Row="0"
+            Grid.Column="2"
+            Folder="{Binding InputDirectory}"
+            ToolTip.Tip="Choose an input folder." />
+        <local:FolderPicker
+            Grid.Row="1"
+            Grid.Column="2"
+            Margin="0,4,0,0"
+            Folder="{Binding OutputDirectory}"
+            ToolTip.Tip="Choose an output folder." />
+    </Grid>
+</UserControl>

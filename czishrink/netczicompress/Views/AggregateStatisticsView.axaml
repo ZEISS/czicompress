@@ -1,0 +1,206 @@
+<UserControl
+    x:Class="netczicompress.Views.AggregateStatisticsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:netczicompress.ViewModels.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="https://github.com/projektanker/icons.avalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="clr-namespace:netczicompress.Views"
+    xmlns:vm="clr-namespace:netczicompress.ViewModels"
+    d:DesignHeight="550"
+    d:DesignWidth="300"
+    x:DataType="vm:IAggregateStatisticsViewModel"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:BytesToStringConverter x:Key="BytesToStringConverter" />
+            <converters:FloatToCompressionRatioStringConverter x:Key="FloatToCompressionRatioStringConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Labels and Values for the Statistics  -->
+        <Grid Grid.Row="0" Margin="0,0,10,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label
+                Grid.Row="0"
+                Margin="0,20,0,20"
+                HorizontalAlignment="Center"
+                FontSize="16"
+                ToolTip.Tip="Basic statistics about the performed operation.">
+                Compression Statistics
+            </Label>
+            <Grid Grid.Row="1">
+                <Grid.Styles>
+                    <Style Selector="Label.StatisticsLabel">
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="4 4 0 4" />
+                    </Style>
+
+                    <Style Selector="TextBox.StatisticsValue">
+                        <Setter Property="IsReadOnly" Value="True" />
+                        <Setter Property="HorizontalAlignment" Value="Right" />
+                        <Setter Property="HorizontalContentAlignment" Value="Left" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="VerticalContentAlignment" Value="Center" />
+                        <Setter Property="TextAlignment" Value="Right" />
+                        <Setter Property="MinWidth" Value="130" />
+                        <Setter Property="BorderThickness" Value="0 0 0 1" />
+                        <Setter Property="CornerRadius" Value="0" />
+                        <Setter Property="Margin" Value="0 4 4 4" />
+                        <Setter Property="FontFamily" Value="FreeMono,Consolas,Monospace,Courier" />
+                        <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
+                    </Style>
+                </Grid.Styles>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Classes="StatisticsLabel">
+                    Files With Errors
+                </Label>
+                <TextBox
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Classes="StatisticsValue"
+                    Text="{Binding FilesWithErrors, Mode=OneWay, StringFormat='{}{0:D}'}" />
+
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Classes="StatisticsLabel">
+                    Files Without Errors
+                </Label>
+                <TextBox
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Classes="StatisticsValue"
+                    Text="{Binding FilesWithNoErrors, Mode=OneWay, StringFormat='{}{0:D}'}" />
+
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Classes="StatisticsLabel">
+                    Duration
+                </Label>
+                <TextBox
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Classes="StatisticsValue"
+                    Text="{Binding Duration, Mode=OneWay, StringFormat='{}{0:hh\\:mm\\.ss}'}" />
+
+                <Label
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Classes="StatisticsLabel">
+                    Input Size
+                </Label>
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Classes="StatisticsValue"
+                    Text="{Binding InputBytes, Mode=OneWay, Converter={StaticResource BytesToStringConverter}}" />
+
+                <Label
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Classes="StatisticsLabel">
+                    Output Size
+                </Label>
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Classes="StatisticsValue"
+                    Text="{Binding OutputBytes, Mode=OneWay, Converter={StaticResource BytesToStringConverter}}" />
+
+                <Label
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Classes="StatisticsLabel">
+                    Delta Size
+                </Label>
+                <TextBox
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    Classes="StatisticsValue"
+                    Text="{Binding DeltaBytes, Mode=OneWay, Converter={StaticResource BytesToStringConverter}}" />
+
+                <Label
+                    Grid.Row="6"
+                    Grid.Column="0"
+                    Classes="StatisticsLabel">
+                    Output / Input Ratio
+                </Label>
+                <TextBox
+                    Grid.Row="6"
+                    Grid.Column="1"
+                    Classes="StatisticsValue"
+                    Text="{Binding OutputToInputRatio, Mode=OneWay, Converter={StaticResource FloatToCompressionRatioStringConverter}}" />
+            </Grid>
+        </Grid>
+
+        <!--  The "Show Log File" & "Copy Badge" Buttons  -->
+        <Grid Grid.Row="2" ColumnDefinitions="* *">
+            <Button
+                Grid.Column="0"
+                Margin="0,10,0,10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Command="{Binding OpenLogFileCommand}"
+                ToolTip.Tip="Show/open the log file.">
+                Show Log File
+            </Button>
+            <Button
+                Grid.Column="1"
+                Margin="0,10,0,10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Command="{Binding CopyBadgeToClipboardCommand}"
+                IsVisible="{Binding IsCopyBadgeToClipboardCommandVisible, Mode=OneWay}"
+                ToolTip.Tip="Puts a badge documenting the run into the clipboard.">
+                <StackPanel Orientation="Horizontal">
+                    <i:Icon Value="fa-regular fa-share-from-square" />
+                    <TextBlock
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Center"
+                        Text="Share" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!--  The Aggregate Status Indication  -->
+        <views:AggregateIndicationView
+            Grid.Row="3"
+            Margin="0,10,0,10"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            DataContext="{Binding AggregateIndicationViewModel}" />
+    </Grid>
+</UserControl>
