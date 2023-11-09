@@ -36,7 +36,7 @@ The tool is based on [libczi](https://github.com/ZEISS/libczi.git).
 - [Disclaimer](#disclaimer)
 
 ## Download
-We have not yet published any Releases. Meanwhile, you can download binaries from the artifacts of the latest [Build workflow run](https://github.com/zeissmicroscopy/czicompress/actions/workflows/cmake.yml?query=branch%3Amain).
+We have not yet published any Releases. Meanwhile, you can download binaries from the artifacts of the latest [Build workflow run](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml?query=branch%3Amain).
 Click on the topmost successful run and download the binaries for your platform:
 * czicompress-windows-64-release-msvc-package-off for Windows
 * czicompress-ubuntu-release-llvm-package-off for Linux
