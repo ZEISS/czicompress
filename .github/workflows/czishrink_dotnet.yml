@@ -49,12 +49,13 @@ jobs:
 
       - name: Get Version from Directory.Build.props
         id: getversion
-        uses: m-ringler/get-xpath@v3
-        with:
-          xml-file: czishrink/Directory.Build.props
-          xpath: 'concat(//VersionPrefix/text(), "-", //VersionSuffix/text())'
+        run: |
+          $xml = [xml](Get-Content -Path "Directory.Build.props")
+          $version = $xml.SelectSingleNode('//VersionPrefix').'#text' + "-" + $xml.SelectSingleNode('//VersionSuffix').'#text'
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        shell: pwsh
 
-      - name: Add build ID to version
+      - name: Add build ID to version in Directory.Build.props
         run: |
           Write-Output "Add build ID ${{ github.run_id }} to VersionSuffix in Directory.Build.props"
           $file = Get-Item "Directory.Build.props"
@@ -130,5 +131,5 @@ jobs:
         uses: actions/upload-artifact@v3
         if: github.event_name == 'push'
         with:
-          name: CziShrink_${{ steps.getversion.outputs.info }}_${{ matrix.config.osfamily}}-x64
+          name: CziShrink_${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
           path: publish
