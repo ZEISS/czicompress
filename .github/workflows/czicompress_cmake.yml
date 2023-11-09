@@ -85,20 +85,20 @@ jobs:
 
       # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
       - name: Prepare Coverage
-        if: matrix.config.OS == 'windows-latest'
+        if: matrix.config.os == 'windows-latest'
         run: |
           choco install OpenCppCoverage -y
           echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
 
       - name: Get Coverage
-        if: matrix.OS == 'windows-latest'
+        if: matrix.config.os == 'windows-latest'
         working-directory: ${{github.workspace}}/czicompress/build/czicompress/czicompress_tests/${{env.BUILD_TYPE}}
         shell: cmd
         run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\TestResults\coverage.xml --sources=czicompress --module=czicompress --optimized_build -- czicompress_tests.exe
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
-        if: matrix.config.OS == 'windows-latest'
+        if: matrix.config.os == 'windows-latest'
         with:
           files: coverage.xml
           fail_ci_if_error: true
