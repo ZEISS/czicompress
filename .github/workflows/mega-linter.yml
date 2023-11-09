@@ -8,6 +8,7 @@ on:
     branches: ["main"]  # run only when merge with main branch
   pull_request:
     branches: ["main"]  # run only when merge with main branch
+  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
