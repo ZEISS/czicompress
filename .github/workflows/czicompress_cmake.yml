@@ -92,9 +92,9 @@ jobs:
 
       - name: Get Coverage
         if: matrix.config.os == 'windows-latest'
-        working-directory: ${{github.workspace}}/czicompress/build/czicompress/czicompress_tests/${{env.BUILD_TYPE}}
+        working-directory: ${{github.workspace}}/czicompress/build/tests/${{env.BUILD_TYPE}}
         shell: cmd
-        run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\TestResults\coverage.xml --sources=czicompress --module=czicompress --optimized_build -- czicompress_tests.exe
+        run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\TestResults\coverage.xml --optimized_build -- czicompress_tests.exe
 
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
