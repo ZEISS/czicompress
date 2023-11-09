@@ -69,12 +69,12 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --no-restore -c Release
+        run: dotnet build --no-restore -c Debug
 
       - name: Test
         run: >
           dotnet test
-          -c Release
+          -c Debug
           --no-build
           --verbosity normal
           --logger trx
@@ -86,6 +86,15 @@ jobs:
           -p:ExcludeByFile=**/*.axaml%2c**/*.g.cs
           -p:Exclude='[netczicompress]netczicompress.Views.*'
 
+      - name: Upload coverage reports for czishrink to Codecov
+        if: matrix.config.name == 'ubuntu'
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          directory: ${{ github.workspace }}/TestResults
+          files: coverage.cobertura.xml
+          verbose: true
+
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v3
         with:
@@ -93,27 +102,6 @@ jobs:
           path: TestResults
         # Use always() to also publish test results when there are test failures
         if: ${{ always() }}
-
-      - name: Code Coverage Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        if: matrix.config.name == 'ubuntu'
-        with:
-          filename: TestResults/coverage.cobertura.xml
-          badge: true
-          fail_below_min: false
-          format: markdown
-          hide_branch_rate: false
-          hide_complexity: false
-          indicators: true
-          output: both
-          thresholds: '60 80'
-
-      - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request' && matrix.config.name == 'ubuntu'
-        with:
-          recreate: true
-          path: code-coverage-results.md
 
       - name: Publish
         if: github.event_name == 'push'
