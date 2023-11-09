@@ -136,7 +136,7 @@ There is no guarantee that any items on this list will be added, rather it is ju
 2. Open a Powershell terminal and run [./upgrade-libczicompressc.ps1](./upgrade-libczicompressc.ps1). Run `get-help ./upgrade-libczicompressc.ps1` for more info.
 
 ## How to upgrade libczicompressc manually
-1. Build libczicompressc.so on linux-x64 and libczicompressc.dll on win-x64 in release mode, or (preferred) get them from the [github CI build](https://github.com/zeissmicroscopy/czicompress/actions/workflows/czicompress_cmake.yml).
+1. Build libczicompressc.so on linux-x64 and libczicompressc.dll on win-x64 in release mode, or (preferred) get them from the [github CI build](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml).
 1. Put the binaries into [libczicompressc/runtimes/linux-x64/native](libczicompressc/runtimes/linux-x64/native) and [libczicompressc/runtimes/win-x64/native](libczicompressc/runtimes/win-x64/native)
 1. Update the nuspec file [libczicompressc/libczicompressc.nuspec](libczicompressc/libczicompressc.nuspec):
     * `package/metadata/version` must be the 'ProductVersion' of libczicompressc.dll (explorer: Properties/Details)
