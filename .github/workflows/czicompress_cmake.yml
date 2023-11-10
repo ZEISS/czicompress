@@ -49,8 +49,8 @@ jobs:
           }
         exclude:
           # From https://github.com/actions/runner/issues/1512
-          - build: debug
-            config: { name: ubuntu-package-off, os: ubuntu-20.04, platform: x64-linux, package: OFF, path-cache: '/usr/local/share/vcpkg/installed', path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake', os-id: 'linux',}
+          - build: Debug
+            config: {name: ubuntu-package-off, os: ubuntu-20.04, platform: x64-linux, package: OFF, path-cache: '/usr/local/share/vcpkg/installed', path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake', os-id: 'linux'}
     steps:
 
       - name: Checkout the source codes.
@@ -75,9 +75,10 @@ jobs:
       # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
       - name: Prepare Coverage
         if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Debug') }}
+        shell: pwsh
         run: |
-          choco install OpenCppCoverage -y
-          echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+            choco install OpenCppCoverage -y
+            echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
 
       - name: Get Coverage
         if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Debug') }}
