@@ -137,8 +137,8 @@ if ($DownloadWindows -or $DownloadLinux)
 	Write-Output "INFO: Downloading artifacts from $($LatestRunOfCMakeBuild.artifacts_url)"
 	$ServerResponse = Invoke-WebRequest -Uri $LatestRunOfCMakeBuild.artifacts_url  -Headers $GithubApiHeaders | ConvertFrom-Json
 
-	$LinuxArtifact = $ServerResponse.artifacts | Where-Object name -eq "czicompress-ubuntu-release-package-on"
-	$WindowsArtifact = $ServerResponse.artifacts | Where-Object name -eq "czicompress-windows-64-release-msvc-package-on"
+	$LinuxArtifact = $ServerResponse.artifacts | Where-Object name -eq "czicompress-ubuntu-package-off-Release"
+	$WindowsArtifact = $ServerResponse.artifacts | Where-Object name -eq "czicompress-windows-64-msvc-package-on-Release"
 
 	if ($ServerResponse.total_count -eq 0) {
 		throw "No artifacts found."

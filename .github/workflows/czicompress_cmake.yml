@@ -16,7 +16,10 @@ jobs:
     defaults:
       run:
         working-directory: ${{github.workspace}}/czicompress
-    name: ${{matrix.config.name}}
+    # https://stackoverflow.com/questions/69636799/how-do-i-pass-the-job-name-into-a-github-actions-input
+    env:
+      name: ${{matrix.config.name}}-${{matrix.build}}
+    name: ${{matrix.config.name}}-${{matrix.build}}
     runs-on: ${{matrix.config.os}}
 
     strategy:
@@ -25,22 +28,9 @@ jobs:
         build: [Release, Debug]
         config:  # Create matrix with combinations of compiler and options.
           # Notes:
-          # - the property 'package' is controlling whether the build-time-dependencies (i.e. eigen3, cli11, catch2) are pulled in via the
-          #    system's package manager or via CMake at build-time.
-          # - {
-          #   name: windows-64-release-msvc-package-off,
-          #   os: windows-latest,
-          #   platform: x64-windows,
-          #   package: OFF
-          # }
-          # - {
-          #   name: ubuntu-release-package-off,
-          #   os: ubuntu-latest,
-          #   platform: x64-linux,
-          #   package: OFF
-          # }
+          # The property 'package' is controlling whether the build-time-dependencies (i.e. eigen3, cli11, catch2) are pulled in via the system's package manager or via CMake at build-time.
           - {
-            name: windows-64-release-msvc-package-on,
+            name: windows-64-msvc-package-on,
             os: windows-latest,
             platform: x64-windows-static,
             package: ON,
@@ -49,7 +39,7 @@ jobs:
             os-id: 'windows',
           }
           - {
-            name: ubuntu-release-package-on,
+            name: ubuntu-package-off,
             os: ubuntu-20.04,   # we want to use an older version in order to increase likelihood that binaries work on other distros
             platform: x64-linux,
             package: OFF,
@@ -58,17 +48,15 @@ jobs:
             os-id: 'linux',
           }
         exclude:
-          - build: Debug
-            config:
-            - {
-              name: ubuntu-release-package-on,
-              os: ubuntu-20.04,   # we want to use an older version in order to increase likelihood that binaries work on other distros
-              platform: x64-linux,
-              package: OFF,
-              path-cache: '/usr/local/share/vcpkg/installed',
-              path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake',
-              os-id: 'linux',
-            }
+          # From https://github.com/actions/runner/issues/1512
+          - build: debug
+            {config: { name: ubuntu-package-off,
+                       os: ubuntu-20.04,
+                       platform: x64-linux,
+                       package: OFF,
+                       path-cache: '/usr/local/share/vcpkg/installed',
+                       path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake',
+                       os-id: 'linux',}}
     steps:
 
       - name: Checkout the source codes.
@@ -117,27 +105,27 @@ jobs:
         shell: bash
         run: |
             set -e
-            mkdir ./czicompress-${{matrix.config.name}}
-            cp -R ./THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt ./czicompress-${{matrix.config.name}}/
-            cp -R ./build/app/THIRD_PARTY_LICENSES.txt ./czicompress-${{matrix.config.name}}/
+            mkdir ./czicompress-${{env.name}}
+            cp -R ./THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt ./czicompress-${{env.name}}/
+            cp -R ./build/app/THIRD_PARTY_LICENSES.txt ./czicompress-${{env.name}}/
 
       # gather the binaries
       - name: Prepare Linux binaries
         if: ${{ (matrix.config.os == 'ubuntu-20.04') && (matrix.build == 'Release') }}
         shell: bash
         run: |
-            cp ./build/app/czicompress ./build/capi/libczicompressc.so ./czicompress-${{matrix.config.name}}/
+            cp ./build/app/czicompress ./build/capi/libczicompressc.so ./czicompress-${{env.name}}/
 
       - name: Prepare Windows binaries
         if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Release') }}
         shell: bash
         run: |
-            cp ./build/app/${{matrix.build}}/*.exe ./build/capi/${{matrix.build}}/libczicompressc.dll ./czicompress-${{matrix.config.name}}/
+            cp ./build/app/${{matrix.build}}/*.exe ./build/capi/${{matrix.build}}/libczicompressc.dll ./czicompress-${{env.name}}/
 
       # upload the build-results to artifacts-store
       - name: Upload artifacts
         if: matrix.build == 'Release'
         uses: actions/upload-artifact@v3
         with:
-          name: czicompress-${{matrix.config.name}}
-          path: czicompress/czicompress-${{matrix.config.name}}/
+          name: czicompress-${{env.name}}
+          path: czicompress/czicompress-${{env.name}}/
