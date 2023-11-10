@@ -378,12 +378,7 @@ std::shared_ptr<libCZI::ICziMetadataBuilder> CopyCziAndCompress::ModifyMetadata(
     auto metadata_src = metadata_segment->CreateMetaFromMetadataSegment();
     const auto metadata_builder = libCZI::CreateMetadataBuilderFromXml(metadata_src->GetXml());
 
-    metadata_builder->GetRootNode()
-        ->GetOrCreateChildNode("Metadata/Information/Image/OriginalCompressionMethod")
-        ->SetValue(this->compression_option_.first == libCZI::CompressionMode::Zstd0   ? "Zstd0"
-                   : this->compression_option_.first == libCZI::CompressionMode::Zstd1 ? "Zstd1"
-                                                                                       : "unknown");
-    metadata_builder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/OriginalEncodingQuality")->SetValue("100");
+    metadata_builder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/CurrentCompressionParameters")->SetValue("Lossless: True");
 
     return metadata_builder;
   }
@@ -411,8 +406,7 @@ std::shared_ptr<libCZI::ICziMetadataBuilder> CopyCziAndDecompress::ModifyMetadat
     auto metadata_src = metadata_segment->CreateMetaFromMetadataSegment();
     const auto metadata_builder = libCZI::CreateMetadataBuilderFromXml(metadata_src->GetXml());
 
-    metadata_builder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/OriginalCompressionMethod")->SetValue("Uncompressed");
-    metadata_builder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/OriginalEncodingQuality")->SetValue("100");
+    metadata_builder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/CurrentCompressionParameters")->SetValue("");
 
     return metadata_builder;
   }

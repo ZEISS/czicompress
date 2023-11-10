@@ -247,18 +247,14 @@ TEST_CASE("copyczi.2: run compression on simple synthetic document changes compr
   auto metadata_segment = reader_compressed_document->ReadMetadataSegment();
   auto metadata = metadata_segment->CreateMetaFromMetadataSegment();
 
-  auto compression_method = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/OriginalCompressionMethod");
-  std::wstring compression_method_string;
-  bool success = compression_method->TryGetValue(&compression_method_string);
-  REQUIRE(success == true);
-  REQUIRE(compression_method_string == std::wstring(L"Zstd1"));
+  auto first_subblock = reader_compressed_document->ReadSubBlock(0);
+  auto compression_method = first_subblock->GetSubBlockInfo().GetCompressionMode();
+  REQUIRE(compression_method == libCZI::CompressionMode::Zstd1);
 
-  std::wstring compression_level;
-  auto encoding_quality = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/OriginalEncodingQuality");
-  std::wstring encoding_quality_string;
-  success = encoding_quality->TryGetValue(&encoding_quality_string);
-  REQUIRE(success == true);
-  REQUIRE(encoding_quality_string == std::wstring(L"100"));
+  auto compression_parameters = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/CurrentCompressionParameters");
+  std::wstring compression_parameters_string;
+  bool success = compression_parameters->TryGetValue(&compression_parameters_string);
+  REQUIRE(compression_parameters_string == std::wstring(L"Lossless: True"));
 }
 
 
@@ -331,17 +327,12 @@ TEST_CASE("copyczi.3: run decompression on simple synthetically compressed docum
   auto metadata_segment = reader_decompressed_document->ReadMetadataSegment();
   auto metadata = metadata_segment->CreateMetaFromMetadataSegment();
 
-  auto compression_method = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/OriginalCompressionMethod");
-  auto xml = metadata->GetXml();
-  std::wstring compression_method_string;
-  bool success = compression_method->TryGetValue(&compression_method_string);
-  REQUIRE(success == true);
-  REQUIRE(compression_method_string == std::wstring(L"Uncompressed"));
+  auto first_subblock = reader_decompressed_document->ReadSubBlock(0);
+  auto compression_method = first_subblock->GetSubBlockInfo().GetCompressionMode();
+  REQUIRE(compression_method == libCZI::CompressionMode::UnCompressed);
 
-  std::wstring compression_level;
-  auto encoding_quality = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/OriginalEncodingQuality");
-  std::wstring encoding_quality_string;
-  success = encoding_quality->TryGetValue(&encoding_quality_string);
-  REQUIRE(success == true);
-  REQUIRE(encoding_quality_string == std::wstring(L"100"));
+  auto compression_parameters = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/CurrentCompressionParameters");
+  std::wstring compression_parameters_string;
+  bool success = compression_parameters->TryGetValue(&compression_parameters_string);
+  REQUIRE(success == false); // in case of uncompressed, the metadata is empty, i.e. <CurrentCompressionParameters />, so getting its value fails.
 }
