@@ -107,7 +107,7 @@ jobs:
         if: ${{ always() }}
 
       - name: Publish
-        if: ${{ (github.event_name == 'push') && (matrix.build == Release) }}
+        if: ${{ (github.event_name == 'push') && (matrix.build == 'Release') }}
         run: >
           dotnet publish netczicompress.Desktop/netczicompress.Desktop.csproj
           -c ${{ matrix.build }}
@@ -120,7 +120,7 @@ jobs:
 
       - name: Upload published binaries
         uses: actions/upload-artifact@v3
-        if: ${{ (github.event_name == 'push') && (matrix.build == Release) }}
+        if: ${{ (github.event_name == 'push') && (matrix.build == 'Release') }}
         with:
           name: CziShrink_${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
           path: publish
