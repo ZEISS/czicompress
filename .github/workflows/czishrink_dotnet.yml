@@ -51,16 +51,16 @@ jobs:
         id: getversion
         run: |
           $xml = [xml](Get-Content -Path "Directory.Build.props")
-          $version = $xml.SelectSingleNode('//VersionPrefix').'#text' + "-" + $xml.SelectSingleNode('//VersionSuffix').'#text'
+          $version = $xml.SelectSingleNode('//VersionPrefix').'#text'
           "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
         shell: pwsh
 
       - name: Add build ID to version in Directory.Build.props
         run: |
-          Write-Output "Add build ID ${{ github.run_id }} to VersionSuffix in Directory.Build.props"
+          Write-Output "Add build ID ${{ github.run_id }} to VersionPrefix in Directory.Build.props"
           $file = Get-Item "Directory.Build.props"
           $xml = [xml](Get-Content -Path $file.FullName)
-          $versionElement = $xml.SelectSingleNode('//VersionSuffix')
+          $versionElement = $xml.SelectSingleNode('//VersionPrefix')
           $versionElement.'#text' += '+${{ github.run_id }}'
           $xml.Save($file.FullName)
         shell: pwsh
