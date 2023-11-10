@@ -23,6 +23,23 @@ static int CheckSizeAndCastToInt(const uint32_t size)
   return static_cast<int>(size);
 }
 
+static void CheckOriginalCompressionMetadata(std::shared_ptr<libCZI::ICziMetadata> metadata)
+{
+  auto original_compression_method =
+      metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/OriginalCompressionMethod");
+  std::wstring original_compression_method_string;
+  bool metadata_node_found = original_compression_method->TryGetValue(&original_compression_method_string);
+  REQUIRE(metadata_node_found == true);
+  REQUIRE(original_compression_method_string == std::wstring(L"JpegXr"));
+
+  auto original_compression_parameters =
+      metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/OriginalCompressionParameters");
+  std::wstring original_compression_parameters_string;
+  metadata_node_found = original_compression_parameters->TryGetValue(&original_compression_parameters_string);
+  REQUIRE(metadata_node_found == true);
+  REQUIRE(original_compression_parameters_string == std::wstring(L"Lossless: False, Quality: 77"));
+}
+
 /// Creates a CZI with four subblock of size 2x2 of pixeltype "Gray8" in a
 /// mosaic arrangement. The arrangement is as follows:
 /// +--+--+
@@ -126,6 +143,12 @@ static tuple<shared_ptr<void>, size_t> CreateCziWithFourSubblockInMosaicArrangem
 
   const libCZI::PrepareMetadataInfo prepare_metadata_info;
   auto metaDataBuilder = writer->GetPreparedMetadata(prepare_metadata_info);
+  metaDataBuilder->GetRootNode()
+      ->GetOrCreateChildNode("Metadata/Information/Image/OriginalCompressionMethod")
+      ->SetValue("JpegXr");
+  metaDataBuilder->GetRootNode()
+      ->GetOrCreateChildNode("Metadata/Information/Image/OriginalCompressionParameters")
+      ->SetValue("Lossless: False, Quality: 77");
 
   // NOLINTNEXTLINE: uninitialized struct is OK b/o Clear()
   libCZI::WriteMetadataInfo write_metadata_info;
@@ -253,8 +276,11 @@ TEST_CASE("copyczi.2: run compression on simple synthetic document changes compr
 
   auto compression_parameters = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/CurrentCompressionParameters");
   std::wstring compression_parameters_string;
-  bool success = compression_parameters->TryGetValue(&compression_parameters_string);
+  bool metadata_node_found = compression_parameters->TryGetValue(&compression_parameters_string);
+  REQUIRE(metadata_node_found == true);
   REQUIRE(compression_parameters_string == std::wstring(L"Lossless: True"));
+
+  CheckOriginalCompressionMetadata(metadata);
 }
 
 
@@ -333,6 +359,10 @@ TEST_CASE("copyczi.3: run decompression on simple synthetically compressed docum
 
   auto compression_parameters = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/CurrentCompressionParameters");
   std::wstring compression_parameters_string;
-  bool success = compression_parameters->TryGetValue(&compression_parameters_string);
-  REQUIRE(success == false); // in case of uncompressed, the metadata is empty, i.e. <CurrentCompressionParameters />, so getting its value fails.
+  bool metadata_node_found = compression_parameters->TryGetValue(&compression_parameters_string);
+
+  // in case of uncompressed, the metadata is empty, i.e. <CurrentCompressionParameters />, so getting its value fails.
+  REQUIRE(metadata_node_found == false); 
+
+  CheckOriginalCompressionMetadata(metadata);
 }
