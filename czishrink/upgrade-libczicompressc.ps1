@@ -296,15 +296,15 @@ $NewVersionTuple="($($NewFileVersion.Major), $($NewFileVersion.Minor))"
 $AlteredSourceCode = $SourceCode -replace '^( *\(int Major, int Minor\) expected = ).*?;$',('$1' + $NewVersionTuple + ";")
 Set-Content -Path netczicompress/Models/PInvokeFileProcessor.cs -Value $AlteredSourceCode
 
-# Increment VersionSuffix
-Write-Output "INFO: Incrementing VersionSuffix in Directory.Build.props"
+# Increment VersionPrefix
+Write-Output "INFO: Incrementing VersionPrefix in Directory.Build.props"
 $file = Get-Item "Directory.Build.props"
 $xml = [xml](Get-Content -Path $file.FullName)
-$versionElement = $xml.SelectSingleNode('//VersionSuffix')
+$versionElement = $xml.SelectSingleNode('//VersionPrefix')
 $VersionTokens = $versionElement.'#text'.split(".")
 $versionElement.'#comment' = $BranchName
 $VersionTokens[1] = [string]([int]($VersionTokens.split(".")[1]) + 1)
-$versionElement.'#text' = "$($VersionTokens[0]).$($VersionTokens[1])"
+$versionElement.'#text' = "$($VersionTokens[0]).$($VersionTokens[1]).$($VersionTokens[2])"
 $xml.Save($file.FullName)
 
 # Git commit everything
