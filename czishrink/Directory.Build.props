@@ -10,6 +10,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- Version -->
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.0.1<!--fix/version-stuff--></VersionPrefix>
   </PropertyGroup>
 </Project>

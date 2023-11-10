@@ -18,8 +18,7 @@ public class ProgramNameAndVersionTests
         var actual = new ProgramNameAndVersion().ToString();
 
         // ASSERT
-        var re = new Regex(@"^CZI Shrink 1\.0\.0(\+\d+)?$");
-        re.IsMatch(actual).Should().BeTrue();
+        actual.Should().MatchRegex(@"^CZI Shrink 1\.0\.\d+(\+\d+)?$");
     }
 
     [Fact]
@@ -39,7 +38,6 @@ public class ProgramNameAndVersionTests
         var actual = new ProgramNameAndVersion().Version;
 
         // ASSERT
-        var re = new Regex(@"^1\.0\.0(\+\d+)?$");
-        re.IsMatch(actual).Should().BeTrue();
+        actual.Should().MatchRegex(@"^1\.0\.\d+(\+\d+)?$");
     }
 }
