@@ -3,3 +3,4 @@
 # SPDX-License-Identifier: MIT
 sources=czicompress
 modules=czicompress
+excluded_sources=czicompress\tests\
