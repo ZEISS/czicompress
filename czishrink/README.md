@@ -4,7 +4,6 @@ An open source and cross-platform GUI for [CziCompress](https://github.com/ZEISS
 ## Table of contents
 
  - [Overview](#overview)
-     - [Download](#download)
      - [System Requirements](#system-requirements)
      - [Theme Support](#theme-support)
      - [I/O](#io)
@@ -18,7 +17,7 @@ An open source and cross-platform GUI for [CziCompress](https://github.com/ZEISS
  - [FAQ](#faq)
  - [Known Issues](#known-issues)
  - [Potential Future Enhancements](#potential-future-enhancements)
- - [Feedback](#feedback)
+ - [Contributing](#contributing)
 
 ## Overview
 
