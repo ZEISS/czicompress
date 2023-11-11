@@ -1,6 +1,0 @@
-# SPDX-FileCopyrightText: 2017-2022 Carl Zeiss Microscopy GmbH
-#
-# SPDX-License-Identifier: MIT
-sources=czicompress
-modules=czicompress
-excluded_sources=czicompress\tests\

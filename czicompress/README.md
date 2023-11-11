@@ -39,7 +39,7 @@ The tool is based on [libczi](https://github.com/ZEISS/libczi.git).
 We have not yet published any Releases. Meanwhile, you can download binaries from the artifacts of the latest [Build workflow run](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml?query=branch%3Amain).
 Click on the topmost successful run and download the binaries for your platform:
 * czicompress-windows-64-msvc-package-on-Release for Windows
-* czicompress-ubuntu-llvm-package-off-Release for Linux
+* czicompress-ubuntu-package-off-Release for Linux
 
 Clicking on these artifacts will download a ZIP file with the executable. The executable is a stand-alone binary. You can put it anywhere you like. 
 
