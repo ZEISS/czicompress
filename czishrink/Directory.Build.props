@@ -10,6 +10,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- Version -->
-    <VersionPrefix>1.0.1<!--fix/version-stuff--></VersionPrefix>
+    <VersionPrefix>1.0.2<!--feature/upgrade-libczicompressc-0_5_2--></VersionPrefix>
   </PropertyGroup>
 </Project>

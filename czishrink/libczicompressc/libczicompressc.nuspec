@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
     <id>libczicompressc</id>
-    <version>0.5.1-alpha.0</version>
+    <version>0.5.2</version>
     <title>Native runtimes for CZI ZStd compression</title>
     <authors>Carl Zeiss Microscopy</authors>
     <owners>Carl Zeiss Microscopy</owners>
@@ -11,6 +11,6 @@
     <license type="expression">MIT</license>
     <projectUrl>https://github.com/zeissmicroscopy/czicompress/</projectUrl>
     <copyright>© Carl Zeiss Microscopy GmbH and others. All rights reserved.</copyright>
-    <repository type="git" url="https://github.com/ZEISS/czicompress" branch="main" commit="029973e80f064bce28b22122213e327037eef782" />
+    <repository type="git" url="https://github.com/ZEISS/czicompress" branch="main" commit="40a2ba8489544626c2481ca95177b3235b5c0de7" />
   </metadata>
 </package>
