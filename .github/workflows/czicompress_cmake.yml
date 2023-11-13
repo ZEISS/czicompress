@@ -11,40 +11,26 @@ on:
 permissions:
   contents: read
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  # or setup build type in the matrix
-  BUILD_TYPE: Release
-
 jobs:
   build-tests:
     defaults:
       run:
         working-directory: ${{github.workspace}}/czicompress
-    name: ${{matrix.config.name}}
+    # https://stackoverflow.com/questions/69636799/how-do-i-pass-the-job-name-into-a-github-actions-input
+    env:
+      name: ${{matrix.config.name}}-${{matrix.build}}
+    name: ${{matrix.config.name}}-${{matrix.build}}
     runs-on: ${{matrix.config.os}}
 
     strategy:
       fail-fast: false
       matrix:
+        build: [Release, Debug]
         config:  # Create matrix with combinations of compiler and options.
           # Notes:
-          # - the property 'package' is controlling whether the build-time-dependencies (i.e. eigen3, cli11, catch2) are pulled in via the
-          #    system's package manager or via CMake at build-time.
-          # - {
-          #   name: windows-64-release-msvc-package-off,
-          #   os: windows-latest,
-          #   platform: x64-windows,
-          #   package: OFF
-          # }
-          # - {
-          #   name: ubuntu-release-package-off,
-          #   os: ubuntu-latest,
-          #   platform: x64-linux,
-          #   package: OFF
-          # }
+          # The property 'package' is controlling whether the build-time-dependencies (i.e. eigen3, cli11, catch2) are pulled in via the system's package manager or via CMake at build-time.
           - {
-            name: windows-64-release-msvc-package-on,
+            name: windows-64-msvc-package-on,
             os: windows-latest,
             platform: x64-windows-static,
             package: ON,
@@ -53,7 +39,7 @@ jobs:
             os-id: 'windows',
           }
           - {
-            name: ubuntu-release-package-on,
+            name: ubuntu-package-off,
             os: ubuntu-20.04,   # we want to use an older version in order to increase likelihood that binaries work on other distros
             platform: x64-linux,
             package: OFF,
@@ -61,7 +47,10 @@ jobs:
             path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake',
             os-id: 'linux',
           }
-
+        exclude:
+          # From https://github.com/actions/runner/issues/1512
+          - build: Debug
+            config: {name: ubuntu-package-off, os: ubuntu-20.04, platform: x64-linux, package: OFF, path-cache: '/usr/local/share/vcpkg/installed', path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake', os-id: 'linux'}
     steps:
 
       - name: Checkout the source codes.
@@ -72,7 +61,7 @@ jobs:
           path-cache: ${{matrix.config.path-cache}}
           path-toolchain: ${{matrix.config.path-toolchain}}
           os-id: ${{matrix.config.os-id}}
-          build-type: ${{env.BUILD_TYPE}}
+          build-type: ${{matrix.build}}
           package: ${{matrix.config.package}}
           platform: ${{matrix.config.platform}}
           src-dir: '${{github.workspace}}/czicompress'
@@ -81,32 +70,57 @@ jobs:
         working-directory: ${{github.workspace}}/czicompress/build
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-        run: ctest -C ${{env.BUILD_TYPE}}
+        run: ctest -C ${{matrix.build}}
+
+      # Coverage collection based on https://about.codecov.io/blog/how-to-set-up-codecov-with-c-plus-plus-and-github-actions/
+      - name: Prepare Coverage
+        if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Debug') }}
+        shell: pwsh
+        run: |
+            choco install OpenCppCoverage -y
+            echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+
+      - name: Get Coverage
+        if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Debug') }}
+        working-directory: ${{github.workspace}}/czicompress/build/tests/${{matrix.build}}
+        shell: cmd
+        run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\TestResults\coverage.xml --sources "${{github.workspace}}\czicompress" --excluded_sources "${{github.workspace}}\czicompress\tests" --modules czicompress -- czicompress_tests.exe
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Debug') }}
+        with:
+          files: coverage.xml
+          fail_ci_if_error: true
+          directory: ${{ github.workspace }}/TestResults
+          verbose: true
 
       - name: Prepare licenses
+        if: matrix.build == 'Release'
         shell: bash
         run: |
             set -e
-            mkdir ./czicompress-${{matrix.config.name}}
-            cp -R ./THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt ./czicompress-${{matrix.config.name}}/
-            cp -R ./build/app/THIRD_PARTY_LICENSES.txt ./czicompress-${{matrix.config.name}}/
+            mkdir ./czicompress-${{env.name}}
+            cp -R ./THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt ./czicompress-${{env.name}}/
+            cp -R ./build/app/THIRD_PARTY_LICENSES.txt ./czicompress-${{env.name}}/
 
       # gather the binaries
       - name: Prepare Linux binaries
-        if: matrix.config.os == 'ubuntu-20.04'
+        if: ${{ (matrix.config.os == 'ubuntu-20.04') && (matrix.build == 'Release') }}
         shell: bash
         run: |
-            cp ./build/app/czicompress ./build/capi/libczicompressc.so ./czicompress-${{matrix.config.name}}/
+            cp ./build/app/czicompress ./build/capi/libczicompressc.so ./czicompress-${{env.name}}/
 
       - name: Prepare Windows binaries
-        if: matrix.config.os == 'windows-latest'
+        if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Release') }}
         shell: bash
         run: |
-            cp ./build/app/${{env.BUILD_TYPE}}/*.exe ./build/capi/${{env.BUILD_TYPE}}/libczicompressc.dll ./czicompress-${{matrix.config.name}}/
+            cp ./build/app/${{matrix.build}}/*.exe ./build/capi/${{matrix.build}}/libczicompressc.dll ./czicompress-${{env.name}}/
 
       # upload the build-results to artifacts-store
       - name: Upload artifacts
+        if: matrix.build == 'Release'
         uses: actions/upload-artifact@v3
         with:
-          name: czicompress-${{matrix.config.name}}
-          path: czicompress/czicompress-${{matrix.config.name}}/
+          name: czicompress-${{env.name}}
+          path: czicompress/czicompress-${{env.name}}/
