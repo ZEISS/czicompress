@@ -5,6 +5,9 @@
 namespace netczicompressTests.Models;
 
 using System.Reactive.Disposables;
+using System.Text;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 /// <summary>
 /// Tests for <see cref="PInvokeFileProcessor"/>.
@@ -23,7 +26,7 @@ public class PInvokeFileProcessorTests
     [InlineData(CompressionMode.CompressUncompressed)]
     [InlineData(CompressionMode.CompressAll)]
     [InlineData(CompressionMode.CompressUncompressedAndZstd)]
-    public void CompressAndDecompressOneFile_FilesHaveCorrectSize(
+    public void CompressAndDecompressOneFile_FilesHaveCorrectSizeAndMetadata(
         CompressionMode mode)
     {
         // ARRANGE
@@ -43,13 +46,17 @@ public class PInvokeFileProcessorTests
         decompressor.ProcessFile(compressed, uncompressed, _ => { }, CancellationToken.None);
 
         var compressedSize = GetLength(compressed);
+
         var decompressedSize = GetLength(uncompressed);
         var originalSize = GetLength(testFile);
 
         // ASSERT
-        compressedSize.Should().Be(58432L);
+        compressedSize.Should().Be(58528L);
         decompressedSize.Should().BeCloseTo(originalSize, 2048);
-        decompressedSize.Should().Be(99552L);
+        decompressedSize.Should().Be(99648L);
+
+        Metadata.FromFile(compressed).CurrentCompressionParameters.Should().Be("Lossless: True");
+        Metadata.FromFile(uncompressed).CurrentCompressionParameters.Should().BeEmpty();
     }
 
     [Theory]
@@ -114,9 +121,9 @@ public class PInvokeFileProcessorTests
     }
 
     [Theory]
-    [InlineData(0, 99552L, 57760L)]
-    [InlineData(2, 99552L, 57920L)]
-    [InlineData(4, 99552L, 57472L)]
+    [InlineData(0, 99648L, 57856L)]
+    [InlineData(2, 99648L, 58016L)]
+    [InlineData(4, 99648L, 57568L)]
     public void CompressWithLevel_FilesHaveCorrectSize(
         int compressionLevel, long expectedUncompressedSize, long expectedCompressedSize)
     {
@@ -159,5 +166,51 @@ public class PInvokeFileProcessorTests
         dirname.Should().NotBeNull();
         var testFile = Path.Combine(dirname ?? ".", "mandelbrot.czi");
         return testFile;
+    }
+
+    private class Metadata
+    {
+        public required XDocument Xml { get; init; }
+
+        public string? CurrentCompressionParameters => this.Xml
+            .XPathSelectElement(
+                "ImageDocument/Metadata/Information/Image/CurrentCompressionParameters")
+            ?.Value;
+
+        public static Metadata FromFile(string path) => new() { Xml = ParseMetadataXml(path) };
+
+        private static XDocument ParseMetadataXml(string filePath)
+        {
+            return XDocument.Parse(ReadMetadataXml(filePath));
+        }
+
+        private static string ReadMetadataXml(string filePath)
+        {
+            // These numbers are from the ZISRAW file specification.
+            const int SegmentHeaderSize = 16 + 8 + 8;
+            const int MetadataPositionInFileHeader = 60;
+            const int MetadataHeaderSize = 256;
+
+            using var stream = File.OpenRead(filePath);
+
+            // BinaryReader uses little-endian as required.
+            using var reader = new BinaryReader(stream);
+
+            // Read metadataPosition from ZISRAW file header
+            stream.Position = SegmentHeaderSize + MetadataPositionInFileHeader;
+            long metadataHeaderPosition = reader.ReadInt64() + SegmentHeaderSize;
+
+            // Read size of XML from ZISRAWMETADATA header
+            stream.Position = metadataHeaderPosition;
+            int metadataSize = reader.ReadInt32();
+
+            // Read XML bytes from ZISRAWMETADATA segment
+            stream.Position = metadataHeaderPosition + MetadataHeaderSize;
+            var xmlBytes = reader.ReadBytes(metadataSize);
+
+            // Decode (always UTF-8 according to the spec)
+            var result = Encoding.UTF8.GetString(xmlBytes);
+            return result;
+        }
     }
 }
