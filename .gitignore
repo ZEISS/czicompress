@@ -432,3 +432,6 @@ FodyWeavers.xsd
 ##################################
 ### END VisualStudio.gitignore ###
 ##################################
+
+# Be able to commit local nupkg
+!czishrink/packages_local/*.nupkg
