@@ -20,7 +20,11 @@ If you specify a -DownloadFolder the script will reuse data downloaded to that f
 
 .EXAMPLE
 
-PS> ./upgrade-libczicompressc.ps1 -DownloadFolder "$env:TEMP/libczicompress/cache" -NoPullRequest
+PS> ./upgrade-libczicompressc.ps1 -NewCziShrinkVersion 2.3.0 -DownloadFolder "$env:TEMP/libczicompress/cache" -NoPullRequest
+
+.PARAMETER NewCziShrinkVersion
+
+The new version for CziShrink.
 
 .PARAMETER DownloadFolder
 
@@ -54,6 +58,9 @@ Overwrites an existing upgrade branch. This can be useful if a previous run of t
 #>
 
 param(
+  [Parameter(Mandatory=$true)]
+  [string]$NewCziShrinkVersion,
+
   [Parameter(Mandatory=$false)]
   [AllowNull()]
   [string]$DownloadFolder = $null,
@@ -171,9 +178,9 @@ Expand-Archive -Path $WindowsArtifactZip -Force -DestinationPath "$DownloadFolde
 #############################################
 
 # Get the new library version
-$NewLibVersion = (Get-Item "$DownloadFolder/libczicompressc.dll").VersionInfo.ProductVersion.Replace(",", ".")
-$NewLibVersion_ = $NewLibVersion.Replace(".", "_")
 $NewFileVersion = (Get-Item "$DownloadFolder/libczicompressc.dll").VersionInfo.FileVersionRaw
+$NewLibVersion = $NewFileVersion.Major, $NewFileVersion.Minor, $NewFileVersion.Build | Join-String -Separator '.'
+$NewLibVersion_ = $NewLibVersion.Replace(".", "_")
 
 $BranchName = "feature/upgrade-libczicompressc-$NewLibVersion_"
 Write-Output "INFO: The new library version is $NewLibVersion => Create branch $BranchName and switch to it."
@@ -296,15 +303,13 @@ $NewVersionTuple="($($NewFileVersion.Major), $($NewFileVersion.Minor))"
 $AlteredSourceCode = $SourceCode -replace '^( *\(int Major, int Minor\) expected = ).*?;$',('$1' + $NewVersionTuple + ";")
 Set-Content -Path netczicompress/Models/PInvokeFileProcessor.cs -Value $AlteredSourceCode
 
-# Increment VersionPrefix
-Write-Output "INFO: Incrementing VersionPrefix in Directory.Build.props"
+# Set CziShrink VersionPrefix
+Write-Output "INFO: Setting VersionPrefix in Directory.Build.props to $NewCziShrinkVersion"
 $file = Get-Item "Directory.Build.props"
 $xml = [xml](Get-Content -Path $file.FullName)
 $versionElement = $xml.SelectSingleNode('//VersionPrefix')
-$VersionTokens = $versionElement.'#text'.split(".")
+$versionElement.'#text' = $NewCziShrinkVersion
 $versionElement.'#comment' = $BranchName
-$VersionTokens[1] = [string]([int]($VersionTokens.split(".")[1]) + 1)
-$versionElement.'#text' = "$($VersionTokens[0]).$($VersionTokens[1]).$($VersionTokens[2])"
 $xml.Save($file.FullName)
 
 # Git commit everything
