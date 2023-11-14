@@ -21,6 +21,8 @@ jobs:
         working-directory: czishrink
     name: ${{matrix.config.os}}-${{matrix.build}}
     runs-on: ${{matrix.config.os}}
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
     strategy:
       fail-fast: false
@@ -68,8 +70,16 @@ jobs:
           $xml.Save($file.FullName)
         shell: pwsh
 
+      - name: Cache nugets
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: ${{ runner.os }}-czishrink-nuget-${{ hashFiles('czishrink/Directory.Packages.props') }}
+          restore-keys: |
+            ${{ runner.os }}-czishrink-nuget-
+
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore # --locked-mode ## does not work
 
       - name: Build
         run: dotnet build --no-restore -c ${{ matrix.build }}
