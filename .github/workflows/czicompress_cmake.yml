@@ -152,12 +152,9 @@ jobs:
             cp ./czicompress-windows-64-msvc-package-on-Release/THIRD_PARTY_LICENSES*.txt ./czicompress/pack
             cp ./czicompress-ubuntu-package-off-Release/libczicompressc.so ./czicompress/pack/runtimes/linux-x64/native
 
+        # https://github.com/marketplace/actions/setup-nuget-exe-for-use-with-actions#usage
       - uses: nuget/setup-nuget@v1
         with:
-          nuget-api-key: ${{ secrets.GITHUB_TOKEN }}
-          # To support SkipDuplicate
-          # See https://learn.microsoft.com/en-us/nuget/reference/cli-reference/cli-ref-push
-          # https://github.com/marketplace/actions/setup-nuget-exe-for-use-with-actions#usage
           nuget-version: '>=5.1 <6'
 
       - name: Get libczicompressc Version
@@ -176,7 +173,15 @@ jobs:
         run: |
             nuget pack libczicompressc.nuspec -properties token_version=${{env.LibVersion}}
 
+      - uses: actions/setup-dotnet@v3
+        # No requirements on version (only pushing)
+        # https://github.com/actions/setup-dotnet#github-package-registry-gpr
+        with:
+          source-url: https://nuget.pkg.github.com/ZEISS/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
       - name: Publish NuGet Package
         working-directory: ${{github.workspace}}/czicompress/pack
         run: |
-            nuget push libczicompressc.${{env.LibVersion}}.nupkg -SkipDuplicate -Source https://nuget.pkg.github.com/ZEISS/index.json
+            dotnet nuget push libczicompressc.${{env.LibVersion}}.nupkg --skip-duplicate
