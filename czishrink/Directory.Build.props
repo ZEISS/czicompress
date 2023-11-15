@@ -5,13 +5,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <MSBuildCopyContentTransitively>True</MSBuildCopyContentTransitively>
     <Nullable>enable</Nullable>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+    
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeAnalysis.ruleset</CodeAnalysisRuleSet>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- Nuget -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+
     <!-- Version -->
-    <VersionPrefix>1.0.2<!--feature/upgrade-libczicompressc-0_5_2--></VersionPrefix>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <VersionPrefix>1.0.3<!--feature/upgrade-libczicompressc-0_5_2--></VersionPrefix>
   </PropertyGroup>
 </Project>
