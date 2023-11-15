@@ -165,7 +165,7 @@ jobs:
         shell: pwsh
         working-directory: ${{github.workspace}}/czicompress/pack
         run: |
-            $NewFileVersion = (Get-Item "./runtimes/win-x64/libczicompressc.dll").VersionInfo.FileVersionRaw
+            $NewFileVersion = (Get-Item "./runtimes/win-x64/native/libczicompressc.dll").VersionInfo.FileVersionRaw
             $NewLibVersion = $NewFileVersion.Major, $NewFileVersion.Minor, $NewFileVersion.Build | Join-String -Separator '.'
             "LibVersion=$NewLibVersion" >> $env:GITHUB_ENV
 
