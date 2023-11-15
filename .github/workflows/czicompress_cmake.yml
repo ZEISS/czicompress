@@ -179,4 +179,4 @@ jobs:
       - name: Publish NuGet Package
         working-directory: ${{github.workspace}}/czicompress/pack
         run: |
-            nuget push libczicompressc.$LibVersion.nupkg -NonInteractive -SkipDuplicate -Source https://nuget.pkg.github.com/ZEISS/index.json
+            nuget push libczicompressc.${{env.LibVersion}}.nupkg -NonInteractive -SkipDuplicate -Source https://nuget.pkg.github.com/ZEISS/index.json
