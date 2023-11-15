@@ -10,9 +10,9 @@ namespace netczicompressTests.Models;
 public class ThreadCountTests
 {
     [Fact]
-    public void DefaultConstructor_HasDefaultValue()
+    public void Default_HasDefaultValue()
     {
-        var sut = new ThreadCount();
+        var sut = ThreadCount.Default;
         sut.Value.Should().Be(ThreadCount.DefaultValue);
     }
 
@@ -31,7 +31,7 @@ public class ThreadCountTests
     [InlineData(1)]
     public void InRangeValue_ShouldBeEqual(int value)
     {
-        var sut = new ThreadCount() { Value = value };
+        var sut = new ThreadCount { Value = value };
         sut.Value.Should().Be(value);
     }
 }

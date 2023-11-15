@@ -10,9 +10,9 @@ namespace netczicompressTests.Models;
 public class CompressionLevelTests
 {
     [Fact]
-    public void DefaultConstructor_HasDefaultValue()
+    public void Default_HasDefaultValue()
     {
-        var sut = new CompressionLevel();
+        var sut = CompressionLevel.Default;
         sut.Value.Should().Be(CompressionLevel.DefaultValue);
     }
 

@@ -17,18 +17,13 @@ using Microsoft.Extensions.Logging;
 /// <para/>
 /// <see cref="ILoggerFactory.AddProvider"/> is not supported.
 /// </remarks>
-public sealed class TraceLoggerFactory : ILoggerFactory, ILoggerProvider
+public sealed class TraceLoggerFactory(bool useLogLevelsAsTraceLevels = false)
+    : ILoggerFactory,
+      ILoggerProvider
 {
-    private readonly bool useLogLevelsAsTraceLevels;
-
-    public TraceLoggerFactory(bool useLogLevelsAsTraceLevels = false)
-    {
-        this.useLogLevelsAsTraceLevels = useLogLevelsAsTraceLevels;
-    }
-
     public ILogger CreateLogger(string categoryName)
     {
-        return new TraceLogger(categoryName, this.useLogLevelsAsTraceLevels);
+        return new TraceLogger(categoryName, useLogLevelsAsTraceLevels);
     }
 
     void ILoggerFactory.AddProvider(ILoggerProvider provider)
@@ -36,28 +31,22 @@ public sealed class TraceLoggerFactory : ILoggerFactory, ILoggerProvider
         throw new NotSupportedException();
     }
 
-    void IDisposable.Dispose()
+    void IDisposable.Dispose() => Trace.Flush();
+
+    private sealed class TraceLogger(string categoryName, bool useLogLevelsAsTraceLevels)
+        : ILogger
     {
-        Trace.Flush();
-    }
-
-    private sealed class TraceLogger : ILogger
-    {
-        private readonly string categoryName;
-        private readonly bool useLogLevelsAsTraceLevels;
-
-        public TraceLogger(string categoryName, bool useLogLevelsAsTraceLevels)
-        {
-            this.categoryName = categoryName;
-            this.useLogLevelsAsTraceLevels = useLogLevelsAsTraceLevels;
-        }
-
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
         {
             if (this.IsEnabled(logLevel))
             {
-                var msg = $"{DateTimeOffset.Now:O}|{this.categoryName}|{ToString(logLevel)}|{eventId}|{formatter(state, exception)}";
-                if (this.useLogLevelsAsTraceLevels)
+                var msg = $"{DateTimeOffset.Now:O}|{categoryName}|{ToString(logLevel)}|{eventId}|{formatter(state, exception)}";
+                if (useLogLevelsAsTraceLevels)
                 {
                     switch (logLevel)
                     {

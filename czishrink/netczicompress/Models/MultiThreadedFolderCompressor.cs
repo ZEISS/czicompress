@@ -18,22 +18,12 @@ using System.Threading.Tasks;
 /// <summary>
 /// A multi-threaded <see cref="IFolderCompressor"/> that uses <see cref="IFileProcessor"/>s to do the actual work.
 /// </summary>
-public class MultiThreadedFolderCompressor : IFolderCompressor
-{
-    private readonly CreateProcessor createProcessor;
-    private readonly FileProcessingFailedHandler fileProcessingFailedHandler;
-    private readonly int maxTriesToCreateTemporaryFile;
-
-    public MultiThreadedFolderCompressor(
+public class MultiThreadedFolderCompressor(
         CreateProcessor createProcessor,
         FileProcessingFailedHandler fileProcessingFailedHandler,
         int maxTriesToCreateTemporaryFiles = 100)
-    {
-        this.createProcessor = createProcessor;
-        this.fileProcessingFailedHandler = fileProcessingFailedHandler ?? throw new ArgumentNullException(nameof(fileProcessingFailedHandler));
-        this.maxTriesToCreateTemporaryFile = maxTriesToCreateTemporaryFiles;
-    }
-
+    : IFolderCompressor
+{
     // Public only for testing. MockFileSystem does not support CaseInsensitive
     public MatchCasing MatchExtensionCasing { get; init; } = MatchCasing.CaseInsensitive;
 
@@ -83,7 +73,7 @@ public class MultiThreadedFolderCompressor : IFolderCompressor
 
                     if (activeTasks.Count < maxNumberOfThreads)
                     {
-                        var processor = this.createProcessor(mode, processingOptions);
+                        var processor = createProcessor(mode, processingOptions);
                         processors.Add(processor);
                         activeTasks.Add(Run(processor));
                     }
@@ -218,7 +208,7 @@ public class MultiThreadedFolderCompressor : IFolderCompressor
                 EnsureParentDirectoryExists(outFile);
             }
 
-            temporaryFile = new TemporaryFile(outFile, this.maxTriesToCreateTemporaryFile);
+            temporaryFile = new TemporaryFile(outFile, maxTriesToCreateTemporaryFiles);
             if (temporaryFile.TemporaryFileCreationFailed)
             {
                 var tempOutFile = temporaryFile.Info;
@@ -247,7 +237,7 @@ public class MultiThreadedFolderCompressor : IFolderCompressor
             // We only cover those exceptions, that have been reported when processing the file, i.e. processedByProcessor is false.
             var tempOutFile = temporaryFile.Info;
             return MakeTheReturnValue(
-                this.fileProcessingFailedHandler.FileProcessingFailed(
+                fileProcessingFailedHandler.FileProcessingFailed(
                     inFile,
                     outFile,
                     tempOutFile,

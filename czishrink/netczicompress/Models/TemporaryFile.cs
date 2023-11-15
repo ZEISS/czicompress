@@ -27,13 +27,13 @@ public class TemporaryFile
     /// immediately created, if possible.
     /// By this <see cref="TemporaryFileCreationFailed"/> is set accordingly.
     /// </summary>
-    /// <param name="outfile">The basic output file name.</param>
+    /// <param name="outFile">The basic output file name.</param>
     /// <param name="maxNumberOfTriesToCreate">The maximum number or tries.</param>
     public TemporaryFile(
-        IFileInfo outfile,
+        IFileInfo outFile,
         int maxNumberOfTriesToCreate = 100)
     {
-        this.OutFile = outfile;
+        this.OutFile = outFile;
         this.MaxNumberOfTriesToCreate = maxNumberOfTriesToCreate;
         this.Info = this.TryCreate();
     }

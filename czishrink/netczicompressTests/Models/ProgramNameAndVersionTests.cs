@@ -4,8 +4,6 @@
 
 namespace netczicompressTests.Models;
 
-using System.Text.RegularExpressions;
-
 /// <summary>
 /// Tests for <see cref="ProgramNameAndVersion"/>.
 /// </summary>

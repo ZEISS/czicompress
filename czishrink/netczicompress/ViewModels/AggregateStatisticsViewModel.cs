@@ -100,22 +100,23 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
             // call measure once with infinity so that we get the "desired size" populated
             control.Measure(Size.Infinity);
             var size = control.DesiredSize;
+            int width = (int)size.Width;
+            int height = (int)size.Height;
+            size = new Size(width, height);
 
             control.Measure(size);
             control.Arrange(new Rect(size));
 
-            using (RenderTargetBitmap bitmap = new RenderTargetBitmap(new PixelSize(Convert.ToInt32(size.Width), Convert.ToInt32(size.Height))))
+            using var bitmap = new RenderTargetBitmap(new PixelSize(width, height));
+            bitmap.Render(control);
+            try
             {
-                bitmap.Render(control);
-                try
-                {
-                    this.clipboardHelper.PutBitmapIntoClipboard(bitmap);
-                    this.BadgeCopiedToClipboardRaised?.Invoke();
-                }
-                catch (Exception exception)
-                {
-                    this.logger.LogError(exception, "putting badge into clipboard failed: {ex}", exception);
-                }
+                this.clipboardHelper.PutBitmapIntoClipboard(bitmap);
+                this.BadgeCopiedToClipboardRaised?.Invoke();
+            }
+            catch (Exception exception)
+            {
+                this.logger.LogError(exception, "putting badge into clipboard failed: {ex}", exception);
             }
         }
     }

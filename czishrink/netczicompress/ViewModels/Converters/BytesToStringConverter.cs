@@ -15,7 +15,8 @@ public class BytesToStringConverter : ForwardOnlyConverter
 {
     // See: https://en.wikipedia.org/wiki/Kilobyte
     // Made the array future-proof in any case.
-    private static readonly string[] Sizes = { "bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "RB", "QB" };
+    private static readonly string[] Sizes =
+        ["bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "RB", "QB"];
 
     public override object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
