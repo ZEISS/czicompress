@@ -252,6 +252,11 @@
           "System.Threading": "4.3.0"
         }
       },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "cjWrLkJXK0rs4zofsK4bSdg+jhDLTaxrkXu4gS6Y7MAlCvRyNNgwY/lJi5RDlQOnSZweHqoyvgvbdvQsRIW+hg=="
+      },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
         "resolved": "2.1.2",
@@ -1341,7 +1346,7 @@
           "Avalonia.ReactiveUI": "[11.0.5, )",
           "Avalonia.Themes.Fluent": "[11.0.5, )",
           "MessageBox.Avalonia": "[3.1.5.1, )",
-          "Microsoft.Extensions.Logging.Abstractions": "[7.0.1, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[8.0.0, )",
           "Projektanker.Icons.Avalonia.FontAwesome": "[8.3.0, )",
           "ReactiveUI.Fody": "[19.5.1, )",
           "System.IO.Abstractions": "[19.2.69, )",
@@ -1447,9 +1452,12 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[7.0.1, )",
-        "resolved": "7.0.1",
-        "contentHash": "pkeBFx0vqMW/A3aUVHh7MPu3WkBhaVlezhSZeb1c9XD0vUReYH1TLFSy5MxJgZfmz5LZzYoErMorlYZiwpOoNA=="
+        "requested": "[8.0.0, )",
+        "resolved": "8.0.0",
+        "contentHash": "arDBqTgFCyS0EvRV7O3MZturChstm50OJ0y9bDJvAcmEPJm0FFpFyjU/JLYyStNGGey081DvnQYlncNX5SJJGA==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0"
+        }
       },
       "Projektanker.Icons.Avalonia.FontAwesome": {
         "type": "CentralTransitive",
