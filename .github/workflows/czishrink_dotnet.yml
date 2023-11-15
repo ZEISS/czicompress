@@ -122,6 +122,7 @@ jobs:
           dotnet publish netczicompress.Desktop/netczicompress.Desktop.csproj
           -c ${{ matrix.build }}
           -a x64
+          --no-restore
           --self-contained
           -p:PublishSingleFile=true
           -p:PublishReadyToRun=true
