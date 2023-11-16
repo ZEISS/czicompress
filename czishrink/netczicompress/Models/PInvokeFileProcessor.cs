@@ -118,10 +118,7 @@ public sealed partial class PInvokeFileProcessor : IFileProcessor
 
     private void CheckDisposed()
     {
-        if (this.IsDisposed)
-        {
-            throw new ObjectDisposedException(this.ToString());
-        }
+        ObjectDisposedException.ThrowIf(this.IsDisposed, this);
     }
 
     internal static partial class NativeMethods
@@ -199,7 +196,7 @@ public sealed partial class PInvokeFileProcessor : IFileProcessor
 
         [LibraryImport(LibName, StringMarshalling = LibStringEncoding)]
         [return: MarshalAs(UnmanagedType.U1)]
-        public static partial bool GetLibVersionString(byte[] buffer, ref ulong bufferLength);
+        public static partial bool GetLibVersionString([Out] byte[] buffer, ref ulong bufferLength);
 
         [LibraryImport(LibName, StringMarshalling = LibStringEncoding)]
         public static partial void GetLibVersion(out int major, out int minor, out int patch);
@@ -215,7 +212,7 @@ public sealed partial class PInvokeFileProcessor : IFileProcessor
             IntPtr file_processor,
             string input_path,
             string output_path,
-            byte[] error_message,
+            [Out] byte[] error_message,
             ref int error_message_length,
             ReportProgressCheckCancel reportProgress);
     }

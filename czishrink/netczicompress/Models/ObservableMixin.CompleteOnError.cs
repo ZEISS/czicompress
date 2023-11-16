@@ -26,18 +26,11 @@ public static partial class ObservableMixin
         return new CompleteOnErrorDecorator<T>(obs);
     }
 
-    public class CompleteOnErrorDecorator<T> : IObservable<T>
+    public class CompleteOnErrorDecorator<T>(IObservable<T> core) : IObservable<T>
     {
-        private readonly IObservable<T> core;
-
-        public CompleteOnErrorDecorator(IObservable<T> core)
-        {
-            this.core = core;
-        }
-
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            return this.core.Subscribe(
+            return core.Subscribe(
                 onNext: observer.OnNext,
                 onCompleted: observer.OnCompleted,
                 onError: ex => observer.OnCompleted());

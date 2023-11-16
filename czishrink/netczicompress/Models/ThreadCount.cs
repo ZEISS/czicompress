@@ -25,7 +25,7 @@ public partial record ThreadCount
     /// </summary>
     public static int DefaultValue { get; } = Maximum;
 
-    public int Value
+    public required int Value
     {
         get => this.internalValue;
         init =>

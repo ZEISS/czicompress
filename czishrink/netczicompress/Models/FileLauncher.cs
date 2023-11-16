@@ -11,7 +11,7 @@ using System.IO.Abstractions;
 /// Launches a file with its associated app,
 /// or displays a file in its folder with the operating system's file manager.
 /// </summary>
-public class FileLauncher : IFileLauncher
+public class FileLauncher(IFileSystem fs, Func<string, string?> getEnvironmentVariable) : IFileLauncher
 {
     // Cf. https://github.com/dotnet/runtime/blob/52806bc157decf345005249c9ea7969c8b9e7e1b/src/libraries/System.Private.CoreLib/src/System/OperatingSystem.cs#L14C9-L41C6
     private const string Windows = "WINDOWS";
@@ -23,23 +23,14 @@ public class FileLauncher : IFileLauncher
 
     private const string Unsupported = "UNSUPPORTED";
     private static readonly string[] SupportedPlatforms =
-        {
+        [
             Windows,
             Osx,
             Linux,
             FreeBsd,
             NetBsd,
             Solaris,
-        };
-
-    private readonly IFileSystem fs;
-    private readonly Func<string, string?> getEnvironmentVariable;
-
-    public FileLauncher(IFileSystem fs, Func<string, string?> getEnvironmentVariable)
-    {
-        this.fs = fs;
-        this.getEnvironmentVariable = getEnvironmentVariable;
-    }
+        ];
 
     protected string CurrentPlatform { get; init; } = GetPlatform();
 
@@ -100,10 +91,10 @@ public class FileLauncher : IFileLauncher
     private ProcessStartInfo GetRevealStartInfoWindows(string path)
     {
         var fileName = "explorer";
-        var sysRoot = this.getEnvironmentVariable("SYSTEMROOT");
+        var sysRoot = getEnvironmentVariable("SYSTEMROOT");
         if (sysRoot != null)
         {
-            fileName = this.fs.Path.Combine(sysRoot, fileName);
+            fileName = fs.Path.Combine(sysRoot, fileName);
         }
 
         return new ProcessStartInfo
@@ -126,7 +117,7 @@ public class FileLauncher : IFileLauncher
 
     private ProcessStartInfo GetOpenParentFolderStartInfo(string path)
     {
-        return GetLaunchStartInfo(this.fs.Path.GetDirectoryName(path));
+        return GetLaunchStartInfo(fs.Path.GetDirectoryName(path));
     }
 
     private ProcessStartInfo GetRevealStartInfo(string path)

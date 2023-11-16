@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <MSBuildCopyContentTransitively>True</MSBuildCopyContentTransitively>
@@ -17,6 +17,6 @@
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.0.3<!--dependabot/nuget/czishrink/Microsoft.Extensions.Logging.Abstractions-8.0.0--></VersionPrefix>
+    <VersionPrefix>1.1.0<!--feature/dotnet8--></VersionPrefix>
   </PropertyGroup>
 </Project>

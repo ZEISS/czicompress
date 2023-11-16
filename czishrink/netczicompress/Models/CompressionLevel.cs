@@ -39,7 +39,7 @@ public record CompressionLevel
     public static int DefaultValue { get; } = 1;
 
     [Range(0, 22)]
-    public int Value
+    public required int Value
     {
         get => this.internalValue;
         init =>

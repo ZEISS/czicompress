@@ -12,14 +12,9 @@ using System.Reactive.Concurrency;
 /// <summary>
 /// A logging strategy that writes data to a CSV log file.
 /// </summary>
-public class CsvLoggingStrategy : ILoggingStrategy
+public class CsvLoggingStrategy(IFileLauncher fileLauncher) : ILoggingStrategy
 {
-    private readonly IFileLauncher fileLauncher;
-
-    public CsvLoggingStrategy(IFileLauncher fileLauncher)
-    {
-        this.fileLauncher = fileLauncher;
-    }
+    private readonly IFileLauncher fileLauncher = fileLauncher;
 
     /// <summary>
     /// Gets the scheduler to use for logging.

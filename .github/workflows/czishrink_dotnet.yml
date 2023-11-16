@@ -50,7 +50,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 8.0.x
 
       - name: Get Version from Directory.Build.props
         id: getversion
@@ -117,12 +117,11 @@ jobs:
         if: ${{ always() }}
 
       - name: Publish
-        if: ${{ (github.event_name == 'push') && (matrix.build == 'Release') }}
+        if: matrix.build == 'Release'
         run: >
           dotnet publish netczicompress.Desktop/netczicompress.Desktop.csproj
           -c ${{ matrix.build }}
           -a x64
-          --no-restore
           --self-contained
           -p:PublishSingleFile=true
           -p:PublishReadyToRun=true

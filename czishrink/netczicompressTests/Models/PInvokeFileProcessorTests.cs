@@ -17,7 +17,7 @@ public class PInvokeFileProcessorTests
     [Fact]
     public void Ctr_WhenCalledWithNoOp_Throws()
     {
-        Action act = () => _ = new PInvokeFileProcessor(CompressionMode.NoOp, new ProcessingOptions(new CompressionLevel()));
+        Action act = () => _ = new PInvokeFileProcessor(CompressionMode.NoOp, new ProcessingOptions(new CompressionLevel { Value = CompressionLevel.DefaultValue }));
 
         act.Should().Throw<ArgumentOutOfRangeException>().WithParameterName("mode");
     }
@@ -39,10 +39,10 @@ public class PInvokeFileProcessorTests
         using var deleteUncompressed = Disposable.Create(() => File.Delete(uncompressed));
 
         // ACT
-        using var compressor = new PInvokeFileProcessor(mode, new ProcessingOptions(new CompressionLevel()));
+        using var compressor = new PInvokeFileProcessor(mode, new ProcessingOptions(CompressionLevel.Default));
         compressor.ProcessFile(testFile, compressed, _ => { }, CancellationToken.None);
 
-        using var decompressor = new PInvokeFileProcessor(CompressionMode.Decompress, new ProcessingOptions(new CompressionLevel()));
+        using var decompressor = new PInvokeFileProcessor(CompressionMode.Decompress, new ProcessingOptions(CompressionLevel.Default));
         decompressor.ProcessFile(compressed, uncompressed, _ => { }, CancellationToken.None);
 
         var compressedSize = GetLength(compressed);
@@ -67,7 +67,7 @@ public class PInvokeFileProcessorTests
     public void NeedsExistingOutputDirectory_ShouldBeTrue(
         CompressionMode mode)
     {
-        using var target = new PInvokeFileProcessor(mode, new ProcessingOptions(new CompressionLevel()));
+        using var target = new PInvokeFileProcessor(mode, new ProcessingOptions(CompressionLevel.Default));
         target.NeedsExistingOutputDirectory.Should().BeTrue();
     }
 
@@ -86,7 +86,7 @@ public class PInvokeFileProcessorTests
         using var deleteCompressed = DeleteLater(compressed);
 
         // ACT
-        using var compressor = PInvokeFileProcessor.Create(mode, new ProcessingOptions(new CompressionLevel()));
+        using var compressor = PInvokeFileProcessor.Create(mode, new ProcessingOptions(CompressionLevel.Default));
         var token = new CancellationToken(true);
         Action act = () => compressor.ProcessFile(testFile, compressed, _ => { }, token);
 
@@ -105,7 +105,7 @@ public class PInvokeFileProcessorTests
         CompressionMode mode)
     {
         // ARRANGE
-        using var compressor = PInvokeFileProcessor.Create(mode, new ProcessingOptions(new CompressionLevel()));
+        using var compressor = PInvokeFileProcessor.Create(mode, new ProcessingOptions(CompressionLevel.Default));
         compressor.Dispose();
 
         Action act = () => compressor.ProcessFile("foo", "bar", _ => { }, CancellationToken.None);
@@ -139,13 +139,13 @@ public class PInvokeFileProcessorTests
         // ACT
         using var compressor = new PInvokeFileProcessor(
             CompressionMode.CompressAll,
-            new ProcessingOptions(new CompressionLevel()
+            new ProcessingOptions(new CompressionLevel
             {
                 Value = compressionLevel,
             }));
         compressor.ProcessFile(testFile, compressed, _ => { }, CancellationToken.None);
 
-        using var decompressor = new PInvokeFileProcessor(CompressionMode.Decompress, new ProcessingOptions(new CompressionLevel()));
+        using var decompressor = new PInvokeFileProcessor(CompressionMode.Decompress, new ProcessingOptions(CompressionLevel.Default));
         decompressor.ProcessFile(compressed, uncompressed, _ => { }, CancellationToken.None);
 
         var compressedSize = GetLength(compressed);
