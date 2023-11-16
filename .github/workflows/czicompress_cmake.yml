@@ -181,10 +181,9 @@ jobs:
       # Upload to artifacts for pre-testing without publishing to GH Packages
       - name: Upload NuGet Package to Artifacts
         uses: actions/upload-artifact@v3
-        working-directory: ${{github.workspace}}/czicompress/pack
         with:
           name: czicompress-nuget
-          path: libczicompressc.${{env.LibVersion}}.nupkg
+          path: ${{github.workspace}}/czicompress/pack/libczicompressc.${{env.LibVersion}}.nupkg
 
       - uses: actions/setup-dotnet@v3
         # Only upload to GH Packages on CD on main

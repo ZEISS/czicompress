@@ -68,6 +68,17 @@ jobs:
           $xml.Save($file.FullName)
         shell: pwsh
 
+      # To support package source mapping with mixed package feeds (see NuGet.config for details)
+      # See https://github.com/dotnet/sdk/issues/31461
+      # See 
+      - name: Update GitHub package registry credentials in NuGet.config
+        run: dotnet nuget update source github_zeiss -p "$GH_TOKEN" -u ZEISS -s https://nuget.pkg.github.com/ZEISS/index.json --store-password-in-clear-text
+        # Run on bash explicitely to have cross-platform environment variable referencing
+        # See https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions#using-secrets-in-a-workflow
+        shell: bash
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
       - name: Restore dependencies
         run: dotnet restore
 
