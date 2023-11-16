@@ -152,9 +152,13 @@ jobs:
             cp ./czicompress-ubuntu-package-off-Release/libczicompressc.so ./czicompress/pack/runtimes/linux-x64/native
 
         # https://github.com/marketplace/actions/setup-nuget-exe-for-use-with-actions#usage
+        # Use NuGet 6.x to enable package source mapping
+        # https://devblogs.microsoft.com/nuget/introducing-package-source-mapping/
+        # https://learn.microsoft.com/en-us/nuget/concepts/security-best-practices
+        # https://devblogs.microsoft.com/nuget/quickly-map-your-nuget-packages-to-sources/
       - uses: nuget/setup-nuget@v1
         with:
-          nuget-version: '>=5.1 <6'
+          nuget-version: '6.x'
 
       - name: Get libczicompressc Version
         # See https://github.com/orgs/community/discussions/25713

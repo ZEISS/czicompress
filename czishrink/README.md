@@ -126,26 +126,25 @@ There is no guarantee that any items on this list will be added, rather it is ju
 
 ## Contributing
 
+See [CONTRIBUTING.md](../CONTRIBUTING.md)
+
+### Build
+libczicompressc is pulled in as a [NuGet package dependency](https://github.com/ZEISS/czicompress/pkgs/nuget/libczicompressc). Until releasing to nuget.org, libczicompressc is [published to the GitHub NuGet package registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-nuget-registry) as part of [CMake Build (czicompress)](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml).  
+To build locally, the following two environment variables need to be set in order to successfully authenticate against https://nuget.pkg.github.com/ZEISS/index.json:  
+- %GITHUB_ZEISS_USERNAME%: This is your GitHub handle associated to your GitHub user part of https://github.com/ZEISS.  
+- %GITHUB_ZEISS_PACKAGES_READ_PAT%: This is a PAT associated to your GitHub user part of https://github.com/ZEISS with read:packages permission scope.  
+
+For more information, see [NuGet.config](NuGet.config).
+
+Users not being able to authenticate against https://nuget.pkg.github.com/ZEISS/index.json can download the NuGet package as a published artifact from [CMake Build (czicompress)](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml) and [add it locally](https://learn.microsoft.com/en-us/nuget/hosting-packages/local-feeds).
+
 ### Notes for Contributors
 * Test changes at least on Linux and Windows.
 * Note that the app will change appearance when the system theme is changed (Windows: Settings -> Personalization -> Colors -> Choose your colors: Light/Dark/Custom). Make sure that GUI changes look good both in the Light and in the Dark Theme. See https://docs.avaloniaui.net/docs/next/guides/styles-and-resources/how-to-use-theme-variants
 
-## How to upgrade libczicompressc automatically
-1. Create a 'classic' personal access token at https://github.com/settings/tokens, authorize it for the ZEISS organization via the "Configure SSO" button, and store it in a GITHUB_TOKEN environment variable.
-2. Open a Powershell terminal and run [./upgrade-libczicompressc.ps1](./upgrade-libczicompressc.ps1). Run `get-help ./upgrade-libczicompressc.ps1` for more info.
-
-## How to upgrade libczicompressc manually
-1. Build libczicompressc.so on linux-x64 and libczicompressc.dll on win-x64 in release mode, or (preferred) get them from the [github CI build](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml).
-1. Put the binaries into [libczicompressc/runtimes/linux-x64/native](libczicompressc/runtimes/linux-x64/native) and [libczicompressc/runtimes/win-x64/native](libczicompressc/runtimes/win-x64/native)
-1. Update the nuspec file [libczicompressc/libczicompressc.nuspec](libczicompressc/libczicompressc.nuspec):
-    * `package/metadata/version` must be the 'ProductVersion' of libczicompressc.dll (explorer: Properties/Details)
-	* `package/metadata/repository[@commit]` must be the git commit from which the binaries were built
-1. [Install nuget if necessary](https://learn.microsoft.com/en-us/nuget/install-nuget-client-tools#cli-tools).
-1. Open a shell in [libczicompressc](libczicompressc), and run `path/to/nuget pack libczicompressc.nuspec`
-1. Move the resulting nupkg into [packages_local](packages_local) and delete the old package from there.
-1. Change the version of libczicompressc in [Directory.Packages.props](Directory.Packages.props)
+### How to upgrade czishrink to new libczicompressc
+1. Change the version of [libczicompressc](https://github.com/ZEISS/czicompress/pkgs/nuget/libczicompressc) in [Directory.Packages.props](Directory.Packages.props)
 1. If major or minor version has changed, change the expected version number in [PInvokeFileProcessor](netczicompress/Models/PInvokeFileProcessor.cs).
 1. Rebuild netczicompress.sln
 1. Run netczicompressTests
-1. Undo git changes to the libczicompressc.dll and libczicompressc.so files (no need to commit them, they are in the nupkg).
-1. Commit the remaining changes with message "Upgrade libczicompressc to new version: x.y.z"
+1. Commit the remaining changes with message "Upgrade czishrink to pull libczicompressc x.y.z"
