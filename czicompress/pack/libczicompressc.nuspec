@@ -9,6 +9,6 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <copyright>© Carl Zeiss Microscopy GmbH and others. All rights reserved.</copyright>
-    <repository type="git" url="https://github.com/ZEISS/czicompress" commit="$token_commit$"/>
+    <repository type="git" url="https://github.com/ZEISS/czicompress" branch="$token_branch" commit="$token_commit$"/>
   </metadata>
 </package>
