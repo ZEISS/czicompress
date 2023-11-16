@@ -117,7 +117,7 @@ jobs:
         if: ${{ always() }}
 
       - name: Publish
-        if: ${{ (github.event_name == 'push') && (matrix.build == 'Release') }}
+        if: matrix.build == 'Release'
         run: >
           dotnet publish netczicompress.Desktop/netczicompress.Desktop.csproj
           -c ${{ matrix.build }}
