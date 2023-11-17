@@ -71,7 +71,7 @@ jobs:
 
       # To support package source mapping with mixed package feeds (see NuGet.config for details)
       # See https://github.com/dotnet/sdk/issues/31461
-      # See 
+      # See https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-nuget-update-source
       - name: Update GitHub package registry credentials in NuGet.config
         run: dotnet nuget update source github_zeiss -p "$GH_TOKEN" -u ZEISS -s https://nuget.pkg.github.com/ZEISS/index.json --store-password-in-clear-text
         # Run on bash explicitely to have cross-platform environment variable referencing
