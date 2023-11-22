@@ -21,11 +21,7 @@
          -->
     <WixVariable Id="WixUIArtifactsRtf" Value="artifactdistribution.rtf" />
     <WixVariable Id="LicenseAgreementDlgBannerBitmap" Value="$(var.CustomImg)\LicenseBanner.bmp" />
-<<<<<<< HEAD
     <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomImg)\DefaultBackground.png" />
-=======
-    <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomImg)\DefaultBackground.bmp" />
->>>>>>> a328abd (Move installer into czishrink subdirectory)
     <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomImg)\DefaultBanner.png" />
 
     <!-- Level and Title are not strictly needed here but give a hint for how installer could leverage features to install something like czicheck or add

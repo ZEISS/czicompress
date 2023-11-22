@@ -4,12 +4,8 @@
       $(DefineConstants);
       CustomImg=$(MSBuildProjectDirectory)\Custom UI\Images;
     </DefineConstants>
-<<<<<<< HEAD
     <SuppressIces>ICE64;ICE69</SuppressIces>
     <OutputName>CZI Shrink Installer</OutputName>
-=======
-    <SuppressIces>ICE64</SuppressIces>
->>>>>>> a328abd (Move installer into czishrink subdirectory)
   </PropertyGroup>
   <ItemGroup>
     <Content Include="CziShrinkVariables.wxi" />
