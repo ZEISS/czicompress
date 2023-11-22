@@ -14,9 +14,15 @@ permissions:
   actions: read
   contents: read
   security-events: write
+  pull-requests: read
 
 jobs:
+  changes:
+    uses: ./.github/workflows/subproject-changes.yml
+
   analyze:
+    needs: changes
+    if: ${{ needs.changes.outputs.czicompress  == 'true' }}
     name: Analyze CPP
     defaults:
       run:

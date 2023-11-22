@@ -22,7 +22,12 @@ on:
 permissions: read-all
 
 jobs:
+  changes:
+    uses: ./.github/workflows/subproject-changes.yml
+
   analyze:
+    needs: changes
+    if: ${{ needs.changes.outputs.czishrink == 'true' }}
     name: Analyze CziShrink
     defaults:
       run:

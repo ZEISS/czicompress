@@ -15,7 +15,12 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  changes:
+    uses: ./.github/workflows/subproject-changes.yml
+
   build:
+    needs: changes
+    if: ${{ needs.changes.outputs.czishrink == 'true' }}
     defaults:
       run:
         working-directory: czishrink
