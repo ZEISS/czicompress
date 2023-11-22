@@ -1,0 +1,25 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <?include CziShrinkVariables.wxi ?>
+  <Fragment>
+    <Component Id="CziShrinkShortcuts" Directory="INSTALLFOLDER" Condition="WIXUI_ADDPROGRAMMENU = 1">
+      <Shortcut Id="StartMenuShortcut"
+                Name="$(var.ShortcutName)"
+                Description="$(var.ShortcutDesc)"
+                Target="[!CziShrinkEXE]"
+                Directory="ApplicationProgramsFolder"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="CleanupStartMenuShortcut"
+                    Directory="ApplicationProgramsFolder"
+                    On="uninstall" />
+      <util:RemoveFolderEx Id="CleanupAppDataFolder"
+                           On="uninstall"
+                           Property="APPDATAFOLDER" />
+      <RegistryValue Root="HKCU"
+                     Key="$(var.RegistryKeyPath)"
+                     Name="Installed"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes" />
+    </Component>
+  </Fragment>
+</Wix>

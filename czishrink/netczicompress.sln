@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "netczicompress.Desktop", "n
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "netczicompressTests", "netczicompressTests\netczicompressTests.csproj", "{8B1A7EB0-48FE-4DF3-B23A-46F520565052}"
 EndProject
+Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "CziShrinkMSI", "netczicompress.Installer\CziShrinkMSI\CziShrinkMSI.wixproj", "{6CE7F25C-8270-4C2D-8EE6-5ABB6AC2CA59}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -27,6 +29,10 @@ Global
 		{8B1A7EB0-48FE-4DF3-B23A-46F520565052}.Debug|x64.Build.0 = Debug|x64
 		{8B1A7EB0-48FE-4DF3-B23A-46F520565052}.Release|x64.ActiveCfg = Release|x64
 		{8B1A7EB0-48FE-4DF3-B23A-46F520565052}.Release|x64.Build.0 = Release|x64
+		{6CE7F25C-8270-4C2D-8EE6-5ABB6AC2CA59}.Debug|x64.ActiveCfg = Debug|x64
+		{6CE7F25C-8270-4C2D-8EE6-5ABB6AC2CA59}.Debug|x64.Build.0 = Debug|x64
+		{6CE7F25C-8270-4C2D-8EE6-5ABB6AC2CA59}.Release|x64.ActiveCfg = Release|x64
+		{6CE7F25C-8270-4C2D-8EE6-5ABB6AC2CA59}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

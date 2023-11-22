@@ -1,0 +1,74 @@
+﻿<Project Sdk="WixToolset.Sdk/4.0.3" InitialTargets="PublishCziShrink">
+  <PropertyGroup>
+    <DefineConstants>
+      $(DefineConstants);
+      CustomImg=$(MSBuildProjectDirectory)\Custom UI\Images;
+    </DefineConstants>
+<<<<<<< HEAD
+    <SuppressIces>ICE64;ICE69</SuppressIces>
+    <OutputName>CZI Shrink Installer</OutputName>
+=======
+    <SuppressIces>ICE64</SuppressIces>
+>>>>>>> a328abd (Move installer into czishrink subdirectory)
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="CziShrinkVariables.wxi" />
+  </ItemGroup>
+  <PropertyGroup>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+  <!-- Signing needs to be explicitly opt-in because we rely on SIGNTOOL_PARAMS to also be defined.-->
+  <PropertyGroup Condition=" '$(SIGN)' != '' ">
+    <SignOutput>true</SignOutput>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Convenience variable to define where published artifacts for various cases of netczicompress.Desktop should be-->
+    <IntDirNetCziCompress>$(IntermediateOutputPath)publish/netczicompress.Desktop</IntDirNetCziCompress>
+  </PropertyGroup>
+  <!-- Case 1: No explicit artifacts -->
+  <PropertyGroup Condition="'$(ArtifactsDirectory)' == '' And !Exists('IntDirNetCziCompress') ">
+    <ArtifactsDirectory>$(IntDirNetCziCompress)</ArtifactsDirectory>
+    <NoExternalArtifacts>true</NoExternalArtifacts>
+  </PropertyGroup>
+  <!-- Case 2: No explicit artifacts AND do not use publish task. -->
+  <!-- The fact that we have a publish attribute on our ProjectReference and use dotnet publish is a bit confusing...
+       The difference boils down to the publishing options such as self-contained, publish-single-file, AOT setting, etc
+       which cannot be defined appropriately within a projectreference. -->
+  <ItemGroup Condition=" '$(DoNotPublish)' == 'true' ">
+    <ProjectReference Include="..\..\netczicompress.Desktop\netczicompress.Desktop.csproj" Publish="true" />
+  </ItemGroup>
+  <!-- If we do not pass an environment variable with the location of our artifacts we publish the project directly.-->
+  <!-- It's not the cleanest to duplicate our publish settings here, perhaps in the future we may want want to externalize this into a build script.-->
+  <Target Name="PublishCziShrink" Condition="'$(NoExternalArtifacts)' == 'true' And '$(DoNotPublish)' == '' And !Exists('$(IntDirNetCziCompress)') ">
+    <!-- PlatformShortName should map to architecture flag that is passed to dotnet publish-->
+    <Exec Command="dotnet publish ../../netczicompress.Desktop/netczicompress.Desktop.csproj -c $(Configuration) -a $(Platform) --self-contained -p:PublishSingleFile=true -p:PublishReadyToRun=true -o $(ArtifactsDirectory)" />
+    <Message Text="Finished Publishing netczicompress.Desktop" />
+  </Target>
+  <ItemGroup>
+    <!-- In order to directly reference exe and pdf we need to filter these file extensions out with XML transforms... -->
+    <Content Include="RemoveExeAndPdfComponents.xslt" />
+    <!-- Case 3 (implied): An explicit artifacts directory has been defined. Either it is signed or we rely on signtool -->
+    <HarvestDirectory Include="$(ArtifactsDirectory)">
+      <ComponentGroupName>CziShrinkDependencyComponents</ComponentGroupName>
+      <DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
+      <SuppressRootDirectory>true</SuppressRootDirectory>
+      <SuppressRegistry>true</SuppressRegistry>
+      <Transforms>RemoveExeAndPdfComponents.xslt</Transforms>
+    </HarvestDirectory>
+    <BindPath Include="$(ArtifactsDirectory)" />
+  </ItemGroup>
+  <Target Name="SignMsi">
+    <Message Importance="high" Text="SignMsi: @(SignMsi)" />
+    <!-- An example invocation of signtool would be as follows:
+           signtool.exe sign /v /f $(TestCertificate) /p password "%(SignMsi.FullPath)" '
+         But this project assumes that the interested party will set these parameters 
+         within env var SIGNTOOL_PARAMS.-->
+    <Exec Command="signtool.exe $(SIGNTOOL_PARAMS) %(SignMsi.FullPath)" />
+  </Target>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Util.wixext" />
+    <PackageReference Include="WixToolset.Heat" />
+    <PackageReference Include="WixToolset.UI.wixext" />
+  </ItemGroup>
+</Project>

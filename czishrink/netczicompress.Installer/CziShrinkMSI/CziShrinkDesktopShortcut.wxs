@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?include CziShrinkVariables.wxi ?>
+  <Fragment>
+<<<<<<< HEAD
+    <Component Id="CziShrinkDesktopShortcut" Directory="DesktopFolder" Condition="WIXUI_ADDDESKTOPSHORTCUT = 1">
+      <RegistryValue Root="HKCU"
+                     Key="$(RegistryKeyPath)"
+                     Name="DesktopShortcutInstalled"
+                     Value="1" />
+      <Shortcut Name="$(var.ShortcutName)"
+                Description="$(var.ShortcutDesc)"
+                Target="[#CziShrinkEXE]"
+                Directory="DesktopFolder"
+                Icon="CziShrinkIcon" />
+
+=======
+    <Component Id="CziShrinkDesktopShortcut" Directory="INSTALLFOLDER" Condition="WIXUI_ADDDESKTOPSHORTCUT=1">
+      <Shortcut Id="DesktopShortcut"
+                Name="$(var.ShortcutName)"
+                Description="$(var.ShortcutDesc)"
+                Target="[!CziShrinkEXE]"
+                Directory="DesktopFolder"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="CleanupDesktopShortcut"
+                    Directory="DesktopFolder"
+                    On="uninstall" />
+      <RegistryValue Root="HKCU"
+                     Key="$(RegistryKeyPath)"
+                     Name="DesktopShortcutInstalled"
+                     Type="integer"
+                     Value="1"
+                     KeyPath="yes" />
+>>>>>>> a328abd (Move installer into czishrink subdirectory)
+    </Component>
+  </Fragment>
+</Wix>
