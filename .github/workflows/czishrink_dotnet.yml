@@ -134,3 +134,28 @@ jobs:
         with:
           name: CziShrink_${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
           path: publish
+
+      - name: Restore Wix installer project
+        if: ${{ matrix.build == 'Release' && matrix.config.os == 'windows-latest' }}
+        working-directory: czishrink\netczicompress.Installer\CziShrinkMSI
+        env:
+          ArtifactsDirectory: ${{ github.workspace }}/publish }}
+        run: dotnet restore --locked-mode
+
+      - name: Build Wix installer
+        if: ${{ matrix.build == 'Release' && matrix.config.os == 'windows-latest' }}
+        working-directory: czishrink\netczicompress.Installer\CziShrinkMSI
+        env:
+          ArtifactsDirectory: ${{ github.workspace }}/publish }}
+        run: >
+          dotnet build
+          -c ${{ matrix.build }}
+          --locked-mode
+          -o ${{ github.workspace }}/installer
+      
+      - name: Upload Wix installer
+        uses: actions/upload-artifact@v3
+        if: ${{ (github.event_name == 'push') && (matrix.build == 'Release') && (matrix.config.os == 'windows-latest') }}
+        with:
+          name: CziShrink_Installer${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
+          path: installer
