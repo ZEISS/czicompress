@@ -6,6 +6,6 @@
   <?define ShortcutDesc = "Batch compress CZI files"?>
   <?define InstallFolder = "$(Manufacturer)\$(FullName)"?>
   <?define ShortcutName = "$(FullName)"?>
-  <?define ManufacturerFullName = "$(ManufacturerBusinessUnit) Gmbh"?>
+  <?define ManufacturerFullName = "$(ManufacturerBusinessUnit) GmbH"?>
   <?define RegistryKeyPath = "Software\$(Manufacturer)\$(FullName)" ?>
 </Include>
