@@ -3,7 +3,7 @@
     <AutoFixtureVersion>4.18.0</AutoFixtureVersion>
     <AvaloniaVersion>11.0.5</AvaloniaVersion>
     <ReactiveUIVersion>19.5.1</ReactiveUIVersion>
-    <SystemIOAbstractionsVersion>19.2.69</SystemIOAbstractionsVersion>
+    <SystemIOAbstractionsVersion>19.2.87</SystemIOAbstractionsVersion>
     <WixVersion>4.0.3</WixVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -35,12 +35,11 @@
     <PackageVersion Include="System.IO.Abstractions" Version="$(SystemIOAbstractionsVersion)" />
     <PackageVersion Include="System.IO.Abstractions.TestingHelpers" Version="$(SystemIOAbstractionsVersion)" />
     <PackageVersion Include="System.Reactive" Version="6.0.0" />
-    <PackageVersion Include="xunit" Version="2.6.1" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.3" />
-	<!-- Installer packages -->
     <PackageVersion Include="WixToolset.Util.wixext" Version="$(WixVersion)"/>
     <PackageVersion Include="WixToolset.Heat" Version="$(WixVersion)" />
     <PackageVersion Include="WixToolset.Bal.wixext" Version="$(WixVersion)" />
     <PackageVersion Include="WixToolset.UI.wixext" Version="$(WixVersion)"/>
+    <PackageVersion Include="xunit" Version="2.6.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.4" />
   </ItemGroup>
 </Project>

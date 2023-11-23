@@ -48,7 +48,7 @@ public class BytesToStringConverterTests
     [InlineData(1e6, 0)]
     [InlineData(true, 0)]
     [InlineData(null, 0)]
-    public void ConversionWithArbitraryInput_Returns0(object byteCount, object expected)
+    public void ConversionWithArbitraryInput_Returns0(object? byteCount, object expected)
     {
         var converter = new BytesToStringConverter();
         var result = converter.Convert(byteCount, typeof(IconAnimation), null, CultureInfo.InvariantCulture);
