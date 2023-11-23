@@ -17,6 +17,6 @@
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.1.0<!--feature/dotnet8--></VersionPrefix>
+    <VersionPrefix>1.1.1<!--dependabot/nuget/czishrink/SystemIOAbstractionsVersion-19.2.87--></VersionPrefix>
   </PropertyGroup>
 </Project>
