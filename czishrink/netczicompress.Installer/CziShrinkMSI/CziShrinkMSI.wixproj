@@ -37,6 +37,7 @@
   <!-- If we do not pass an environment variable with the location of our artifacts we publish the project directly.-->
   <!-- It's not the cleanest to duplicate our publish settings here, perhaps in the future we may want want to externalize this into a build script.-->
   <Target Name="PublishCziShrink" Condition="'$(NoExternalArtifacts)' == 'true' And '$(DoNotPublish)' == '' And !Exists('$(IntDirNetCziCompress)') ">
+    <Message Text="Publishing netczicompress.Desktop..." />
     <!-- PlatformShortName should map to architecture flag that is passed to dotnet publish-->
     <Exec Command="dotnet publish ../../netczicompress.Desktop/netczicompress.Desktop.csproj -c $(Configuration) -a $(Platform) --self-contained -p:PublishSingleFile=true -p:PublishReadyToRun=true -o $(ArtifactsDirectory)" />
     <Message Text="Finished Publishing netczicompress.Desktop" />
