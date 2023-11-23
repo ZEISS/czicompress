@@ -5,15 +5,6 @@ This file contains the declaration of all the localizable strings.
 
   <String Id="DowngradeError" Value="A newer version of [ProductName] is already installed." />
 
-  <!-- Artifact Agreement Dialog -->
-  <String Id="ArtifactsAgreementDlg_Title" Overridable="yes" Value="[ProductName] Setup" />
-  <String Id="ArtifactsAgreementDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Third Party Licenses Acknowledgements" />
-  <String Id="ArtifactsAgreementDlgDescription" Overridable="yes" Value="Please read the following acknowledgements carefully" />
-  <String Id="ArtifactsAgreementDlgBannerBitmap" Overridable="yes" Value="Artifacts_Banner" />
-
-  <!-- License Agreement Dialog -->
-  <String Id="LicenseAgreementDlgBannerBitmap" Overridable="yes" Value="License_Banner" />
-
   <!-- Custom Install Directory Dialog-->
   <String Id="AddProgramMenuCheckBox" Overridable="yes" Value="Create StartMenu entry" />
   <String Id="AddDesktopShortcutCheckBox" Overridable="yes" Value="Create Desktop shortcut" />
