@@ -9,9 +9,15 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 
 /// <summary>
-/// Tests for <see cref="TraceLoggerFactory"/>.
+/// Class to define test collection for <see cref="TraceLoggerFactoryTests"/>
 /// </summary>
 [CollectionDefinition(nameof(TraceLoggerFactoryTests), DisableParallelization = true)]
+public sealed class TraceLoggerFactoryTestsCollection {}
+
+/// <summary>
+/// Tests for <see cref="TraceLoggerFactory"/>.
+/// </summary>
+[Collection(nameof(TraceLoggerFactoryTests)]
 public sealed class TraceLoggerFactoryTests : IDisposable
 {
     private readonly MemoryTraceListener listener = new();

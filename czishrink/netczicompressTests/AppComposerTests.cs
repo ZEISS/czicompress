@@ -12,8 +12,15 @@ using netczicompress;
 using netczicompress.ViewModels;
 
 /// <summary>
+/// Class to define test collection for <see cref="AppComposerTests"/>
+/// </summary>
+[CollectionDefinition(nameof(AppComposerTests), DisableParallelization = true)]
+public class AppComposerTestsCollection { }
+
+/// <summary>
 /// Tests for <see cref="AppComposer"/>.
 /// </summary>
+[Collection(nameof(AppComposerTests))]
 public partial class AppComposerTests
 {
     [Fact]
