@@ -1,4 +1,8 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+﻿<!--
+SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <?include CziShrinkVariables.wxi ?>
   <Package Name="$(var.FullName)"
            Manufacturer="$(var.ManufacturerFullName)"

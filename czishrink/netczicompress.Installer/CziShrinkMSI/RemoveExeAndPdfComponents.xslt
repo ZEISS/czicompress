@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" exclude-result-prefixes="xsl wix"
     xmlns:wix="http://wixtoolset.org/schemas/v4/wxs"

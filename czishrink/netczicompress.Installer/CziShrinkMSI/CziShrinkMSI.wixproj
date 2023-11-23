@@ -1,4 +1,8 @@
-﻿<Project Sdk="WixToolset.Sdk/4.0.3" InitialTargets="PublishCziShrink">
+﻿<!--
+SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<Project Sdk="WixToolset.Sdk/4.0.3" InitialTargets="PublishCziShrink">
   <PropertyGroup>
     <DefineConstants>
       $(DefineConstants);

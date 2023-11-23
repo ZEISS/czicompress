@@ -11,7 +11,7 @@ Files: .github/* .gitignore .gitattributes czicompress/.editorconfig czicompress
 Copyright: 2023 Carl Zeiss Microscopy GmbH
 License: CC0-1.0
 
-Files: czishrink/*.axaml czishrink/*.json czishrink/*.nuspec czishrink/*.txt czishrink/*.ico czishrink/*.png czishrink/*.props czishrink/*.targets czishrink/*.sh czishrink/*.svg czishrink/*.csproj czishrink/*.gitattributes czishrink/*.nupkg czishrink/*.md czishrink/*.pdf czishrink/*.config czishrink/*.ruleset czishrink/*.ps1 czishrink/*.czi czishrink/*.xml czishrink/*.sln czishrink/*.manifest README.md
+Files: czishrink/*.axaml czishrink/*.json czishrink/*.nuspec czishrink/*.txt czishrink/*.ico czishrink/*.png czishrink/*.props czishrink/*.targets czishrink/*.sh czishrink/*.svg czishrink/*.csproj czishrink/*.wixproj czishrink/*.gitattributes czishrink/*.nupkg czishrink/*.md czishrink/*.pdf czishrink/*.config czishrink/*.ruleset czishrink/*.ps1 czishrink/*.czi czishrink/*.xml czishrink/*.sln czishrink/*.manifest czishrink/*.rtf README.md
 Copyright: 2023 Carl Zeiss Microscopy GmbH
 License: GPL-3.0-or-later
 
