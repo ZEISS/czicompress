@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 /// <summary>
 /// Tests for <see cref="TraceLoggerFactory"/>.
 /// </summary>
+[CollectionDefinition(nameof(TraceLoggerFactoryTests), DisableParallelization = true)]
 public sealed class TraceLoggerFactoryTests : IDisposable
 {
     private readonly MemoryTraceListener listener = new();
