@@ -38,7 +38,7 @@ public class FloatToCompressionRatioStringConverterTests
     [InlineData("foo")]
     [InlineData(null)]
     [InlineData(typeof(string))]
-    public void Convert_WhenCalledOnSomethingThatIsNeitherFloatNorDouble_ReturnsEmptyString(object value)
+    public void Convert_WhenCalledOnSomethingThatIsNeitherFloatNorDouble_ReturnsEmptyString(object? value)
     {
         var converter = new FloatToCompressionRatioStringConverter();
         var result = converter.Convert(value, typeof(double), null, CultureInfo.InvariantCulture);
