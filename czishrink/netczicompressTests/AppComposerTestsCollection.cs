@@ -4,9 +4,8 @@
 
 namespace netczicompressTests
 {
-
     /// <summary>
-    /// Class to define test collection for <see cref="AppComposerTests"/>
+    /// Class to define test collection for <see cref="AppComposerTests"/>.
     /// </summary>
     [CollectionDefinition(nameof(AppComposerTests), DisableParallelization = true)]
     public class AppComposerTestsCollection
