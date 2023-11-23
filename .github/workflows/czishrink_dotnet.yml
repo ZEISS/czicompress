@@ -152,7 +152,7 @@ jobs:
           -c ${{ matrix.build }}
           --no-restore
           -o ${{ github.workspace }}/installer
-      
+
       - name: Upload Wix installer
         uses: actions/upload-artifact@v3
         if: ${{ (github.event_name == 'push') && (matrix.build == 'Release') && (matrix.config.os == 'windows-latest') }}
