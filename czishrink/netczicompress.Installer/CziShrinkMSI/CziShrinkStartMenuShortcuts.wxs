@@ -1,7 +1,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <?include CziShrinkVariables.wxi ?>
   <Fragment>
-    <Component Id="CziShrinkShortcuts" Directory="INSTALLFOLDER" Condition="WIXUI_ADDPROGRAMMENU = 1">
+    <Component Id="CziShrinkStartMenuShortcuts" Directory="INSTALLFOLDER" Condition="NOT ENABLESTARTMENUSHORTCUT = 0">
       <Shortcut Id="StartMenuShortcut"
                 Name="$(var.ShortcutName)"
                 Description="$(var.ShortcutDesc)"
