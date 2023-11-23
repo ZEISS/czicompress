@@ -1,6 +1,8 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <?include CziShrinkVariables.wxi ?>
   <Fragment>
+    <!-- Variables in all caps are public in Wix-->
+    <!-- Default behavior is to create these shortcuts unless explicitly disabled via variable -->
     <Component Id="CziShrinkStartMenuShortcuts" Directory="INSTALLFOLDER" Condition="NOT ENABLESTARTMENUSHORTCUT = 0">
       <Shortcut Id="StartMenuShortcut"
                 Name="$(var.ShortcutName)"
@@ -14,6 +16,9 @@
       <util:RemoveFolderEx Id="CleanupAppDataFolder"
                            On="uninstall"
                            Property="APPDATAFOLDER" />
+      <!-- Note that for all users the registry key ought to be HKMU rather than per-user HKCU. In the best case
+           this ought to be made contingent on whether the installer is run per-user or per-machine. Additionally
+           this may cause an ICE57 error which would would have to be suppressed.-->
       <RegistryValue Root="HKCU"
                      Key="$(var.RegistryKeyPath)"
                      Name="Installed"

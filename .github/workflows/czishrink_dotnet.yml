@@ -139,14 +139,14 @@ jobs:
         if: ${{ matrix.build == 'Release' && matrix.config.os == 'windows-latest' }}
         working-directory: czishrink\netczicompress.Installer\CziShrinkMSI
         env:
-          ArtifactsDirectory: ${{ github.workspace }}/publish }}
+          ArtifactsDirectory: ${{ github.workspace }}/publish
         run: dotnet restore --locked-mode
 
       - name: Build Wix installer
         if: ${{ matrix.build == 'Release' && matrix.config.os == 'windows-latest' }}
         working-directory: czishrink\netczicompress.Installer\CziShrinkMSI
         env:
-          ArtifactsDirectory: ${{ github.workspace }}/publish }}
+          ArtifactsDirectory: ${{ github.workspace }}/publish
         run: >
           dotnet build
           -c ${{ matrix.build }}
