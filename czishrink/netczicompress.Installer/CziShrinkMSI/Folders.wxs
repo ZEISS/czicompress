@@ -5,7 +5,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <?include CziShrinkVariables.wxi ?>
   <Fragment>
-    <StandardDirectory Id="ProgramFiles6432Folder">
+    <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="$(var.Manufacturer)\!(bind.Property.ProductName)" />
     </StandardDirectory>
     <StandardDirectory Id="DesktopFolder" />

@@ -7,7 +7,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   <Package Name="$(var.FullName)"
            Manufacturer="$(var.ManufacturerFullName)"
            Version="!(bind.fileVersion.CziShrinkExe)"
-           UpgradeCode="6d400b13-c2d8-4490-87d5-e5492c7f8277">
+           UpgradeCode="6d400b13-c2d8-4490-87d5-e5492c7f8277" >
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
 
     <!-- We want to highly compress the cab file and embed it into the executable-->
