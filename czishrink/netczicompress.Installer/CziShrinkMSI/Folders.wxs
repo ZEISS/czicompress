@@ -8,7 +8,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <StandardDirectory Id="ProgramFiles64Folder">
       <Directory Id="INSTALLFOLDER" Name="$(var.Manufacturer)\!(bind.Property.ProductName)" />
     </StandardDirectory>
+
     <StandardDirectory Id="DesktopFolder" />
+
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="ApplicationProgramsFolder" Name="$(var.ManufacturerBusinessUnit)\!(bind.Property.ProductName)" />
     </StandardDirectory>

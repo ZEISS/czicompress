@@ -4,6 +4,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <?include CziShrinkVariables.wxi ?>
+
   <Package Name="$(var.FullName)"
            Manufacturer="$(var.ManufacturerFullName)"
            Version="!(bind.fileVersion.CziShrinkExe)"

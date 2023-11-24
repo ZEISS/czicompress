@@ -14,16 +14,16 @@ SPDX-License-Identifier: GPL-3.0-or-later
                 Target="[!CziShrinkEXE]"
                 Directory="ApplicationProgramsFolder"
                 WorkingDirectory="INSTALLFOLDER" />
+
       <RemoveFolder Id="CleanupStartMenuShortcut"
                     Directory="ApplicationProgramsFolder"
                     On="uninstall" />
+
       <util:RemoveFolderEx Id="CleanupAppDataFolder"
                            On="uninstall"
                            Property="APPDATAFOLDER" />
-      <!-- Note that for all users the registry key ought to be HKMU rather than per-user HKCU. In the best case
-           this ought to be made contingent on whether the installer is run per-user or per-machine. Additionally
-           this may cause an ICE57 error which would would have to be suppressed.-->
-      <RegistryValue Root="HKCU"
+
+      <RegistryValue Root="HKMU"
                      Key="$(var.RegistryKeyPath)"
                      Name="Installed"
                      Type="integer"

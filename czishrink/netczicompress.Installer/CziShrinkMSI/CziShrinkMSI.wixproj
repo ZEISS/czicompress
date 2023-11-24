@@ -8,7 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       $(DefineConstants);
       CustomImg=$(MSBuildProjectDirectory)\Custom UI\Images;
     </DefineConstants>
-    <SuppressIces>ICE64;ICE69</SuppressIces>
+    <SuppressIces>ICE64;ICE69;ICE57</SuppressIces>
     <OutputName>CZIShrinkInstaller</OutputName>
   </PropertyGroup>
   <ItemGroup>
@@ -16,6 +16,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
   </ItemGroup>
   <PropertyGroup>
     <Platforms>x64</Platforms>
+    <Platform>x64</Platform>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
   <!-- Signing needs to be explicitly opt-in because we rely on SIGNTOOL_PARAMS to also be defined.-->
