@@ -433,6 +433,7 @@ FodyWeavers.xsd
 ### END VisualStudio.gitignore ###
 ##################################
 
+# Wix toolset
 *.wixpdb
 
 # Be able to commit local nupkg
