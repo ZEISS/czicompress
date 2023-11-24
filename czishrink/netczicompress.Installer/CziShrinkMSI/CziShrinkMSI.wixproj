@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
       CustomImg=$(MSBuildProjectDirectory)\Custom UI\Images;
     </DefineConstants>
     <SuppressIces>ICE64;ICE69</SuppressIces>
-    <OutputName>CZI Shrink Installer</OutputName>
+    <OutputName>CZIShrinkInstaller</OutputName>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="CziShrinkVariables.wxi" />
