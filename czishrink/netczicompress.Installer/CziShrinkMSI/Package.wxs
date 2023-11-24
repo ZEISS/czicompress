@@ -18,10 +18,6 @@ SPDX-License-Identifier: GPL-3.0-or-later
       InstallDirectory="INSTALLFOLDER"/>
 
     <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
-    <!-- Unfortunately it appears that windows installer needs explicit CodePages to be set and has issues w/ Utf-8.
-         We plan to eventually move onto using spdx manifests which are notably less human readable and the usage of
-         this will be phased out.
-         -->
 
     <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomImg)\DefaultBackground.png" />
     <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomImg)\DefaultBanner.png" />

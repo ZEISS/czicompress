@@ -7,11 +7,5 @@ SPDX-License-Identifier: GPL-3.0-or-later
 This file contains the declaration of all the localizable strings.
 -->
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
-
   <String Id="DowngradeError" Value="A newer version of [ProductName] is already installed." />
-
-  <!-- Custom Install Directory Dialog-->
-  <String Id="AddProgramMenuCheckBox" Overridable="yes" Value="Create StartMenu entry" />
-  <String Id="AddDesktopShortcutCheckBox" Overridable="yes" Value="Create Desktop shortcut" />
-  <String Id="RunAfterInstallCheckBox" Overridable="yes" Value="Start program after install" />
 </WixLocalization>
