@@ -8,6 +8,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
+using static System.FormattableString;
+
 /// <summary>
 /// Writes a sequence of <see cref="CompressorMessage.FileFinished"/> messages to a CSV file.
 /// </summary>
@@ -45,16 +47,17 @@ public class CsvLogFileWriter : IObserver<CompressorMessage.FileFinished>
 
     private static string ToLine(CompressorMessage.FileFinished value)
     {
-        return string.Join(
-            ',',
-            Quote(value.InputFile.FullName),
-            value.SizeInput,
-            value.SizeOutput,
-            value.ErrorMessage == null ? value.SizeRatio : string.Empty,
-            value.ErrorMessage == null ? value.SizeDelta : string.Empty,
-            value.TimeElapsed?.ToString("c") ?? string.Empty,
-            value.ErrorMessage == null ? "SUCCESS" : "ERROR",
-            Quote(value.ErrorMessage)) + "\r\n";
+        return Invariant(
+                $"{
+                    Quote(value.InputFile.FullName)},{
+                    value.SizeInput},{
+                    value.SizeOutput},{
+                    (value.ErrorMessage == null ? value.SizeRatio : string.Empty)},{
+                    (value.ErrorMessage == null ? value.SizeDelta : string.Empty)},{
+                    value.TimeElapsed?.ToString("c") ?? string.Empty},{
+                    (value.ErrorMessage == null ? "SUCCESS" : "ERROR")},{
+                    Quote(value.ErrorMessage)}")
+                + "\r\n";
     }
 
     private static string Quote(string? value)
