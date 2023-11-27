@@ -17,6 +17,6 @@
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.1.2<!--feature/traceloggertests-to-non-parallel-collection--></VersionPrefix>
+    <VersionPrefix>1.1.3<!--bugfix/decimal-sep--></VersionPrefix>
   </PropertyGroup>
 </Project>
