@@ -18,5 +18,7 @@
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <VersionPrefix>1.1.1<!--dependabot/nuget/czishrink/SystemIOAbstractionsVersion-19.2.87--></VersionPrefix>
+    <!-- When empty has no effect, used for setting exe version for installer builds -->
+    <AssemblyVersion></AssemblyVersion>
   </PropertyGroup>
 </Project>
