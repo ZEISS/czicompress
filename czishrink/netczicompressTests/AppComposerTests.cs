@@ -14,6 +14,7 @@ using netczicompress.ViewModels;
 /// <summary>
 /// Tests for <see cref="AppComposer"/>.
 /// </summary>
+[Collection(nameof(AppComposerTests))]
 public partial class AppComposerTests
 {
     [Fact]
