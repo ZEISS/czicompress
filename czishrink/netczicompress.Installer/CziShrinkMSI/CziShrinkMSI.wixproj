@@ -11,6 +11,12 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <SuppressIces>ICE64;ICE69;ICE57</SuppressIces>
     <OutputName>CZIShrinkInstaller</OutputName>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(CustomVersion)' != '' ">
+    <DefineConstants>
+      $(DefineConstants);
+      CustomVersion=$(CustomVersion);
+    </DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Content Include="CziShrinkVariables.wxi" />
   </ItemGroup>
