@@ -17,6 +17,6 @@
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.1.3<!--bugfix/decimal-sep--></VersionPrefix>
+    <VersionPrefix>1.1.4<!--feature/wix-installer-extensions--></VersionPrefix>
   </PropertyGroup>
 </Project>
