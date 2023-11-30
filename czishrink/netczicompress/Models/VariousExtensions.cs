@@ -57,14 +57,18 @@ public static class VariousExtensions
 
     public static void Deconstruct(
         this TimeSpan value,
-        out int totalDays,
-        out int totalHours,
+        out double totalDays,
+        out int days,
+        out double totalHours,
+        out int hours,
         out int minutes,
         out int seconds,
         out int milliseconds)
     {
-        totalDays = (int)value.TotalDays;
-        totalHours = (int)value.TotalHours;
+        totalDays = value.TotalDays;
+        days = value.Days;
+        totalHours = value.TotalHours;
+        hours = value.Hours;
         minutes = value.Minutes;
         seconds = value.Seconds;
         milliseconds = value.Milliseconds;
