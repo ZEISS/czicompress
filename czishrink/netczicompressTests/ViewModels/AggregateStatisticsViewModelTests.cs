@@ -51,6 +51,30 @@ public class AggregateStatisticsViewModelTests
         sut.Should().BeEquivalentTo(newValue);
     }
 
+    [Theory]
+    [InlineData(12, 13, 14, 15, 0, "301h 14m 15s")]
+    [InlineData(0, 13, 14, 15, 0, "13h 14m 15s")]
+    [InlineData(0, 3, 14, 15, 0, "3h 14m 15s")]
+    [InlineData(0, 0, 04, 05, 10, "4m 5s")]
+    [InlineData(10, 25, 62, 64, 10000, "266h 3m 14s")]
+    [InlineData(00, 00, 00, 00, int.MaxValue, "596h 31m 23s")]
+    [InlineData(00, 256204778, 48, 5, 477, "256204778h 48m 5s")] /* roughly equivalent to TimeSpan.MaxValue */
+    [InlineData(0, -13, -14, -15, 0, "-13h -14m -15s")] /* Should be impossible but it doesn't hurt to handle */
+    public void OnNext_WithNewDuration_HasNiceFormattedPropertySet(int days, int hours, int minutes, int seconds, int milliseconds, string formattedString)
+    {
+        // ARRANGE
+        var fixture = CreateFixture();
+        var sut = fixture.Create<AggregateStatisticsViewModel>();
+        var newValue = fixture.Create<AggregateStatistics>();
+        var modifiedValue = newValue with { Duration = new TimeSpan(days, hours, minutes, seconds, milliseconds) };
+
+        // ACT
+        sut.OnNext(modifiedValue);
+
+        // ASSERT
+        sut.DurationFormatted.Should().BeEquivalentTo(formattedString);
+    }
+
     [Fact]
     public void OnCompleted_WhenCalled_DoesNotDoAnything()
     {

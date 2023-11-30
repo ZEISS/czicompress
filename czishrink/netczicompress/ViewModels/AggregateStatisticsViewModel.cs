@@ -54,6 +54,8 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
 
     public TimeSpan Duration => this.current.Duration;
 
+    public string DurationFormatted => FormatTimeSpan(this.current.Duration);
+
     public long InputBytes => this.current.InputBytes;
 
     public long OutputBytes => this.current.OutputBytes;
@@ -82,6 +84,15 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
     {
         this.current = value;
         this.RaisePropertyChanged(string.Empty);
+    }
+
+    private static string FormatTimeSpan(TimeSpan value)
+    {
+        var (_, totalHours, minutes, seconds, _) = value;
+        return
+            $"{(totalHours != 0 ? $"{totalHours}h " : string.Empty)}" +
+            $"{(minutes != 0 ? $"{minutes}m " : string.Empty)}" +
+            $"{seconds}s";
     }
 
     private void DoCopyBadgeToClipboard()
