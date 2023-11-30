@@ -59,8 +59,8 @@ public class CsvLogFileWriterTests
         new[]
         {
             "InputFile,SizeInput,SizeOutput,SizeRatio,SizeDelta,TimeToProcess,Status,ErrorMessage",
-            "\"foo/bla/bla.czi\",100,16,0.16,-84,00:00:00:0000000,SUCCESS,",
-            "\"foo/bla/blub.czi\",1000,1600,1.6,600,00:00:00:0000000,SUCCESS,",
+            "\"foo/bla/bla.czi\",100,16,0.16,-84,00:00:00,SUCCESS,",
+            "\"foo/bla/blub.czi\",1000,1600,1.6,600,00:00:00,SUCCESS,",
             "\"bar/bla/baz,; .CZI\",1000,1600,,,,ERROR,\"oops\nHere's another line.\"",
             string.Empty,
         });
