@@ -72,7 +72,7 @@ public class AggregateStatisticsViewModelTests
         sut.OnNext(modifiedValue);
 
         // ASSERT
-        sut.DurationFormatted.Should().BeEquivalentTo(formattedString);
+        sut.Duration.Should().BeEquivalentTo(formattedString);
     }
 
     [Fact]
