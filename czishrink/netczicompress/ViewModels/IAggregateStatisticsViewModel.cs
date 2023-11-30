@@ -19,7 +19,7 @@ public interface IAggregateStatisticsViewModel : INotifyPropertyChanged
 
     long DeltaBytes { get; }
 
-    string DurationFormatted { get; }
+    string Duration { get; }
 
     int FilesWithErrors { get; }
 
