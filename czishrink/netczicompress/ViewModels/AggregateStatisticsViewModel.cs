@@ -88,9 +88,10 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
 
     private static string FormatTimeSpan(TimeSpan value)
     {
-        var (_, totalHours, minutes, seconds, _) = value;
+        var (_, _, totalHours, _, minutes, seconds, _) = value;
+        var totalHoursClamped = (int)totalHours;
         return
-            $"{(totalHours != 0 ? $"{totalHours}h " : string.Empty)}" +
+            $"{(totalHoursClamped != 0 ? $"{totalHoursClamped}h " : string.Empty)}" +
             $"{(minutes != 0 ? $"{minutes}m " : string.Empty)}" +
             $"{seconds}s";
     }
