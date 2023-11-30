@@ -54,7 +54,7 @@ public class CsvLogFileWriter : IObserver<CompressorMessage.FileFinished>
                     value.SizeOutput},{
                     (value.ErrorMessage == null ? value.SizeRatio : string.Empty)},{
                     (value.ErrorMessage == null ? value.SizeDelta : string.Empty)},{
-                    value.TimeElapsed?.ToString("c") ?? string.Empty},{
+                    value.TimeElapsed?.ToDateTimeString() ?? string.Empty},{
                     (value.ErrorMessage == null ? "SUCCESS" : "ERROR")},{
                     Quote(value.ErrorMessage)}")
                 + "\r\n";
