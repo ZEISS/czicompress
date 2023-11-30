@@ -52,8 +52,6 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
 
     public int FilesWithNoErrors => this.current.FilesWithNoErrors;
 
-    public TimeSpan Duration => this.current.Duration;
-
     public string DurationFormatted => FormatTimeSpan(this.current.Duration);
 
     public long InputBytes => this.current.InputBytes;

@@ -19,8 +19,6 @@ public interface IAggregateStatisticsViewModel : INotifyPropertyChanged
 
     long DeltaBytes { get; }
 
-    TimeSpan Duration { get; }
-
     string DurationFormatted { get; }
 
     int FilesWithErrors { get; }
