@@ -103,7 +103,7 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
             var control = new netczicompress.Views.CompressionResultBadge();
 
             control.FilesWithoutErrorsValue.Text = string.Format(CultureInfo.CurrentCulture, @"{0:D}", this.FilesWithNoErrors);
-            control.DurationValue.Text = string.Format(CultureInfo.CurrentCulture, @"{0:hh\:mm\.ss}", this.Duration);
+            control.DurationValue.Text = this.DurationFormatted;
             control.InputSizeValue.Text = new BytesToStringConverter().Convert(this.InputBytes, typeof(long), null, CultureInfo.CurrentCulture).ToString();
             control.OutputSizeValue.Text = new BytesToStringConverter().Convert(this.OutputBytes, typeof(long), null, CultureInfo.CurrentCulture).ToString();
             control.DeltaSizeValue.Text = new BytesToStringConverter().Convert(this.DeltaBytes, typeof(long), null, CultureInfo.CurrentCulture).ToString();
