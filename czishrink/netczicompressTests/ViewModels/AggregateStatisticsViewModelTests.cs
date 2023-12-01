@@ -7,6 +7,7 @@ namespace netczicompressTests.ViewModels;
 using System.ComponentModel;
 
 using netczicompress.ViewModels;
+using netczicompress.ViewModels.Formatters;
 
 /// <summary>
 /// Tests for <see cref="AggregateStatisticsViewModel"/>.
@@ -23,7 +24,7 @@ public class AggregateStatisticsViewModelTests
         var sut = fixture.Create<AggregateStatisticsViewModel>();
 
         // ASSERT
-        sut.Should().BeEquivalentTo(AggregateStatistics.Empty, options => options.Excluding(o => o.Duration));
+        sut.Should().BeEquivalentTo(AggregateStatistics.Empty);
     }
 
     [Fact]
@@ -48,7 +49,7 @@ public class AggregateStatisticsViewModelTests
             Times.Once);
         propertyListener.VerifyNoOtherCalls();
 
-        sut.Should().BeEquivalentTo(newValue, options => options.Excluding(o => o.Duration));
+        sut.Should().BeEquivalentTo(newValue);
     }
 
     [Fact]
@@ -81,8 +82,15 @@ public class AggregateStatisticsViewModelTests
     {
         // ARRANGE
         IFixture fixture = CreateFixture();
+
+        var timeSpanFormatterMock = fixture.Freeze<Mock<ITimeSpanFormatter>>();
+        timeSpanFormatterMock
+            .Setup(x => x.FormatTimeSpan(It.IsAny<TimeSpan>()))
+            .Returns(string.Empty);
+
         var oldValue = fixture.Create<AggregateStatistics>();
         var sut = fixture.Create<AggregateStatisticsViewModel>();
+
         sut.OnNext(oldValue);
 
         // ACT
@@ -92,8 +100,8 @@ public class AggregateStatisticsViewModelTests
         // ASSERT
         monitor.OccurredEvents.Should().BeEmpty();
 
-        // Duration formatting is tested in <see cref="OnNext_WithNewDuration_HasNiceFormattedPropertySet"/>
-        sut.Should().BeEquivalentTo(oldValue, options => options.Excluding(o => o.Duration));
+        sut.Should().BeEquivalentTo(oldValue);
+        sut.FormattedDuration.Should().BeEquivalentTo(string.Empty);
     }
 
     private static IFixture CreateFixture()
