@@ -14,6 +14,9 @@
 		<Content Include="..\THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt" Link="THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="..\README.pdf" Link="README.pdf">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
