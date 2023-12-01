@@ -1,0 +1,24 @@
+<!--
+SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="CziShrinkComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <File Id="CziShrinkEXE"
+              KeyPath="yes"
+              Checksum="yes"
+              Source="CziShrink.exe" />
+      </Component>
+      <Component>
+        <File Id="ReadmePDF"
+              KeyPath="yes"
+              Checksum="yes"
+              Source="README.pdf">
+        </File>
+      </Component>
+      <ComponentGroupRef Id="CziShrinkDependencyComponents" />
+    </ComponentGroup>
+  </Fragment>
+</Wix>

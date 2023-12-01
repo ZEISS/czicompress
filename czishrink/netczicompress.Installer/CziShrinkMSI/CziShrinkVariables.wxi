@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?define FullName = "CZI Shrink" ?>
+  <?define Manufacturer = "Carl Zeiss"?>
+  <?define ManufacturerBusinessUnit = "$(Manufacturer) Microscopy"?>
+  <?define ShortcutDesc = "Batch compress CZI files"?>
+  <?define InstallFolder = "$(Manufacturer)\$(FullName)"?>
+  <?define ShortcutName = "$(FullName)"?>
+  <?define ManufacturerFullName = "$(ManufacturerBusinessUnit) GmbH"?>
+  <?define RegistryKeyPath = "Software\$(Manufacturer)\$(FullName)" ?>
+</Include>
