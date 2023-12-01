@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "dependencies": {
+    "native,Version=v0.0": {
+      "StyleCop.Analyzers.Unstable": {
+        "type": "Direct",
+        "requested": "[1.2.0.507, )",
+        "resolved": "1.2.0.507",
+        "contentHash": "gTY3IQdRqDJ4hbhSA3e/R48oE8b/OiKfvwkt1QdNVfrJK2gMHBV8ldaHJ885jxWZfllK66soa/sdcjh9bX49Tw=="
+      },
+      "WixToolset.Heat": {
+        "type": "Direct",
+        "requested": "[4.0.3, )",
+        "resolved": "4.0.3",
+        "contentHash": "NNaAYVEZo4Gw1mb58OA7/6lXWIx8A6dbX1gXzM+HAEjp35wnTkkB/yYpMeLfCrHSTJ3muAHCvSmI+4qgCFGwmA=="
+      },
+      "WixToolset.UI.wixext": {
+        "type": "Direct",
+        "requested": "[4.0.3, )",
+        "resolved": "4.0.3",
+        "contentHash": "93DL5vwJUzbRjLVA0t2Pe5Te/MtHvLmpXDApv+tjuWu8eqDp+dF70YXV4/nuRvdEQiQ2IeMwSDffP5SnVErvuQ=="
+      },
+      "WixToolset.Util.wixext": {
+        "type": "Direct",
+        "requested": "[4.0.3, )",
+        "resolved": "4.0.3",
+        "contentHash": "gWDOZNC6Y+8RPNjjAviFTyZwEYMNa+pg5gqRnZinUYwCi0mLlaD+lpWm37L6oU9hEcvkBXkJRVJSIqjsxiSOHQ=="
+      }
+    },
+    "native,Version=v0.0/win-x64": {}
+  }
+}

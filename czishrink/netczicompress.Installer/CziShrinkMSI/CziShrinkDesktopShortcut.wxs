@@ -1,0 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?include CziShrinkVariables.wxi ?>
+  <Fragment>
+    <!-- Variables in all caps are public in Wix-->
+    <!-- Default behavior is to create these shortcuts unless explicitly disabled via variable -->
+    <Component Id="CziShrinkDesktopShortcut" Directory="DesktopFolder" Condition="NOT ENABLEDESKTOPSHORTCUT = 0">
+      <RegistryValue Root="HKMU"
+                     Key="$(RegistryKeyPath)"
+                     Name="DesktopShortcutInstalled"
+                     Value="1" />
+
+      <Shortcut Name="$(var.ShortcutName)"
+                Description="$(var.ShortcutDesc)"
+                Target="[#CziShrinkEXE]"
+                Directory="DesktopFolder"
+                Icon="CziShrinkIcon" />
+    </Component>
+  </Fragment>
+</Wix>

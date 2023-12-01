@@ -1,0 +1,52 @@
+﻿<!--
+SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <?include CziShrinkVariables.wxi ?>
+
+  <?ifdef $(var.CustomVersion) ?>
+    <?define Version = $(var.CustomVersion) ?>
+  <?else?>
+    <?define Version = !(bind.fileVersion.CziShrinkExe) ?>
+  <?endif?>
+
+    <Package Name="$(var.FullName)"
+             Manufacturer="$(var.ManufacturerFullName)"
+             Version="$(var.Version)"
+             UpgradeCode="6d400b13-c2d8-4490-87d5-e5492c7f8277" >
+      <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
+
+    <!-- We want to highly compress the cab file and embed it into the executable-->
+    <MediaTemplate CompressionLevel="high" EmbedCab="yes" />
+
+    <ui:WixUI
+      Id="WixUI_InstallDir"
+      InstallDirectory="INSTALLFOLDER"/>
+
+    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.CustomImg)\DefaultBackground.png" />
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.CustomImg)\DefaultBanner.png" />
+
+    <WixVariable Id="LicenseAgreementDlgBannerBitmap" Value="$(var.CustomImg)\LicenseBanner.bmp" />
+
+    <!-- Level and Title are not strictly needed here but give a hint for how installer could leverage features to install something like czicheck or add
+         modules that deal with different paradigms (file formats, compression algorithm, etc) than initially expected.-->
+    <Feature Id="Main" Title="CziShrink" Level="1" ConfigurableDirectory="INSTALLFOLDER">
+      <ComponentGroupRef Id="CziShrinkComponents" />
+      <ComponentRef Id="CziShrinkStartMenuShortcuts" />
+      <ComponentRef Id="CziShrinkDesktopShortcut" />
+    </Feature>
+
+    <!-- CustomAction is to run CziShrink after installing provided the user checked the appropriate option -->
+    <Property Id="WixUnelevatedShellExecTarget" Value="[#CziShrinkEXE]" />
+    <CustomAction Id="LaunchApplicationAfterExit"
+                  BinaryRef="Wix4UtilCA_$(sys.BUILDARCHSHORT)"
+                  DllEntry="WixUnelevatedShellExec"
+                  Execute="immediate" Return="check" />
+
+    <Icon Id="CziShrinkIcon" SourceFile="..\..\netczicompress\Assets\netczicompress.ico" />
+    <Property Id="ARPPRODUCTICON" Value="CziShrinkIcon" />
+  </Package>
+</Wix>
