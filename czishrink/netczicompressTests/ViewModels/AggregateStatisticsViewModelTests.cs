@@ -23,7 +23,7 @@ public class AggregateStatisticsViewModelTests
         var sut = fixture.Create<AggregateStatisticsViewModel>();
 
         // ASSERT
-        sut.Should().BeEquivalentTo(AggregateStatistics.Empty);
+        sut.Should().BeEquivalentTo(AggregateStatistics.Empty, options => options.Excluding(o => o.Duration));
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class AggregateStatisticsViewModelTests
             Times.Once);
         propertyListener.VerifyNoOtherCalls();
 
-        sut.Should().BeEquivalentTo(newValue);
+        sut.Should().BeEquivalentTo(newValue, options => options.Excluding(o => o.Duration));
     }
 
     [Fact]
@@ -91,7 +91,9 @@ public class AggregateStatisticsViewModelTests
 
         // ASSERT
         monitor.OccurredEvents.Should().BeEmpty();
-        sut.Should().BeEquivalentTo(oldValue);
+
+        // Duration formatting is tested in <see cref="OnNext_WithNewDuration_HasNiceFormattedPropertySet"/>
+        sut.Should().BeEquivalentTo(oldValue, options => options.Excluding(o => o.Duration));
     }
 
     private static IFixture CreateFixture()

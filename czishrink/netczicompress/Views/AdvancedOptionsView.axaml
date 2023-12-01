@@ -1,72 +1,72 @@
 ﻿<UserControl
-  d:DesignHeight="70"
-  d:DesignWidth="400"
-  mc:Ignorable="d"
-  x:Class="netczicompress.Views.AdvancedOptionsView"
-  x:DataType="vm:IAdvancedOptionsViewModel"
-  xmlns="https://github.com/avaloniaui"
-  xmlns:converters="clr-namespace:netczicompress.ViewModels.Converters"
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:local="clr-namespace:netczicompress.Models"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:vm="clr-namespace:netczicompress.ViewModels"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    x:Class="netczicompress.Views.AdvancedOptionsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:netczicompress.ViewModels.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:netczicompress.Models"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:netczicompress.ViewModels"
+    d:DesignHeight="100"
+    d:DesignWidth="430"
+    x:DataType="vm:IAdvancedOptionsViewModel"
+    mc:Ignorable="d">
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <converters:ThreadCountToDecimalConverter x:Key="ThreadCountToDecimalConverter" />
-      <converters:CompressionLevelToDecimalConverter x:Key="CompressionLevelToDecimalConverter" />
-    </ResourceDictionary>
-  </UserControl.Resources>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:ThreadCountToDecimalConverter x:Key="ThreadCountToDecimalConverter" />
+            <converters:CompressionLevelToDecimalConverter x:Key="CompressionLevelToDecimalConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
 
-  <Grid ColumnDefinitions="Auto,20,60*" RowDefinitions="Auto, Auto, Auto">
-    <Label
-      Grid.Column="0"
-      Grid.Row="0"
-      VerticalAlignment="Center">
-      Copy non-processable files to destination
-    </Label>
-    <CheckBox
-      Grid.Column="2"
-      Grid.Row="0"
-      IsChecked="{Binding CopyFailedFiles}"
-      ToolTip.Tip="Copy the files, which are not processable, as-is to the destination folder."
-      VerticalAlignment="Center" />
-    <Label
-      Grid.Column="0"
-      Grid.Row="1"
-      VerticalAlignment="Center">
-      Threads
-    </Label>
-    <!--  ReflectionBinding used to avoid null problems  -->
-    <NumericUpDown
-      ClipValueToMinMax="True"
-      Grid.Column="2"
-      Grid.Row="1"
-      Increment="1"
-      Maximum="{Binding ThreadCount.Maximum, Mode=OneWay}"
-      Minimum="{Binding ThreadCount.Minimum, Mode=OneWay}"
-      ParsingNumberStyle="Integer"
-      ToolTip.Tip="Number of threads to use when carrying out operation."
-      Value="{Binding ThreadCount, Converter={StaticResource ThreadCountToDecimalConverter}}"
-      VerticalAlignment="Center" />
-    <Label
-      Grid.Column="0"
-      Grid.Row="2"
-      VerticalAlignment="Center">
-      Compression Level
-    </Label>
-    <!--  ReflectionBinding used to avoid null problems  -->
-    <NumericUpDown
-      ClipValueToMinMax="True"
-      Grid.Column="2"
-      Grid.Row="2"
-      Increment="1"
-      Maximum="{Binding CompressionLevel.Maximum, Mode=OneWay}"
-      Minimum="{Binding CompressionLevel.Minimum, Mode=OneWay}"
-      ParsingNumberStyle="Integer"
-      ToolTip.Tip="ZStandard compression level. Higher levels means better compression at the cost of more time."
-      Value="{Binding CompressionLevel, Converter={StaticResource CompressionLevelToDecimalConverter}}"
-      VerticalAlignment="Center" />
-  </Grid>
+    <Grid ColumnDefinitions="Auto,20,60*" RowDefinitions="Auto, Auto, Auto">
+        <Label
+            Grid.Row="0"
+            Grid.Column="0"
+            VerticalAlignment="Center">
+            Copy non-processable files to destination
+        </Label>
+        <CheckBox
+            Grid.Row="0"
+            Grid.Column="2"
+            VerticalAlignment="Center"
+            IsChecked="{Binding CopyFailedFiles}"
+            ToolTip.Tip="Copy the files, which are not processable, as-is to the destination folder." />
+        <Label
+            Grid.Row="1"
+            Grid.Column="0"
+            VerticalAlignment="Center">
+            Threads
+        </Label>
+        <!--  ReflectionBinding used to avoid null problems  -->
+        <NumericUpDown
+            Grid.Row="1"
+            Grid.Column="2"
+            VerticalAlignment="Center"
+            ClipValueToMinMax="True"
+            Increment="1"
+            Maximum="{Binding ThreadCount.Maximum, Mode=OneWay}"
+            Minimum="{Binding ThreadCount.Minimum, Mode=OneWay}"
+            ParsingNumberStyle="Integer"
+            ToolTip.Tip="Number of threads to use when carrying out operation."
+            Value="{Binding ThreadCount, Converter={StaticResource ThreadCountToDecimalConverter}}" />
+        <Label
+            Grid.Row="2"
+            Grid.Column="0"
+            VerticalAlignment="Center">
+            Compression Level
+        </Label>
+        <!--  ReflectionBinding used to avoid null problems  -->
+        <NumericUpDown
+            Grid.Row="2"
+            Grid.Column="2"
+            VerticalAlignment="Center"
+            ClipValueToMinMax="True"
+            Increment="1"
+            Maximum="{Binding CompressionLevel.Maximum, Mode=OneWay}"
+            Minimum="{Binding CompressionLevel.Minimum, Mode=OneWay}"
+            ParsingNumberStyle="Integer"
+            ToolTip.Tip="ZStandard compression level. Higher levels means better compression at the cost of more time."
+            Value="{Binding CompressionLevel, Converter={StaticResource CompressionLevelToDecimalConverter}}" />
+    </Grid>
 </UserControl>

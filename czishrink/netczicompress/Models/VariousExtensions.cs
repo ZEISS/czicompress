@@ -54,4 +54,23 @@ public static class VariousExtensions
             };
         }
     }
+
+    public static void Deconstruct(
+        this TimeSpan value,
+        out double totalDays,
+        out int days,
+        out double totalHours,
+        out int hours,
+        out int minutes,
+        out int seconds,
+        out int milliseconds)
+    {
+        totalDays = value.TotalDays;
+        days = value.Days;
+        totalHours = value.TotalHours;
+        hours = value.Hours;
+        minutes = value.Minutes;
+        seconds = value.Seconds;
+        milliseconds = value.Milliseconds;
+    }
 }

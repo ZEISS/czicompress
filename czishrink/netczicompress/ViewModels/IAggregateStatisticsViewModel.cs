@@ -21,6 +21,8 @@ public interface IAggregateStatisticsViewModel : INotifyPropertyChanged
 
     TimeSpan Duration { get; }
 
+    string FormattedDuration { get; }
+
     int FilesWithErrors { get; }
 
     int FilesWithNoErrors { get; }
