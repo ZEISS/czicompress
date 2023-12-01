@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using netczicompress.Models;
 using netczicompress.Models.Clipboard;
 using netczicompress.ViewModels.Converters;
+using netczicompress.ViewModels.Formatters;
 using ReactiveUI;
 
 /// <summary>
@@ -26,14 +27,20 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
 
     private readonly IClipboardHelper? clipboardHelper;
     private readonly ILogger logger;
+    private readonly ITimeSpanFormatter timeSpanFormatter;
 
     private AggregateStatistics current;
 
-    public AggregateStatisticsViewModel(IAggregateIndicationViewModel aggregateIndicationViewModel, IClipboardHelper? clipboardHelper, ILogger<AggregateStatisticsViewModel> logger)
+    public AggregateStatisticsViewModel(
+        IAggregateIndicationViewModel aggregateIndicationViewModel,
+        IClipboardHelper? clipboardHelper,
+        ILogger<AggregateStatisticsViewModel> logger,
+        ITimeSpanFormatter timeSpanFormatter)
     {
         this.AggregateIndicationViewModel = aggregateIndicationViewModel;
         this.clipboardHelper = clipboardHelper;
         this.logger = logger;
+        this.timeSpanFormatter = timeSpanFormatter;
         this.current = InitialAggregateStatistics;
 
         // construct an expression for "when to enable the Copy Badge"-button - we bind the enabled-status
@@ -52,7 +59,9 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
 
     public int FilesWithNoErrors => this.current.FilesWithNoErrors;
 
-    public string Duration => FormatTimeSpan(this.current.Duration);
+    public TimeSpan Duration => this.current.Duration;
+
+    public string FormattedDuration => this.timeSpanFormatter.FormatTimeSpan(this.Duration);
 
     public long InputBytes => this.current.InputBytes;
 
@@ -84,16 +93,6 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
         this.RaisePropertyChanged(string.Empty);
     }
 
-    private static string FormatTimeSpan(TimeSpan value)
-    {
-        var (_, _, totalHours, _, minutes, seconds, _) = value;
-        var totalHoursTruncated = (int)totalHours;
-        return
-            $"{(totalHoursTruncated != 0 ? $"{totalHoursTruncated}h " : string.Empty)}" +
-            $"{(minutes != 0 ? $"{minutes}m " : string.Empty)}" +
-            $"{seconds}s";
-    }
-
     private void DoCopyBadgeToClipboard()
     {
         if (this.clipboardHelper != null)
@@ -101,7 +100,7 @@ public class AggregateStatisticsViewModel : ViewModelBase, IObserver<AggregateSt
             var control = new netczicompress.Views.CompressionResultBadge();
 
             control.FilesWithoutErrorsValue.Text = string.Format(CultureInfo.CurrentCulture, @"{0:D}", this.FilesWithNoErrors);
-            control.DurationValue.Text = this.Duration;
+            control.DurationValue.Text = this.FormattedDuration;
             control.InputSizeValue.Text = new BytesToStringConverter().Convert(this.InputBytes, typeof(long), null, CultureInfo.CurrentCulture).ToString();
             control.OutputSizeValue.Text = new BytesToStringConverter().Convert(this.OutputBytes, typeof(long), null, CultureInfo.CurrentCulture).ToString();
             control.DeltaSizeValue.Text = new BytesToStringConverter().Convert(this.DeltaBytes, typeof(long), null, CultureInfo.CurrentCulture).ToString();

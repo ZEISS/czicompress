@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using netczicompress.Models;
 using netczicompress.Models.Clipboard;
 using netczicompress.ViewModels;
+using netczicompress.ViewModels.Formatters;
 using netczicompress.Views;
 
 using ReactiveUI;
@@ -72,7 +73,8 @@ public class AppComposer
         var aggregateStatisticsViewModel = new AggregateStatisticsViewModel(
             aggregateIndicationViewModel: aggregateIndicationViewModel,
             ClipboardHelper.Instance,
-            logger: loggerfactory.CreateLogger<AggregateStatisticsViewModel>())
+            logger: loggerfactory.CreateLogger<AggregateStatisticsViewModel>(),
+            timeSpanFormatter: new HumanReadableTimeSpanFormatter())
         {
             OpenLogFileCommand = logViewModel.OpenLogFileCommand,
         };
