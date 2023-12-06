@@ -24,6 +24,7 @@ public class AboutViewModel : ViewModelBase, IAboutViewModel
         this.CloseAboutCommand = ReactiveCommand.Create(() => this.IsVisible = false);
         this.ShowAboutCommand = ReactiveCommand.Create(() => this.IsVisible = true);
         this.ShowTextFileCommand = ReactiveCommand.CreateFromTask<string>(this.OpenTextFile);
+        this.OpenUrlCommand = ReactiveCommand.CreateFromTask<string>(this.OpenUrlLink);
         this.ProgramVersionAndCopyRight = $"{info}, © 2023 Carl Zeiss Microscopy GmbH and others";
         this.launcher = launcher;
     }
@@ -41,9 +42,16 @@ public class AboutViewModel : ViewModelBase, IAboutViewModel
 
     public ICommand ShowTextFileCommand { get; }
 
+    public ICommand OpenUrlCommand { get; }
+
     private Task OpenTextFile(string filename)
     {
         var fullFilename = System.IO.Path.Combine(AppContext.BaseDirectory, filename);
         return this.launcher.Launch(fullFilename);
+    }
+
+    private Task OpenUrlLink(string url)
+    {
+        return this.launcher.Launch(url);
     }
 }
