@@ -36,7 +36,7 @@
                     Grid.Column="0"
                     Command="{Binding OpenUrlCommand}"
                     CommandParameter="https://github.com/ZEISS/czicompress/tree/main/czishrink">
-                    GitHub Repository
+                    GitHub repository
                 </Button>
                 <Button
                     Grid.Row="1"
