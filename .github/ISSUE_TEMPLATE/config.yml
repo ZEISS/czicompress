@@ -1,0 +1,20 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "\U0000270D CZI Shrink Feedback"
+    url: https://github.com/ZEISS/czicompress/discussions/new?category=czi-shrink-feedback
+    about: Feedback for the GUI tool CZI Shrink
+  - name: "\U0001F4A1 CZI Shrink Feature Request"
+    url: https://github.com/ZEISS/czicompress/discussions/new?category=czi-shrink-feature-requests
+    about: Feature request for the GUI tool CZI Shrink
+  - name: "\U0000003F CZI Shrink Questions"
+    url: https://github.com/ZEISS/czicompress/discussions/new?category=czi-shrink-questions
+    about: Questions about the GUI tool CZI Shrink
+  - name: "\U0000270D CZI Compress Feedback"
+    url: https://github.com/ZEISS/czicompress/discussions/new?category=czi-compress-feedback
+    about: Feedback for the CLI tool CZI Compress
+  - name: "\U0001F4A1 CZI Compress Feature Request"
+    url: https://github.com/ZEISS/czicompress/discussions/new?category=czi-compress-feature-requests
+    about: Feature request for the CLI tool CZI Compress
+  - name: "\U0000003F CZI Compress Questions"
+    url: https://github.com/ZEISS/czicompress/discussions/new?category=czi-compress-questions
+    about: Questions about the CLI tool CZI Compress

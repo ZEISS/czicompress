@@ -1,0 +1,75 @@
+name: "🕷️ Bug report"
+description: Create a report to help us improve
+labels:
+ - bug
+body:
+- type: dropdown
+  id: toolaffected
+  attributes:
+    label: Which tool is affected?
+    description: CZI Shrink is the GUI application while CZI Compress refers to the CLI tool.
+    multiple: false
+    options:
+      - CZI Compress
+      - CZI Shrink
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Description
+    description: Describe the bug and add screenshots if possible/applicable.
+    placeholder: A clear and concise description of what the bug is.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Steps to reproduce
+    description: Please include screenshots (if applicable) and relevant logs.
+    placeholder: |
+      1. Go to '...'
+      2. Click on '....'
+      3. Scroll down to '....'
+      4. See error
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Expected behavior
+    description: A clear and concise description of what you expected to happen.
+    placeholder: |
+      1. Go to '...'
+      2. Click on '....'
+      3. Scroll down to '....'
+      4. See error
+  validations:
+    required: true
+
+- type: dropdown
+  attributes:
+    label: OS
+    description: What operating system are you using?
+    multiple: false
+    options:
+      - Windows
+      - MacOS
+      - Linux
+  validations:
+    required: true
+
+- type: input
+  attributes:
+    label: OS Version
+    description: What version and flavor (if applicable) of your OS are you using?
+    placeholder: Ubuntu 23.10 | Sonoma 14.1.2 | Windows 11 23H2
+  validations:
+    required: true  
+
+- type: textarea
+  attributes:
+    label: Other Context
+    description: Please add any other context that may be relevant.
+  validations:
+    required: false

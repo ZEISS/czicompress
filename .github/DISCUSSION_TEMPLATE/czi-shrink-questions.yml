@@ -1,0 +1,9 @@
+labels: ["czishrink", "question"]
+body:
+- type: textarea
+  id: question
+  attributes:
+    label: Question
+    description: Please add any screenshots of logs as applicable
+  validations:
+    required: true
