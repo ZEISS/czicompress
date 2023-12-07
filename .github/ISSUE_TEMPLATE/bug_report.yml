@@ -11,8 +11,8 @@ body:
     description: CZI Shrink is the GUI application while CZI Compress refers to the CLI tool.
     multiple: false
     options:
-      - CZI Compress
-      - CZI Shrink
+     - CZI Compress
+     - CZI Shrink
    validations:
     required: true
 

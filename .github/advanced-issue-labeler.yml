@@ -1,10 +1,10 @@
 ---
 policy:
   - section:
-    - id: [toolaffected]
-      block-list: ['None','Other']
-      label:
-        - name: czicompress
-          keys: ['CZI Compress']
-        - name: 'czishrink'
-          keys: ['CZI Shrink']
+      - id: [toolaffected]
+        block-list: ['None','Other']
+        label:
+          - name: czicompress
+            keys: ['CZI Compress']
+          - name: 'czishrink'
+            keys: ['CZI Shrink']
