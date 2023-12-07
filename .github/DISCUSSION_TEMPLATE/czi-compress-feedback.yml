@@ -1,15 +1,16 @@
+---
 labels: ["czicompress", "feedback"]
 body:
-- type: markdown
-  attributes:
-    value: |
-      Thank you for your interest in CZI Compress!
-
-      Your feedback helps us improve 💪
-- type: textarea
-  id: content
-  attributes:
-    label: Feedback
-    description: Tell us your thoughts!
-  validations:
-    required: true
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your interest in CZI Compress!
+  
+        Your feedback helps us improve 💪
+  - type: textarea
+    id: content
+    attributes:
+      label: Feedback
+      description: Tell us your thoughts!
+    validations:
+      required: true
