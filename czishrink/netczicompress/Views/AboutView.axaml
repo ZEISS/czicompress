@@ -29,11 +29,34 @@
             </StackPanel.Styles>
             <TextBlock Text="{Binding ProgramVersionAndCopyRight}" />
             <TextBlock Text="{Binding LibraryName, StringFormat='Based on {0}'}" />
+            <TextBlock Text="This program is open source." />
+            <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto, Auto">
+                <Button
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Command="{Binding OpenUrlCommand}"
+                    CommandParameter="https://github.com/ZEISS/czicompress/tree/main/czishrink">
+                    GitHub Repository
+                </Button>
+                <Button
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Command="{Binding OpenUrlCommand}"
+                    CommandParameter="https://github.com/ZEISS/czicompress/issues/new/choose">
+                    Report an issue
+                </Button>
+                <Button
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Command="{Binding OpenUrlCommand}"
+                    CommandParameter="https://github.com/ZEISS/czicompress/discussions/new/choose">
+                    Feedback/Questions
+                </Button>
+            </Grid>
             <TextBlock>
                 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
                 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
             </TextBlock>
-            <Button Command="{Binding OpenUrlCommand}" CommandParameter="https://github.com/ZEISS/czicompress/issues/new/choose">Feedback/Questions</Button>
             <Button Command="{Binding ShowTextFileCommand}" CommandParameter="LICENSE.txt">Show License</Button>
             <TextBlock Text="This programs contains third party libraries" />
             <Button Command="{Binding ShowTextFileCommand}" CommandParameter="THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt">Show Third Party Licenses</Button>
