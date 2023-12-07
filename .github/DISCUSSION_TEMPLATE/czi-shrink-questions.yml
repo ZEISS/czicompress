@@ -5,6 +5,6 @@ body:
     id: question
     attributes:
       label: Question
-      description: Please add any screenshots of logs as applicable
+      description: Please add any screenshots or logs if applicable
     validations:
       required: true
