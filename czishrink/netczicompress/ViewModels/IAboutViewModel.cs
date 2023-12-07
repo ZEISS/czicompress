@@ -18,4 +18,6 @@ public interface IAboutViewModel
     string LibraryName { get; }
 
     ICommand ShowTextFileCommand { get; }
+
+    ICommand OpenUrlCommand { get; }
 }
