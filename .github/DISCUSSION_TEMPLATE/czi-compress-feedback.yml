@@ -5,7 +5,7 @@ body:
     attributes:
       value: |
         Thank you for your interest in CZI Compress!
-  
+
         Your feedback helps us improve 💪
   - type: textarea
     id: content
