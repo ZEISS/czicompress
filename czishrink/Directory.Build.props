@@ -17,6 +17,6 @@
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.1.6<!--bugfix/timespan_format_greater_than_24h_addendum--></VersionPrefix>
+    <VersionPrefix>1.2.0<!--feature/add-feedback-button--></VersionPrefix>
   </PropertyGroup>
 </Project>

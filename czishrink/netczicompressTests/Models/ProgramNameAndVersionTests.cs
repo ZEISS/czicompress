@@ -9,6 +9,8 @@ namespace netczicompressTests.Models;
 /// </summary>
 public class ProgramNameAndVersionTests
 {
+    private static readonly (int Major, int Minor) Version = (1, 2);
+
     [Fact]
     public void ToString_WhenCalled_ReturnsExpected()
     {
@@ -16,7 +18,7 @@ public class ProgramNameAndVersionTests
         var actual = new ProgramNameAndVersion().ToString();
 
         // ASSERT
-        actual.Should().MatchRegex(@"^CZI Shrink 1\.1\.\d+(\+\d+)?$");
+        actual.Should().MatchRegex($@"^CZI Shrink {Version.Major}\.{Version.Minor}\.\d+(\+\d+)?$");
     }
 
     [Fact]
@@ -36,6 +38,6 @@ public class ProgramNameAndVersionTests
         var actual = new ProgramNameAndVersion().Version;
 
         // ASSERT
-        actual.Should().MatchRegex(@"^1\.1\.\d+(\+\d+)?$");
+        actual.Should().MatchRegex($@"^{Version.Major}\.{Version.Minor}\.\d+(\+\d+)?$");
     }
 }

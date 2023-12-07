@@ -106,6 +106,24 @@ public class AboutViewModelTests
         launcherMock.Verify(x => x.Launch(expectedFileName), Times.Once);
     }
 
+    [Fact]
+    public void OpenUrlCommandCommand_WhenCalled_DoesNotModifyUrl()
+    {
+        // ARRANGE
+        IFixture fixture = CreateFixture();
+        var launcherMock = fixture.Freeze<Mock<IFileLauncher>>();
+
+        var sut = fixture.Create<AboutViewModel>();
+        const string url = "https://www.test.domain";
+
+        // ACT
+        sut.OpenUrlCommand.CanExecute(url).Should().BeTrue();
+        sut.OpenUrlCommand.Execute(url);
+
+        // ASSERT
+        launcherMock.Verify(x => x.Launch(url), Times.Once);
+    }
+
     private static IFixture CreateFixture()
     {
         // ARRANGE
