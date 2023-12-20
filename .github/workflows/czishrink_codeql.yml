@@ -51,7 +51,7 @@ jobs:
               ${{ runner.os }}-czishrink-nuget-
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: csharp
           queries: security-and-quality
@@ -63,4 +63,4 @@ jobs:
         run: dotnet build --no-restore -c Release
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
