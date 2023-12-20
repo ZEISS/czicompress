@@ -109,7 +109,7 @@ jobs:
           verbose: true
 
       - name: Upload dotnet test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dotnet-results-${{ matrix.config.os }}
           path: TestResults
@@ -129,7 +129,7 @@ jobs:
           -o ${{ github.workspace }}/publish
 
       - name: Upload published binaries
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ (github.event_name == 'push') && (matrix.build == 'Release') }}
         with:
           name: CziShrink_${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
@@ -154,7 +154,7 @@ jobs:
           -o ${{ github.workspace }}/installer
 
       - name: Upload Wix installer
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ (github.event_name == 'push') && (matrix.build == 'Release') && (matrix.config.os == 'windows-latest') }}
         with:
           name: CziShrink_Installer${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
