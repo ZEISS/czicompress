@@ -71,7 +71,7 @@ jobs:
         shell: pwsh
 
       - name: Cache nugets
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/.nuget/packages
           key: ${{ runner.os }}-czishrink-nuget-${{ hashFiles('czishrink/**/packages.lock.json') }}
