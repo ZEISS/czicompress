@@ -87,13 +87,14 @@ jobs:
         run: OpenCppCoverage.exe --export_type cobertura:${{github.workspace}}\TestResults\coverage.xml --sources "${{github.workspace}}\czicompress" --excluded_sources "${{github.workspace}}\czicompress\tests" --modules czicompress -- czicompress_tests.exe
 
       - name: Upload Coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Debug') }}
         with:
           files: coverage.xml
           fail_ci_if_error: true
           directory: ${{ github.workspace }}/TestResults
           verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }} # required
 
       - name: Prepare licenses
         if: matrix.build == 'Release'
