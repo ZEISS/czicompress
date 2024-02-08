@@ -107,6 +107,7 @@ jobs:
           directory: ${{ github.workspace }}/TestResults
           files: coverage.cobertura.xml
           verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }} # required
 
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v4
