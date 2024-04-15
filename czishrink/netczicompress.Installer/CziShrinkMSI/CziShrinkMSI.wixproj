@@ -2,7 +2,7 @@
 SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 SPDX-License-Identifier: GPL-3.0-or-later
 -->
-<Project Sdk="WixToolset.Sdk/4.0.3" InitialTargets="PublishCziShrink">
+<Project Sdk="WixToolset.Sdk/5.0.0" InitialTargets="PublishCziShrink">
   <PropertyGroup>
     <DefineConstants>
       $(DefineConstants);
