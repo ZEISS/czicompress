@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 ---
-verbose: 100
+verbose: 2
 # - A custom schema catalog.
 #   This catalog will be searched ahead of any custom catalogs passed using
 #   --catalogs or SchemaStore.org
