@@ -20,7 +20,7 @@ If you specify a -DownloadFolder the script will reuse data downloaded to that f
 
 .EXAMPLE
 
-PS> ./upgrade-libczicompressc.ps1 -NewCziShrinkVersion 2.3.0 -DownloadFolder "$env:TEMP/libczicompress/cache" -NoPullRequest
+PS> ./upgrade-libczicompressc.ps1 -NewCziShrinkVersion 2.3.0 -DownloadFolder "$env:TEMP/libczicompress/cache" -NoPR
 
 .PARAMETER NewCziShrinkVersion
 
