@@ -7,7 +7,7 @@ Files: cla_*.txt czicompress/CMakeSettings.json CODE_OF_CONDUCT.md CONTRIBUTING.
 Copyright: 2023 Carl Zeiss Microscopy GmbH
 License: MIT
 
-Files: .github/* .gitignore .gitattributes czicompress/.editorconfig czicompress/.runsettings czicompress/CPPLINT.cfg czicompress/.clang-format
+Files: .github/* .gitignore .gitattributes czicompress/.editorconfig czicompress/.runsettings czicompress/CPPLINT.cfg czicompress/.clang-format .vscode/*
 Copyright: 2023 Carl Zeiss Microscopy GmbH
 License: CC0-1.0
 
