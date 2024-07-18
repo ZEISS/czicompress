@@ -1,0 +1,20 @@
+---
+verbose: 100
+# - A custom schema catalog.
+#   This catalog will be searched ahead of any custom catalogs passed using
+#   --catalogs or SchemaStore.org
+#   The format of this is subtly different to the format of a catalog
+#   passed via --catalogs (which matches the SchemaStore.org format)
+customCatalog:
+    schemas:
+        - name: GitHub Issue Template configuration  # The name of the schema (required)
+
+          # A Minimatch glob expression for matching up file names with a schema (required)
+          fileMatch: ["**/.github/ISSUE_TEMPLATE/config.yaml"]
+
+          # A URL or local file path for the schema location (required)
+          # Unlike the SchemaStore.org format, which has a `url` key,
+          # custom catalogs defined in v8r config files have a `location` key
+          # which can refer to either a URL or local file.
+          # Relative paths are interpreted as relative to the config file location.
+          location: https://json.schemastore.org/github-issue-config.json
