@@ -13,7 +13,7 @@ customCatalog:
         - name: GitHub Issue Template configuration  # The name of the schema (required)
 
           # A Minimatch glob expression for matching up file names with a schema (required)
-          fileMatch: ["**/.github/ISSUE_TEMPLATE/config.yaml"]
+          fileMatch: ["**/.github/ISSUE_TEMPLATE/config.yml"]
 
           # A URL or local file path for the schema location (required)
           # Unlike the SchemaStore.org format, which has a `url` key,
