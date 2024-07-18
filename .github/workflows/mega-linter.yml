@@ -35,6 +35,7 @@ jobs:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
           VALIDATE_ALL_CODEBASE: true
+          CSHARP_DOTNET_FORMAT_CLI_LINT_MODE: project
 
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
