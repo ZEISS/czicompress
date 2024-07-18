@@ -7,13 +7,14 @@
 ---
 APPLY_FIXES: none
 DISABLE:
-  - COPYPASTE # Comment to enable checks of excessive copy-pastes
-  - SPELL # Comment to enable checks of spelling mistakes
+  - COPYPASTE  # Comment to enable checks of excessive copy-pastes
+  - SPELL  # Comment to enable checks of spelling mistakes
+  - CSHARP  # We are using StyleCop.Analyzers for that
 DISABLE_ERRORS_LINTERS:
-  - MARKDOWN_MARKDOWN_LINK_CHECK # Make non-blocking due to network timeouts etc.
+  - MARKDOWN_MARKDOWN_LINK_CHECK  # Make non-blocking due to network timeouts etc.
 DISABLE_LINTERS:
-  - REPOSITORY_TRIVY # this linter seems currently broken, so we disable it here for now
-C_CPPLINT_ARGUMENTS: --verbose=2
+  - REPOSITORY_TRIVY  # this linter seems currently broken, so we disable it here for now
+CC_CPPLINT_ARGUMENTS: --verbose=2
 CPP_CPPLINT_ARGUMENTS: --verbose=2
 SHOW_ELAPSED_TIME: true
 FILEIO_REPORTER: false
@@ -21,4 +22,3 @@ UPDATED_SOURCES_REPORTER: false
 TEXT_REPORTER: true
 EMAIL_REPORTER: false
 VALIDATE_ALL_CODEBASE: true
-CSHARP_DOTNET_FORMAT_CLI_LINT_MODE: project
