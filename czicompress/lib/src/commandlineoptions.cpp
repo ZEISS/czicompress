@@ -150,12 +150,7 @@ CommandLineOptions::ParseResult CommandLineOptions::Parse(int argc, const char* 
 
   // specify the string-to-enum-mapping for a boolean option
   std::map<std::string, bool> map_string_to_boolean{
-      {"0", false},
-      {"false", false},
-      {"no", false},
-      {"1", true},
-      {"true", true},
-      {"yes", true},
+      {"0", false}, {"false", false}, {"no", false}, {"1", true}, {"true", true}, {"yes", true},
   };
 
   // specify the string-to-enum-mapping for "command"

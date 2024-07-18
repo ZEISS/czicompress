@@ -25,8 +25,7 @@ static int CheckSizeAndCastToInt(const uint32_t size)
 
 static void CheckOriginalCompressionMetadata(std::shared_ptr<libCZI::ICziMetadata> metadata)
 {
-  auto original_compression_method =
-      metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/OriginalCompressionMethod");
+  auto original_compression_method = metadata->GetChildNodeReadonly("ImageDocument/Metadata/Information/Image/OriginalCompressionMethod");
   std::wstring original_compression_method_string;
   bool metadata_node_found = original_compression_method->TryGetValue(&original_compression_method_string);
   REQUIRE(metadata_node_found == true);
@@ -58,7 +57,7 @@ static tuple<shared_ptr<void>, size_t> CreateCziWithFourSubblockInMosaicArrangem
   auto outStream = make_shared<CMemOutputStream>(0);
 
   auto spWriterInfo = make_shared<libCZI::CCziWriterInfo>(libCZI::GUID{0x1234567, 0x89ab, 0xcdef, {1, 2, 3, 4, 5, 6, 7, 8}},  // NOLINT
-                                                          libCZI::CDimBounds{{libCZI::DimensionIndex::C, 0, 1}},      // set a bounds for C
+                                                          libCZI::CDimBounds{{libCZI::DimensionIndex::C, 0, 1}},  // set a bounds for C
                                                           0, 3);  // set a bounds M : 0<=m<=0
   writer->Create(outStream, spWriterInfo);
 
@@ -143,9 +142,7 @@ static tuple<shared_ptr<void>, size_t> CreateCziWithFourSubblockInMosaicArrangem
 
   const libCZI::PrepareMetadataInfo prepare_metadata_info;
   auto metaDataBuilder = writer->GetPreparedMetadata(prepare_metadata_info);
-  metaDataBuilder->GetRootNode()
-      ->GetOrCreateChildNode("Metadata/Information/Image/OriginalCompressionMethod")
-      ->SetValue("JpegXr");
+  metaDataBuilder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/OriginalCompressionMethod")->SetValue("JpegXr");
   metaDataBuilder->GetRootNode()
       ->GetOrCreateChildNode("Metadata/Information/Image/OriginalCompressionParameters")
       ->SetValue("Lossless: False, Quality: 77");
@@ -283,7 +280,6 @@ TEST_CASE("copyczi.2: run compression on simple synthetic document changes compr
   CheckOriginalCompressionMetadata(metadata);
 }
 
-
 TEST_CASE("copyczi.3: run decompression on simple synthetically compressed document changes compression method in metadata.", "[copyczi]")
 {
   // arrange
@@ -362,7 +358,7 @@ TEST_CASE("copyczi.3: run decompression on simple synthetically compressed docum
   bool metadata_node_found = compression_parameters->TryGetValue(&compression_parameters_string);
 
   // in case of uncompressed, the metadata is empty, i.e. <CurrentCompressionParameters />, so getting its value fails.
-  REQUIRE(metadata_node_found == false); 
+  REQUIRE(metadata_node_found == false);
 
   CheckOriginalCompressionMetadata(metadata);
 }

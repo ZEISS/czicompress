@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include <cstdint>
@@ -11,10 +12,9 @@
 #include "capi_export.h"
 #include "include/command.h"
 #include "include/compressionstrategy.h"
-#include <stddef.h>
 
 // input_path is only guaranteed to exist during the duration of this call and should be copied if retained
-typedef bool (*ProgressReport)(int32_t progress_percent); // NOLINT(readability/casting)
+typedef bool (*ProgressReport)(int32_t progress_percent);  // NOLINT(readability/casting)
 
 /**
  * Processes a single file with the specified file processor.
@@ -68,10 +68,10 @@ extern "C" CAPI_EXPORT void GetLibVersion(int32_t* major, int32_t* minor, int32_
  * least the number given with the first call) and call again.
  *
  *  @param buffer   Pointer to a buffer (which size is stated with size).
- *  @param size     Pointer to an uint64 which on input contains the size of the buffer, and on output (with return value false) 
- *                  the required size of the buffer. 
+ *  @param size     Pointer to an uint64 which on input contains the size of the buffer, and on output (with return value false)
+ *                  the required size of the buffer.
  *
- * @returns    True if the buffer size was sufficient (and in this case the text is copied to the buffer); false otherwise (and in 
+ * @returns    True if the buffer size was sufficient (and in this case the text is copied to the buffer); false otherwise (and in
  *             this case the required size is written to *size).
  */
 extern "C" CAPI_EXPORT bool GetLibVersionString(char* buffer, uint64_t* size);

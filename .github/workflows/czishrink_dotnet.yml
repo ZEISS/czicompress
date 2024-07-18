@@ -29,14 +29,8 @@ jobs:
       matrix:
         build: [Release, Debug]
         config:
-          - {
-            os: windows-latest,
-            osfamily: win,
-          }
-          - {
-            os: ubuntu-latest,
-            osfamily: linux,
-          }
+          - {os: windows-latest, osfamily: win}
+          - {os: ubuntu-latest, osfamily: linux}
         exclude:
           # From https://github.com/actions/runner/issues/1512
           - build: Debug
@@ -107,7 +101,7 @@ jobs:
           directory: ${{ github.workspace }}/TestResults
           files: coverage.cobertura.xml
           verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }} # required
+          token: ${{ secrets.CODECOV_TOKEN }}  # required
 
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v4

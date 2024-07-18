@@ -24,7 +24,7 @@ If you find yourself wishing for a feature or improvement that doesn't exist in 
 We are always happy to receive code contributions from your side.  
 
 For all contributions, please respect the following guidelines:
-- Make sure to either sign the [Individual](./cla_individual.txt) or the [Corporate](./cla_corporate.txt) Contributor License Agreement (CLA) and send it to github.microscopy@zeiss.com.
+- Make sure to either sign the [Individual](./cla_individual.txt) or the [Corporate](./cla_corporate.txt) Contributor License Agreement (CLA) and send it to <github.microscopy@zeiss.com>.
 - Always associate a PR with either an [issue](#other-issues) or a [feature](#suggesting-a-feature).  
 - Each PR should implement ONE feature or bugfix. If you want to add or fix more than one thing, submit more than one PR.
 - Do not commit changes to files that are irrelevant to your feature or bugfix.
@@ -32,4 +32,4 @@ For all contributions, please respect the following guidelines:
 - Be aware that the PR review process is not immediate, and is generally proportional to the size of the PR.
 
 # Attribution
-This template was inspired by https://github.com/nayafia/contributing-template.
+This template was inspired by <https://github.com/nayafia/contributing-template>.

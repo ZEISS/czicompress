@@ -1,5 +1,5 @@
 ---
-name: 'Dependency Review'
+name: "Dependency Review"
 on: [pull_request]
 
 permissions:
@@ -9,9 +9,9 @@ jobs:
   dependency-review:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout Repository'
+      - name: "Checkout Repository"
         uses: actions/checkout@v4
-      - name: 'Dependency Review'
+      - name: "Dependency Review"
         uses: actions/dependency-review-action@v4
         with:
           # Add more licenses as required. Do not add copy-left licenses or licenses incompatible with MIT (for czicompress) and GPL-3.0-or-later (for czishrink)

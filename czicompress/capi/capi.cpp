@@ -122,14 +122,14 @@ private:
   }
 };
 
-void* CreateFileProcessor(Command command, CompressionStrategy strategy, int compression_level)
+void *CreateFileProcessor(Command command, CompressionStrategy strategy, int compression_level)
 {
   return new FileProcessor(command, strategy, compression_level);
 }
 
 void DestroyFileProcessor(void *file_processor)
 {
-  auto* processor = static_cast<FileProcessor*>(file_processor);
+  auto *processor = static_cast<FileProcessor *>(file_processor);
   delete processor;
 }
 
@@ -181,7 +181,7 @@ int ProcessFile(void *file_processor, const char *const input_path, const char *
     if (!error_message_length) throw std::invalid_argument("Error message length pointer is null.");
     if (!progress) throw std::invalid_argument("Progress function pointer is null");
 
-    auto *proc = static_cast<FileProcessor*>(file_processor);
+    auto *proc = static_cast<FileProcessor *>(file_processor);
     proc->ProcessFile(input_path, output_path, progress);
     error_message = nullptr;
     return EXIT_SUCCESS;

@@ -378,7 +378,9 @@ std::shared_ptr<libCZI::ICziMetadataBuilder> CopyCziAndCompress::ModifyMetadata(
     auto metadata_src = metadata_segment->CreateMetaFromMetadataSegment();
     const auto metadata_builder = libCZI::CreateMetadataBuilderFromXml(metadata_src->GetXml());
 
-    metadata_builder->GetRootNode()->GetOrCreateChildNode("Metadata/Information/Image/CurrentCompressionParameters")->SetValue("Lossless: True");
+    metadata_builder->GetRootNode()
+        ->GetOrCreateChildNode("Metadata/Information/Image/CurrentCompressionParameters")
+        ->SetValue("Lossless: True");
 
     return metadata_builder;
   }
@@ -388,14 +390,13 @@ std::shared_ptr<libCZI::ICziMetadataBuilder> CopyCziAndCompress::ModifyMetadata(
 
 //-----------------------------------------------------------------------------
 
-CopyCziAndDecompress::ActionWithSubBlock CopyCziAndDecompress::DecideWhatToDoWithSubBlock(
-    const std::shared_ptr<libCZI::ISubBlock>&)
+CopyCziAndDecompress::ActionWithSubBlock CopyCziAndDecompress::DecideWhatToDoWithSubBlock(const std::shared_ptr<libCZI::ISubBlock>&)
 {
   return ActionWithSubBlock::kDecompress;
 }
 
 std::shared_ptr<libCZI::ICziMetadataBuilder> CopyCziAndDecompress::ModifyMetadata(
-   const std::shared_ptr<libCZI::IMetadataSegment>& metadata_segment)
+    const std::shared_ptr<libCZI::IMetadataSegment>& metadata_segment)
 {
   // well... if we at least decompressed half of the subblocks, then we feel entitled to set the
   // documents metadata (which states the "prevalant compression") - in this case, we set the

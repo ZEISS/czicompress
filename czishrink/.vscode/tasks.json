@@ -1,70 +1,67 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/netczicompress.sln",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "publish",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "publish",
-                "${workspaceFolder}/netczicompress.Desktop/netczicompress.Desktop.csproj",
-                "-c", "Release",
-                "--use-current-runtime", "true",
-                "--self-contained",
-                "-p:PublishSingleFile=true",
-                "-p:PublishReadyToRun=true",
-                "-p:PublishReadyToRunShowWarnings=true"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Watch (Tests)",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "test",
-                "--project",
-                "netczicompressTests"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Test with Coverage",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "test",
-                "/p:CollectCoverage=true",
-                "/p:CoverletOutputFormat=lcov%2ccobertura",
-                "/p:CoverletOutput=${workspaceFolder}/coverage/",
-                "/p:ExcludeByAttribute=GeneratedCodeAttribute%2cObsoleteAttribute",
-                "/p:ExcludeByFile=**/*.axaml%2c**/*.g.cs",
-                "/p:Exclude=[netczicompress]netczicompress.Views.*"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Generate coverage report",
-            "command": "reportgenerator",
-            "type": "shell",
-            "args": [
-                "-reports:${workspaceFolder}/coverage/coverage.info",
-                "-targetdir:${workspaceFolder}/coverage/covstats"
-            ],
-            "problemMatcher": []
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/netczicompress.sln",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "publish",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "publish",
+        "${workspaceFolder}/netczicompress.Desktop/netczicompress.Desktop.csproj",
+        "-c",
+        "Release",
+        "--use-current-runtime",
+        "true",
+        "--self-contained",
+        "-p:PublishSingleFile=true",
+        "-p:PublishReadyToRun=true",
+        "-p:PublishReadyToRunShowWarnings=true"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Watch (Tests)",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["watch", "test", "--project", "netczicompressTests"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Test with Coverage",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "test",
+        "/p:CollectCoverage=true",
+        "/p:CoverletOutputFormat=lcov%2ccobertura",
+        "/p:CoverletOutput=${workspaceFolder}/coverage/",
+        "/p:ExcludeByAttribute=GeneratedCodeAttribute%2cObsoleteAttribute",
+        "/p:ExcludeByFile=**/*.axaml%2c**/*.g.cs",
+        "/p:Exclude=[netczicompress]netczicompress.Views.*"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Generate coverage report",
+      "command": "reportgenerator",
+      "type": "shell",
+      "args": [
+        "-reports:${workspaceFolder}/coverage/coverage.info",
+        "-targetdir:${workspaceFolder}/coverage/covstats"
+      ],
+      "problemMatcher": []
+    }
+  ]
 }
