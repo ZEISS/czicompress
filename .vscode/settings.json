@@ -2,6 +2,24 @@
     "yaml.schemas": {
         "https://raw.githubusercontent.com/megalinter/megalinter/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json": [
             ".mega-linter.yml"
+        ],
+        "https://json.schemastore.org/github-issue-config.json": [
+            ".github/ISSUE_TEMPLATE/config.yml"
+        ],
+        "https://json.schemastore.org/github-issue-forms.json": [
+            ".github/ISSUE_TEMPLATE/bug_report.yml"
+        ],
+        "https://json.schemastore.org/github-discussion.json": [
+            ".github/DISCUSSION_TEMPLATE/*.yml"
+        ],
+        "https://json.schemastore.org/github-workflow.json": [
+            ".github/workflows/*.yml"
+        ],
+        "https://json.schemastore.org/codecov.json": [
+            ".github/codecov.yml"
+        ],
+        "https://json.schemastore.org/dependabot-2.0.json": [
+            ".github/dependabot.yml"
         ]
     }
 }
