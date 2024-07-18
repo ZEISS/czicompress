@@ -37,4 +37,4 @@ component_management:
       paths:
         - "czishrink/"
 comment:
-  layout: "header, diff, flags, components" # show component info in the PR comment
+  layout: "header, diff, flags, components"  # show component info in the PR comment

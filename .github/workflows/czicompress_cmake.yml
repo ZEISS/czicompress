@@ -102,7 +102,7 @@ jobs:
           fail_ci_if_error: true
           directory: ${{ github.workspace }}/TestResults
           verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }} # required
+          token: ${{ secrets.CODECOV_TOKEN }}  # required
 
       - name: Prepare licenses
         if: matrix.build == 'Release'
