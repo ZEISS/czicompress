@@ -94,8 +94,8 @@ int main(int argc, char** argv)
     reader->Open(stream, &open_options);
 
     // Create an "output-stream-object"
-    const auto output_stream =
-        libCZI::CreateOutputStreamForFile(utils::utf8::WidenUtf8(command_line_options.GetOutputFileName()).c_str(), command_line_options.GetOverwriteExistingFile());
+    const auto output_stream = libCZI::CreateOutputStreamForFile(utils::utf8::WidenUtf8(command_line_options.GetOutputFileName()).c_str(),
+                                                                 command_line_options.GetOverwriteExistingFile());
 
     // create (and configure) the "CZI-writer"-object
     libCZI::CZIWriterOptions czi_writer_options;

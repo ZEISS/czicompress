@@ -17,17 +17,17 @@ The tool is based on [libczi](https://github.com/ZEISS/libczi.git).
 
 - [Download](#download)
 - [Usage](#usage)
-    - [Examples](#examples)
-        - [Single file](#single-file)
-        - [Multiple files (bash shell)](#multiple-files-bash-shell)
-        - [Multiple files (Powershell)](#multiple-files-powershell)
+  - [Examples](#examples)
+    - [Single file](#single-file)
+    - [Multiple files (bash shell)](#multiple-files-bash-shell)
+    - [Multiple files (Powershell)](#multiple-files-powershell)
 - [Build and Test](#build-and-test)
-    - [Pre-requisites](#pre-requisites)
-    - [Build in Visual Studio](#build-in-visual-studio)
-    - [Build in command line](#build-in-command-line)
-        - [Quick build](#quick-build)
-        - [Build with preferred compiler](#build-with-preferred-compiler)
-    - [Tests](#tests)
+  - [Pre-requisites](#pre-requisites)
+  - [Build in Visual Studio](#build-in-visual-studio)
+  - [Build in command line](#build-in-command-line)
+    - [Quick build](#quick-build)
+    - [Build with preferred compiler](#build-with-preferred-compiler)
+  - [Tests](#tests)
 - [Known issues](#known-issues)
 - [Guidelines](#guidelines)
 - [Versioning](#versioning)
@@ -41,7 +41,7 @@ Click on the topmost successful run and download the binaries for your platform:
 * czicompress-windows-64-msvc-package-on-Release for Windows
 * czicompress-ubuntu-package-off-Release for Linux
 
-Clicking on these artifacts will download a ZIP file with the executable. The executable is a stand-alone binary. You can put it anywhere you like. 
+Clicking on these artifacts will download a ZIP file with the executable. The executable is a stand-alone binary. You can put it anywhere you like.
 
 ## Usage
 
@@ -139,7 +139,7 @@ fi
 
 exit $status
 ~~~
-* Then run 
+* Then run
 ~~~sh
 find -type f -name '*.czi' -not -iname '*.zstd.czi' -exec bash czicompress.sh '{}' \;
 ~~~
@@ -182,13 +182,13 @@ $files | ForEach-Object {
   $outFileName = "$($_.DirectoryName)\$($_.BaseName)$outputSuffix$($_.Extension)"
   Write-Host "$($_) -> $($outFileName)"
   if ((Test-Path -Path $outFileName)) {
-	  Write-Host "Output file already exists... Removing"
-	  Remove-Item $outFileName
+   Write-Host "Output file already exists... Removing"
+   Remove-Item $outFileName
   }
   if ((Test-Path -Path $outFileName)) {
-	  Write-Host "Unable to remove file"
-	  # This will act as a continue because this code is executed as a script block and not like a classic for-each loop
-	  return
+   Write-Host "Unable to remove file"
+   # This will act as a continue because this code is executed as a script block and not like a classic for-each loop
+   return
   }
 
   # The backticks here are to escape the double quotes which exist in case we have spaces in file path.
@@ -212,7 +212,7 @@ Build either with Visual Studio or with CMake in command line.
 The `CZICompress` source codes are implemented using C++17 standard and can be compiled on Windows or Linux and with multiple compilers. You can compile codes by using IDE like Microsoft Visual Studio (MSVS), Visual Studio Code (VSCode) or any other IDE that works with `CMake`. Make sure that on your machine you have one of these tools:
 
 |            | Windows             | Linux         |
-| ---------- | ------------------- | ------------- |
+|------------|---------------------|---------------|
 | Build tool | CMake               | CMake         |
 | Compilers  | MSVC                | GNU, LLVM     |
 | IDE        | MSVS, VSCode, CLion | VSCode, CLion |

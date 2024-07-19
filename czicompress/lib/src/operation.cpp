@@ -20,10 +20,7 @@ void Operation::DoOperation(const std::function<bool(const ProgressInfo&)>& prog
   std::function<bool(const ProgressInfo&)> progress_report_function;
   if (progress)
   {
-    progress_report_function = [progress](const ProgressInfo& info) -> bool
-    {
-      return progress(info);
-    };
+    progress_report_function = [progress](const ProgressInfo& info) -> bool { return progress(info); };
   }
 
   const auto operation = this->CreateCopyClass(progress_report_function);

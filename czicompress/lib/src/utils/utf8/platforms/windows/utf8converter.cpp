@@ -8,7 +8,6 @@
 
 #include <stdexcept>
 
-
 namespace utils::utf8
 {
 std::wstring WidenUtf8(const std::string &str)

@@ -16,7 +16,7 @@ on:
     #        │  │ │ │ │
     #        │  │ │ │ │
     #        *  * * * *
-    - cron: '30 2 * * 2'
+    - cron: "30 2 * * 2"
   workflow_dispatch: {}
 
 permissions: read-all
@@ -48,7 +48,7 @@ jobs:
           path: ${{ github.workspace }}/.nuget/packages
           key: ${{ runner.os }}-czishrink-nuget-${{ hashFiles('czishrink/**/packages.lock.json') }}
           restore-keys: |
-              ${{ runner.os }}-czishrink-nuget-
+            ${{ runner.os }}-czishrink-nuget-
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3

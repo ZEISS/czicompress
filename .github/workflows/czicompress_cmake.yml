@@ -35,24 +35,32 @@ jobs:
             platform: x64-windows-static,
             package: ON,
             path-cache: '${{ github.workspace }}\vcpkg\installed',
-            path-toolchain: 'C:/vcpkg/scripts/buildsystems/vcpkg.cmake',
-            os-id: 'windows',
+            path-toolchain: "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            os-id: "windows",
           }
           - {
             name: ubuntu-package-off,
-            os: ubuntu-20.04,   # we want to use an older version in order to increase likelihood that binaries work on other distros
+            os: ubuntu-20.04,  # we want to use an older version in order to increase likelihood that binaries work on other distros
             platform: x64-linux,
             package: OFF,
-            path-cache: '/usr/local/share/vcpkg/installed',
-            path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake',
-            os-id: 'linux',
+            path-cache: "/usr/local/share/vcpkg/installed",
+            path-toolchain: "/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake",
+            os-id: "linux",
           }
         exclude:
           # From https://github.com/actions/runner/issues/1512
           - build: Debug
-            config: {name: ubuntu-package-off, os: ubuntu-20.04, platform: x64-linux, package: OFF, path-cache: '/usr/local/share/vcpkg/installed', path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake', os-id: 'linux'}
+            config:
+              {
+                name: ubuntu-package-off,
+                os: ubuntu-20.04,
+                platform: x64-linux,
+                package: OFF,
+                path-cache: "/usr/local/share/vcpkg/installed",
+                path-toolchain: "/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake",
+                os-id: "linux",
+              }
     steps:
-
       - name: Checkout the source codes.
         uses: actions/checkout@v4
 
@@ -64,7 +72,7 @@ jobs:
           build-type: ${{matrix.build}}
           package: ${{matrix.config.package}}
           platform: ${{matrix.config.platform}}
-          src-dir: '${{github.workspace}}/czicompress'
+          src-dir: "${{github.workspace}}/czicompress"
 
       - name: Run unit tests
         working-directory: ${{github.workspace}}/czicompress/build
@@ -77,8 +85,8 @@ jobs:
         if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Debug') }}
         shell: pwsh
         run: |
-            choco install OpenCppCoverage -y
-            echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+          choco install OpenCppCoverage -y
+          echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
 
       - name: Get Coverage
         if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Debug') }}
@@ -94,29 +102,29 @@ jobs:
           fail_ci_if_error: true
           directory: ${{ github.workspace }}/TestResults
           verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }} # required
+          token: ${{ secrets.CODECOV_TOKEN }}  # required
 
       - name: Prepare licenses
         if: matrix.build == 'Release'
         shell: bash
         run: |
-            set -e
-            mkdir ./czicompress-${{env.name}}
-            cp -R ./THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt ./czicompress-${{env.name}}/
-            cp -R ./build/app/THIRD_PARTY_LICENSES.txt ./czicompress-${{env.name}}/
+          set -e
+          mkdir ./czicompress-${{env.name}}
+          cp -R ./THIRD_PARTY_LICENSES_ARTIFACT_DISTRIBUTION.txt ./czicompress-${{env.name}}/
+          cp -R ./build/app/THIRD_PARTY_LICENSES.txt ./czicompress-${{env.name}}/
 
       # gather the binaries
       - name: Prepare Linux binaries
         if: ${{ (matrix.config.os == 'ubuntu-20.04') && (matrix.build == 'Release') }}
         shell: bash
         run: |
-            cp ./build/app/czicompress ./build/capi/libczicompressc.so ./czicompress-${{env.name}}/
+          cp ./build/app/czicompress ./build/capi/libczicompressc.so ./czicompress-${{env.name}}/
 
       - name: Prepare Windows binaries
         if: ${{ (matrix.config.os == 'windows-latest') && (matrix.build == 'Release') }}
         shell: bash
         run: |
-            cp ./build/app/${{matrix.build}}/*.exe ./build/capi/${{matrix.build}}/libczicompressc.dll ./czicompress-${{env.name}}/
+          cp ./build/app/${{matrix.build}}/*.exe ./build/capi/${{matrix.build}}/libczicompressc.dll ./czicompress-${{env.name}}/
 
       # upload the build-results to artifacts-store
       - name: Upload artifacts
