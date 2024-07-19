@@ -3,34 +3,34 @@ An open source and cross-platform GUI for [CziCompress](https://github.com/ZEISS
 
 ## Table of contents
 
- - [Overview](#overview)
-     - [System Requirements](#system-requirements)
-     - [Theme Support](#theme-support)
-     - [I/O](#io)
-     - [Parameters](#parameters)
-         - [Operations](#operations)
-     - [Progress Update](#progress-update)
-     - [Compression Statistics](#compression-statistics)
-         - [Sharing](#sharing)
-     - [Errors](#errors)
- - [Logs](#logs)
- - [FAQ](#faq)
- - [Known Issues](#known-issues)
- - [Potential Future Enhancements](#potential-future-enhancements)
- - [Contributing](#contributing)
+- [Overview](#overview)
+  - [System Requirements](#system-requirements)
+  - [Theme Support](#theme-support)
+  - [I/O](#io)
+  - [Parameters](#parameters)
+    - [Operations](#operations)
+  - [Progress Update](#progress-update)
+  - [Compression Statistics](#compression-statistics)
+    - [Sharing](#sharing)
+  - [Errors](#errors)
+- [Logs](#logs)
+- [FAQ](#faq)
+- [Known Issues](#known-issues)
+- [Potential Future Enhancements](#potential-future-enhancements)
+- [Contributing](#contributing)
 
 ## Overview
 
 ## System Requirements
 
 ### Windows
- - Windows 10 or later
+- Windows 10 or later
 ### Linux
- - Supported OS:
-     - Debian 9 (Stretch) and higher
-     - Ubuntu 16.04 and higher
- - X11
- - Clipboad functionality requires xclip to be installed
+- Supported OS:
+  - Debian 9 (Stretch) and higher
+  - Ubuntu 16.04 and higher
+- X11
+- Clipboad functionality requires xclip to be installed
 
 ## Theme Support
 Dark and a light themes are set automatically based on your OS settings.
@@ -47,13 +47,13 @@ The intent of the tool is to be a bulk-compression utility.
 
 ### Operations
 
-| Operation | Description |
-|-----------|-------------|
-| Compress uncompressed data                    |Compresses only uncompressed subblocks and copies others.|
-| Compress uncompressed and Zstd-compressed data|Compresses subblocks that were originally uncompressed or compressed with zstd. |
-| Compress all data                             |Compresses all subblocks regardless of current compression method (if possible). |
-| Decompress all data                           |Decompresses all possible subblocks.  |
-| Dry Run                                       |Finds all CZI files in the input folder but does not create any output CZI files. Like the other operations, it creates a CSV report in the output folder.|
+| Operation                                      | Description                                                                                                                                                |
+|------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Compress uncompressed data                     | Compresses only uncompressed subblocks and copies others.                                                                                                  |
+| Compress uncompressed and Zstd-compressed data | Compresses subblocks that were originally uncompressed or compressed with zstd.                                                                            |
+| Compress all data                              | Compresses all subblocks regardless of current compression method (if possible).                                                                           |
+| Decompress all data                            | Decompresses all possible subblocks.                                                                                                                       |
+| Dry Run                                        | Finds all CZI files in the input folder but does not create any output CZI files. Like the other operations, it creates a CSV report in the output folder. |
 
 ## Progress Update
 CZI Shrink scans the input folder for CZI files.
@@ -97,10 +97,10 @@ the actual entries written.
 In some cases you may see no log output until the operation has completed if a reasonably constrained input directory is chosen.
 
 ### Format
-| InputFile | SizeInput | SizeOutput | SizeRatio | SizeDelta | TimeToProcess | Status | ErrorMessage|
-| ----------|-----------|------------|-----------|-----------|---------------|--------|-------------|
-| Sample_file.czi | 696480 | 564992  |0.811210659| 131488    | 00:00:00.0672709 |SUCCESS||
-| Sample_file2.czi| 1107888032 | 0 | 0 | -1 | |ERROR | Illegal data detected at offset 235352768 -> Invalid SubBlock-magic |
+| InputFile        | SizeInput  | SizeOutput | SizeRatio   | SizeDelta | TimeToProcess    | Status  | ErrorMessage                                                        |
+|------------------|------------|------------|-------------|-----------|------------------|---------|---------------------------------------------------------------------|
+| Sample_file.czi  | 696480     | 564992     | 0.811210659 | 131488    | 00:00:00.0672709 | SUCCESS |                                                                     |
+| Sample_file2.czi | 1107888032 | 0          | 0           | -1        |                  | ERROR   | Illegal data detected at offset 235352768 -> Invalid SubBlock-magic |
 ## FAQ
 - Is the compression lossy?
   - The tool uses [Zstandard](https://github.com/facebook/zstd) which is a fast and lossless compression algorithm.
@@ -128,10 +128,10 @@ There is no guarantee that any items on this list will be added, rather it is ju
 
 ### Notes for Contributors
 * Test changes at least on Linux and Windows.
-* Note that the app will change appearance when the system theme is changed (Windows: Settings -> Personalization -> Colors -> Choose your colors: Light/Dark/Custom). Make sure that GUI changes look good both in the Light and in the Dark Theme. See https://docs.avaloniaui.net/docs/next/guides/styles-and-resources/how-to-use-theme-variants
+* Note that the app will change appearance when the system theme is changed (Windows: Settings -> Personalization -> Colors -> Choose your colors: Light/Dark/Custom). Make sure that GUI changes look good both in the Light and in the Dark Theme. See <https://docs.avaloniaui.net/docs/next/guides/styles-and-resources/how-to-use-theme-variants>
 
 ## How to upgrade libczicompressc automatically
-1. Create a 'classic' personal access token at https://github.com/settings/tokens, authorize it for the ZEISS organization via the "Configure SSO" button, and store it in a GITHUB_TOKEN environment variable.
+1. Create a 'classic' personal access token at <https://github.com/settings/tokens>, authorize it for the ZEISS organization via the "Configure SSO" button, and store it in a GITHUB_TOKEN environment variable.
 2. Open a Powershell terminal and run [./upgrade-libczicompressc.ps1](./upgrade-libczicompressc.ps1). Run `get-help ./upgrade-libczicompressc.ps1` for more info.
 
 ## How to upgrade libczicompressc manually
@@ -139,7 +139,7 @@ There is no guarantee that any items on this list will be added, rather it is ju
 1. Put the binaries into [libczicompressc/runtimes/linux-x64/native](libczicompressc/runtimes/linux-x64/native) and [libczicompressc/runtimes/win-x64/native](libczicompressc/runtimes/win-x64/native)
 1. Update the nuspec file [libczicompressc/libczicompressc.nuspec](libczicompressc/libczicompressc.nuspec):
     * `package/metadata/version` must be the 'ProductVersion' of libczicompressc.dll (explorer: Properties/Details)
-	* `package/metadata/repository[@commit]` must be the git commit from which the binaries were built
+ * `package/metadata/repository[@commit]` must be the git commit from which the binaries were built
 1. [Install nuget if necessary](https://learn.microsoft.com/en-us/nuget/install-nuget-client-tools#cli-tools).
 1. Open a shell in [libczicompressc](libczicompressc), and run `path/to/nuget pack libczicompressc.nuspec`
 1. Move the resulting nupkg into [packages_local](packages_local) and delete the old package from there.

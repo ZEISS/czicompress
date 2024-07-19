@@ -48,7 +48,7 @@ public:
 
 protected:
   /// Gets the statistics object.
-  /// 
+  ///
   /// \returns The statistics object.
   const ActionWithSubBlockStatistics& GetStatistics() const;
 
@@ -82,7 +82,7 @@ protected:
   virtual std::tuple<libCZI::CompressionMode, std::shared_ptr<libCZI::IMemoryBlock>> CompressSubBlock(
       const std::shared_ptr<libCZI::ISubBlock>& subblock);
 
-  /// This method is called when the metadata-segment is being process. It allows to 
+  /// This method is called when the metadata-segment is being process. It allows to
   /// alter the XML and do modifications.
   /// If no modification is needed (and the data from the source metadata-segment) is to be
   /// copied verbatim, then this method can return a nullptr.
@@ -94,8 +94,7 @@ protected:
   ///
   /// \returns A std::shared_ptr&lt;libCZI::ICziMetadataBuilder&gt; containing the
   ///          metadata to be written to the destination document.
-  virtual std::shared_ptr<libCZI::ICziMetadataBuilder> ModifyMetadata(
-      const std::shared_ptr<libCZI::IMetadataSegment>& metadata_segment);
+  virtual std::shared_ptr<libCZI::ICziMetadataBuilder> ModifyMetadata(const std::shared_ptr<libCZI::IMetadataSegment>& metadata_segment);
 
 private:
   /// This object is used to keep a statistics about the operations done with the subblocks.

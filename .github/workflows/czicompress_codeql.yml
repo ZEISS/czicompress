@@ -47,13 +47,13 @@ jobs:
 
       - uses: ./.github/actions/cmake-build
         with:
-          path-cache: '/usr/local/share/vcpkg/installed'
-          path-toolchain: '/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake'
-          os-id: 'linux'
+          path-cache: "/usr/local/share/vcpkg/installed"
+          path-toolchain: "/usr/local/share/vcpkg/scripts/buildsystems/vcpkg.cmake"
+          os-id: "linux"
           build-type: Release
           package: ON
           platform: x64-linux
-          src-dir: '${{github.workspace}}/czicompress'
+          src-dir: "${{github.workspace}}/czicompress"
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

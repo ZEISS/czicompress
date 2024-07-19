@@ -1,27 +1,27 @@
 ---
-name: 'CMake-Build'
-description: 'Install Dependencies + Configure CMake + Build'
+name: "CMake-Build"
+description: "Install Dependencies + Configure CMake + Build"
 inputs:
   path-cache:
-    description: 'Path to vcpkg cache directory'
+    description: "Path to vcpkg cache directory"
     required: true
   path-toolchain:
-    description: 'Path to vcpkg tool chain file'
+    description: "Path to vcpkg tool chain file"
     required: true
   os-id:
-    description: 'Operating System Identifier'
+    description: "Operating System Identifier"
     required: true
   build-type:
-    description: 'Build Configuration'
+    description: "Build Configuration"
     required: true
   package:
-    description: 'Using package manager for external dependencies'
+    description: "Using package manager for external dependencies"
     required: true
   platform:
-    description: 'OS platform'
+    description: "OS platform"
     required: true
   src-dir:
-    description: 'The directory with the sources'
+    description: "The directory with the sources"
     required: true
 runs:
   using: "composite"
@@ -44,9 +44,9 @@ runs:
       shell: bash
       working-directory: ${{inputs.src-dir}}
       run: |
-         # We install the following packages: eigen3, catch2, cli11. Installing them with vcpkg (and caching them)
-         # is faster than downloading and building them from source (which is the default behavior of the CZICompress-build-system).
-         vcpkg install --triplet ${{inputs.platform}} eigen3 catch2 cli11
+        # We install the following packages: eigen3, catch2, cli11. Installing them with vcpkg (and caching them)
+        # is faster than downloading and building them from source (which is the default behavior of the CZICompress-build-system).
+        vcpkg install --triplet ${{inputs.platform}} eigen3 catch2 cli11
 
     - name: Configure CMake
       shell: bash

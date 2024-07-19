@@ -3,10 +3,7 @@
 
   "settings": {
     "namingRules": {
-      "allowedNamespaceComponents": [
-        "netczicompress",
-        "netczicompressTests"
-      ]
+      "allowedNamespaceComponents": ["netczicompress", "netczicompressTests"]
     }
   }
 }

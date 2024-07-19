@@ -2,9 +2,9 @@
 policy:
   - section:
       - id: [toolaffected]
-        block-list: ['None', 'Other']
+        block-list: ["None", "Other"]
         label:
           - name: czicompress
-            keys: ['CZI Compress']
-          - name: 'czishrink'
-            keys: ['CZI Shrink']
+            keys: ["CZI Compress"]
+          - name: "czishrink"
+            keys: ["CZI Shrink"]

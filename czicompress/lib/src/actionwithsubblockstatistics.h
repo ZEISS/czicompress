@@ -51,9 +51,6 @@ public:
   /// \returns Total count of subblocks processed.
   std::uint64_t GetTotalCountOfSubblocksProcessed() const
   {
-    return 
-        this->count_subblocks_copied_verbatim_ + 
-        this->count_subblocks_compressed_ + 
-        this->count_subblocks_decompressed_;
+    return this->count_subblocks_copied_verbatim_ + this->count_subblocks_compressed_ + this->count_subblocks_decompressed_;
   }
 };

@@ -1,4 +1,4 @@
-# STOP - Read this First!
+# STOP - Read this First
 Reporting a security vulnerability?  
 Check out the project's [security policy](https://github.com/zeiss/czicompress/security/policy).
 
@@ -24,7 +24,7 @@ Fixes # (issue)
 Describe the tests that you ran to verify your changes.  
 Provide instructions to reproduce.
 
-## Checklist:
+## Checklist
 
 - [ ] I followed the Contributing Guidelines.
 - [ ] I did a self-review.

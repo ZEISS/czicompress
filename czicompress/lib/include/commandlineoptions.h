@@ -31,6 +31,7 @@ private:
   libCZI::Utils::CompressionOption compression_option_;
   bool overwrite_existing_file_{false};
   bool ignore_duplicate_subblocks_{true};
+
 public:
   /// Values that represent the result of the "Parse"-operation.
   enum class ParseResult
