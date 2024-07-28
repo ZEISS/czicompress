@@ -190,15 +190,16 @@ int ProcessFile(void *file_processor, const char *const input_path, const char *
   {
     const auto *messagestr = exception.what();
     const size_t len = strlen(messagestr);
-    if (len < *error_message_length)
-    {
-      *error_message_length = len;
-    }
-
+    
     // Pointer/s for passing back error information are/is invalid so we do not attempt to write.
     if (!error_message || !error_message_length)
     {
       return EXIT_FAILURE;
+    }
+    
+    if (len < *error_message_length)
+    {
+      *error_message_length = len;
     }
 
     // Checking for null pointers only not necessarily for invalid string;
