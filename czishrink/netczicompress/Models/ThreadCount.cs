@@ -6,9 +6,9 @@ namespace netczicompress.Models;
 
 public partial record ThreadCount
 {
-    private readonly int internalValue = Maximum;
-
     public static readonly ThreadCount Default;
+
+    private readonly int internalValue = Maximum;
 
     static ThreadCount()
     {

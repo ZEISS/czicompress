@@ -11,9 +11,9 @@ using System.ComponentModel.DataAnnotations;
 /// </summary>
 public record CompressionLevel
 {
-    private readonly int internalValue = DefaultValue;
-
     public static readonly CompressionLevel Default;
+
+    private readonly int internalValue = DefaultValue;
 
     static CompressionLevel()
     {
