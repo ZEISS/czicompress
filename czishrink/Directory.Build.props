@@ -17,6 +17,6 @@
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.2.2<!--dependabot/nuget/czishrink/czishrink-22c529c319--></VersionPrefix>
+    <VersionPrefix>1.2.3<!--feature/update-logging-abstractions--></VersionPrefix>
   </PropertyGroup>
 </Project>
