@@ -9,8 +9,18 @@ updates:
     schedule:
       interval: "weekly"
       day: "wednesday"
+    groups:
+      czishrink:
+        applies-to: version-updates
+        patterns:
+        - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "wednesday"
+    groups:
+      github-actions:
+        applies-to: version-updates
+        patterns:
+        - "*"
