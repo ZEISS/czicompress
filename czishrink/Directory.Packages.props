@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <AutoFixtureVersion>4.18.0</AutoFixtureVersion>
-    <AvaloniaVersion>11.0.5</AvaloniaVersion>
+    <AvaloniaVersion>11.0.10</AvaloniaVersion>
     <ReactiveUIVersion>19.5.1</ReactiveUIVersion>
     <SystemIOAbstractionsVersion>19.2.87</SystemIOAbstractionsVersion>
     <WixVersion>5.0.0</WixVersion>
@@ -27,7 +27,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
     <PackageVersion Include="Moq" Version="4.20.69" />
-    <PackageVersion Include="Projektanker.Icons.Avalonia.FontAwesome" Version="8.3.0" />
+    <PackageVersion Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.4.0" />
     <PackageVersion Include="ReactiveUI" Version="$(ReactiveUIVersion)" />
     <PackageVersion Include="ReactiveUI.Fody" Version="$(ReactiveUIVersion)" />
     <PackageVersion Include="Splat" Version="14.8.6" />
