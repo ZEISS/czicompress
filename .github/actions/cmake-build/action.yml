@@ -44,6 +44,15 @@ runs:
       shell: bash
       working-directory: ${{inputs.src-dir}}
       run: |
+        # Temporary workaround for the vcpkg internal issue
+        # See https://github.com/microsoft/vcpkg/issues/41199#issuecomment-2378255699 for details
+        # shellcheck disable=SC2153
+        export SystemDrive=$SYSTEMDRIVE
+        # shellcheck disable=SC2153
+        export SystemRoot=$SYSTEMROOT
+        # shellcheck disable=SC2153
+        export windir=$WINDIR
+
         # We install the following packages: eigen3, catch2, cli11. Installing them with vcpkg (and caching them)
         # is faster than downloading and building them from source (which is the default behavior of the CZICompress-build-system).
         vcpkg install --triplet ${{inputs.platform}} eigen3 catch2 cli11
