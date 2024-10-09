@@ -41,10 +41,18 @@ jobs:
         with:
           lfs: true
 
+      - name: Get dotnet version from global.json
+        id: get_dotnet_version
+        run: |
+          $global_json = Get-Content -Path "./global.json" | ConvertFrom-Json
+          $dotnetversion = $global_json.sdk.version
+          "dotnetversion=$dotnetversion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        shell: pwsh
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: ${{ steps.get_dotnet_version.outputs.dotnetversion }}
 
       - name: Get Version from Directory.Build.props
         id: getversion
