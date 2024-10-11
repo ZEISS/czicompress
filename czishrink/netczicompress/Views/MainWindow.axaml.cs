@@ -133,7 +133,7 @@ public partial class MainWindow : Window
                     new ButtonDefinition { Name = "Yes", IsDefault = false },
                     new ButtonDefinition { Name = "No", IsDefault = true, IsCancel = true },
                 },
-                WindowIcon = this.Icon,
+                WindowIcon = this.Icon!,
             });
 
         var result = await box.ShowWindowDialogAsync(this);
