@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <AutoFixtureVersion>4.18.1</AutoFixtureVersion>
-    <AvaloniaVersion>11.1.4</AvaloniaVersion>
+    <AvaloniaVersion>11.2.0</AvaloniaVersion>
     <ReactiveUIVersion>20.1.63</ReactiveUIVersion>
     <SystemIOAbstractionsVersion>21.0.29</SystemIOAbstractionsVersion>
     <WixVersion>5.0.2</WixVersion>
