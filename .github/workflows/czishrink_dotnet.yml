@@ -54,6 +54,9 @@ jobs:
         with:
           dotnet-version: ${{ steps.get_dotnet_version.outputs.dotnetversion }}
 
+      - name: Print .NET version
+        run: dotnet --version
+
       - name: Get Version from Directory.Build.props
         id: getversion
         run: |
