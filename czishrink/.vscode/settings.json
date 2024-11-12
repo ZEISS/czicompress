@@ -1,3 +1,4 @@
 {
-  "dotnet.defaultSolution": "netczicompress.sln"
+  "dotnet.defaultSolution": "netczicompress.sln",
+  "dotnet-test-explorer.testProjectPath": "**/*Tests.@(csproj|vbproj|fsproj)"
 }

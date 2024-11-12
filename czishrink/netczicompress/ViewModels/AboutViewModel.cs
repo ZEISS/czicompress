@@ -25,7 +25,7 @@ public class AboutViewModel : ViewModelBase, IAboutViewModel
         this.ShowAboutCommand = ReactiveCommand.Create(() => this.IsVisible = true);
         this.ShowTextFileCommand = ReactiveCommand.CreateFromTask<string>(this.OpenTextFile);
         this.OpenUrlCommand = ReactiveCommand.CreateFromTask<string>(this.OpenUrlLink);
-        this.ProgramVersionAndCopyRight = $"{info}, © 2023 Carl Zeiss Microscopy GmbH and others";
+        this.ProgramVersionAndCopyRight = $"{info}, © 2023-2024 Carl Zeiss Microscopy GmbH and others";
         this.launcher = launcher;
     }
 
