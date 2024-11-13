@@ -17,6 +17,6 @@
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.2.5<!--feature/upgrade-dotnet-sdk--></VersionPrefix>
+    <VersionPrefix>1.2.6<!--dependabot/nuget/czishrink/czishrink-588e908de1--></VersionPrefix>
   </PropertyGroup>
 </Project>

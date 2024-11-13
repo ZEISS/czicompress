@@ -27,7 +27,7 @@ public class AboutViewModelTests
         // ASSERT
         sut.IsVisible.Should().BeFalse();
         sut.LibraryName.Should().BeSameAs(libname);
-        sut.ProgramVersionAndCopyRight.Should().Be("FooBar 99.3.7, © 2023 Carl Zeiss Microscopy GmbH and others");
+        sut.ProgramVersionAndCopyRight.Should().Be("FooBar 99.3.7, © 2023-2024 Carl Zeiss Microscopy GmbH and others");
     }
 
     [Theory]
