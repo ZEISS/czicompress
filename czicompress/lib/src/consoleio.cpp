@@ -10,6 +10,7 @@
 #include <cstdarg>
 #include <iostream>
 #include <limits>
+#include <memory>
 
 #if CZICOMPRESS_WIN32_ENVIRONMENT
 #include <Windows.h>

@@ -7,6 +7,7 @@
 #include <include/utils/utf8/utf8converter.h>
 
 #include <stdexcept>
+#include <string>
 
 namespace utils::utf8
 {

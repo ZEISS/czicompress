@@ -7,7 +7,11 @@
 #include <CZICompress_Config.h>
 
 #include <CLI/CLI.hpp>
+#include <map>
+#include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "inc_libCZI.h"
 

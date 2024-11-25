@@ -6,6 +6,7 @@
 
 #include <codecvt>
 #include <locale>
+#include <string>
 
 namespace utils::utf8
 {
