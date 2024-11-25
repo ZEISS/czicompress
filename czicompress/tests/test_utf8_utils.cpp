@@ -6,6 +6,7 @@
 #include <src/copyczi.h>
 
 #include <catch2/catch_test_macros.hpp>
+#include <string>
 
 #include "catch2/catch_all.hpp"
 #include "libczi_utils.h"

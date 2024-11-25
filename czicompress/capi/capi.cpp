@@ -105,7 +105,7 @@ public:
               total_progress = 95 + 4 + 1 * phase_progress;
           }
 
-          return progress_report((int32_t)total_progress);
+          return progress_report(static_cast<int32_t>(total_progress));
         });
 
     writer->Close();

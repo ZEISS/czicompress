@@ -7,6 +7,7 @@
 #include <libCZI.h>
 
 #include <algorithm>
+#include <memory>
 
 CMemOutputStream::CMemOutputStream(size_t initial_size) : ptr_(nullptr), allocated_size_(initial_size), used_size_(0)
 {

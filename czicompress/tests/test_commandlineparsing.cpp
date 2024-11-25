@@ -8,6 +8,7 @@
 #include <include/commandlineoptions.h>
 
 #include <catch2/catch_test_macros.hpp>
+#include <memory>
 #include <tuple>
 #include <vector>
 
