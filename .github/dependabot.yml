@@ -19,6 +19,10 @@ updates:
     schedule:
       interval: "weekly"
       day: "wednesday"
+    ignore:
+      # FluentAssertions is non-free from version 8.0.0 onwards
+      - dependency-name: "FluentAssertions"
+        update-types: ["version-update:semver-major"]
     groups:
       github-actions:
         applies-to: version-updates
