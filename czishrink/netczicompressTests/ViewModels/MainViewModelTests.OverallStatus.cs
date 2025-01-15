@@ -248,7 +248,7 @@ public partial class MainViewModelTests
 
     private static void SetFolders(MainViewModel sut, IFileSystem fs, bool setInput = true, bool setOutput = true)
     {
-        string someExistingDir = fs.Path.GetTempPath();
+        string someExistingDir = fs.DirectoryInfo.New(fs.Path.GetTempPath()).FullName;
         if (setInput)
         {
             sut.InputDirectory = someExistingDir;
