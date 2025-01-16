@@ -17,6 +17,6 @@
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.2.6<!--dependabot/nuget/czishrink/czishrink-588e908de1--></VersionPrefix>
+    <VersionPrefix>1.2.7<!--dependabot/nuget/czishrink/czishrink-dd71dc6aae--></VersionPrefix>
   </PropertyGroup>
 </Project>
