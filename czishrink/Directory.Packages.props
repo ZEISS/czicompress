@@ -42,5 +42,9 @@
     <PackageVersion Include="WixToolset.UI.wixext" Version="$(WixVersion)"/>
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.1" />
+
+    <!-- Transitive dependencies pinned due to security vulnerabilities -->
+    <PackageVersion Include="System.Net.Http" Version="4.3.4" />
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 </Project>
