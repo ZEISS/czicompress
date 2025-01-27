@@ -14,9 +14,10 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
 
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.2.7<!--dependabot/nuget/czishrink/czishrink-dd71dc6aae--></VersionPrefix>
+    <VersionPrefix>1.2.8<!--dependabot/nuget/czishrink/czishrink-8004fcd715--></VersionPrefix>
   </PropertyGroup>
 </Project>
