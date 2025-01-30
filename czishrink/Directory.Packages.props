@@ -3,7 +3,7 @@
     <AutoFixtureVersion>4.18.1</AutoFixtureVersion>
     <AvaloniaVersion>11.2.3</AvaloniaVersion>
     <ReactiveUIVersion>20.1.63</ReactiveUIVersion>
-    <SystemIOAbstractionsVersion>21.2.12</SystemIOAbstractionsVersion>
+    <SystemIOAbstractionsVersion>21.3.1</SystemIOAbstractionsVersion>
     <WixVersion>5.0.2</WixVersion>
   </PropertyGroup>
   <ItemGroup>
