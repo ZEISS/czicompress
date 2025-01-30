@@ -498,15 +498,15 @@
       },
       "TestableIO.System.IO.Abstractions": {
         "type": "Transitive",
-        "resolved": "21.2.8",
-        "contentHash": "YCf4D/Jp9JDaCmrAvVOuQjNUc/vqE3jagvlkv1I4lX6fUZZMWjjuh2PXFBomLFvUbHCGXeC2RR8/7tGx7xDLYw=="
+        "resolved": "21.2.12",
+        "contentHash": "6yi1kmr7ASscxsXTeEsV0B3pS2Xt+MBetJ72KCSmPP+hJKgkA5rkmUEnjwv4Nflyid7pdxqZovJN0y5Fz95eOA=="
       },
       "TestableIO.System.IO.Abstractions.Wrappers": {
         "type": "Transitive",
-        "resolved": "21.2.8",
-        "contentHash": "hvB1myOVVJVCWz2z3IthtJv3R48k3HHZKQqisy6ZNBNz6s8ziJS7JAzCeBFmTyzTQjamELprKk6R9TLFzsCZ5Q==",
+        "resolved": "21.2.12",
+        "contentHash": "lF2QW/NLd+B4c+wNJrm4FpD0PEHM02srBRhpB4Ese+jMUCxewXN2YrdTAaE8fYH4ki1bt2aIyJ57aw+msg/y2w==",
         "dependencies": {
-          "TestableIO.System.IO.Abstractions": "21.2.8"
+          "TestableIO.System.IO.Abstractions": "21.2.12"
         }
       },
       "Tmds.DBus.Protocol": {
@@ -530,7 +530,7 @@
           "Microsoft.Extensions.Logging.Abstractions": "[8.0.2, )",
           "Projektanker.Icons.Avalonia.FontAwesome": "[9.6.0, )",
           "ReactiveUI.Fody": "[19.5.41, )",
-          "System.IO.Abstractions": "[21.2.8, )",
+          "System.IO.Abstractions": "[21.2.12, )",
           "libczicompressc": "[0.5.2, )"
         }
       },
@@ -599,17 +599,17 @@
       "DynamicData": {
         "type": "CentralTransitive",
         "requested": "[9.0.4, )",
-        "resolved": "8.4.1",
-        "contentHash": "Mn1+fU/jqxgONEJq8KLQPGWEi7g/hUVTbjZyn4QM0sWWDAVOHPO9WjXWORSykwdfg/6S3GM15qsfz+2EvO+QAQ==",
+        "resolved": "9.0.4",
+        "contentHash": "CjJUF3u8V7QseHlumOBajFUYM9YKlI6QhDKz5MMyeckPeU6QyMExDJhGsJqIk6RYYLaPNLsk5qkzxEgDWv/lsg==",
         "dependencies": {
-          "System.Reactive": "6.0.0"
+          "System.Reactive": "6.0.1"
         }
       },
       "Fody": {
         "type": "CentralTransitive",
         "requested": "[6.8.2, )",
-        "resolved": "6.8.0",
-        "contentHash": "hfZ/f8Mezt8aTkgv9nsvFdYoQ809/AqwsJlOGOPYIfBcG2aAIG3v3ex9d8ZqQuFYyMoucjRg4eKy3VleeGodKQ=="
+        "resolved": "6.8.2",
+        "contentHash": "sjGHrtGS1+kcrv99WXCvujOFBTQp4zCH3ZC9wo2LAtVaJkuLpHghQx3y4k1Q8ZKuDAbEw+HE6ZjPUJQK3ejepQ=="
       },
       "libczicompressc": {
         "type": "CentralTransitive",
@@ -640,10 +640,10 @@
       "ReactiveUI": {
         "type": "CentralTransitive",
         "requested": "[20.1.63, )",
-        "resolved": "20.1.1",
-        "contentHash": "9hNPknWjijnaSWs6auypoXqUptPZcRpUypF+cf1zD50fgW+SEoQda502N3fVZ2eWPcaiUad+z6GaLwOWmUVHNw==",
+        "resolved": "20.1.63",
+        "contentHash": "lPrrPDH5dgBZh/vpZGqycTbeRPHWcrLAhmRAOK8rqeAObVuYAzLrhoGusnfRvaljz0ApP5UiPLEdH7lxtfj0Jw==",
         "dependencies": {
-          "DynamicData": "8.4.1",
+          "DynamicData": "9.0.4",
           "Splat": "15.1.1",
           "System.ComponentModel.Annotations": "5.0.0"
         }
@@ -661,17 +661,17 @@
       "Splat": {
         "type": "CentralTransitive",
         "requested": "[15.2.22, )",
-        "resolved": "15.1.1",
-        "contentHash": "RHDTdF90FwVbRia2cmuIzkiVoETqnXSB2dDBBi/I35HWXqv4OKGqoMcfcd6obMvO2OmmY5PjU1M62K8LkJafAA=="
+        "resolved": "15.2.22",
+        "contentHash": "/pWR1fEsosVqdtn7qG+FjEJP/crrK8HQRQyyJKriuZQUKuRBft4/PI6+YTXirgCeuJTsbERo7vGL+z9988oSPw=="
       },
       "System.IO.Abstractions": {
         "type": "CentralTransitive",
-        "requested": "[21.2.8, )",
-        "resolved": "21.2.8",
-        "contentHash": "kgu2kRfPVf50c0Tp5EMEiY6NtbNOIZlNgWW83LIKFCbo+d0WXPygAF+1fjBzmWjebKiIF5KClIXlA7qTOfZBDg==",
+        "requested": "[21.2.12, )",
+        "resolved": "21.2.12",
+        "contentHash": "NZwU16WTHDgUbGUg6CtiJTA2WynFRfpaMuOSrTrSBO3WMkmpTDJfQwx/laeStzlmk/R2ytOuQM06VjHS8WbGHA==",
         "dependencies": {
-          "TestableIO.System.IO.Abstractions": "21.2.8",
-          "TestableIO.System.IO.Abstractions.Wrappers": "21.2.8"
+          "TestableIO.System.IO.Abstractions": "21.2.12",
+          "TestableIO.System.IO.Abstractions.Wrappers": "21.2.12"
         }
       },
       "System.Reactive": {
