@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Parse issue form
-        uses: stefanbuck/github-issue-parser@c1a559d78bfb8dd05216dab9ffd2b91082ff5324
+        uses: stefanbuck/github-issue-parser@v3
         id: issue-parser
         with:
           template-path: .github/ISSUE_TEMPLATE/bug_report.yml
