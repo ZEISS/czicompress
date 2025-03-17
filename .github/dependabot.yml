@@ -13,6 +13,8 @@ updates:
       # FluentAssertions is non-free from version 8.0.0 onwards
       - dependency-name: "FluentAssertions"
         update-types: ["version-update:semver-major"]
+      # local package (not readable for dependabot if it's not using git lfs)
+      - dependency-name: "libczicompressc"
     groups:
       czishrink:
         applies-to: version-updates
