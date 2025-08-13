@@ -62,7 +62,7 @@ jobs:
               }
     steps:
       - name: Checkout the source codes.
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - uses: ./.github/actions/cmake-build
         with:
@@ -142,7 +142,7 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install Alpine build deps
         run: |
