@@ -37,7 +37,7 @@ jobs:
             config: {os: windows-latest, osfamily: win}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           lfs: true
 
@@ -50,7 +50,7 @@ jobs:
         shell: pwsh
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ steps.get_dotnet_version.outputs.dotnetversion }}
 
@@ -115,7 +115,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}  # required
 
       - name: Upload dotnet test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dotnet-results-${{ matrix.config.os }}-${{ matrix.build }}
           path: TestResults
@@ -135,7 +135,7 @@ jobs:
           -o ${{ github.workspace }}/publish
 
       - name: Upload published binaries
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ (github.event_name != 'pull_request') && (matrix.build == 'Release') }}
         with:
           name: CziShrink_${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
@@ -160,7 +160,7 @@ jobs:
           -o ${{ github.workspace }}/installer
 
       - name: Upload Wix installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ (github.event_name != 'pull_request') && (matrix.build == 'Release') && (matrix.config.os == 'windows-latest') }}
         with:
           name: CziShrink_Installer${{ steps.getversion.outputs.version }}_${{ matrix.config.osfamily}}-x64
