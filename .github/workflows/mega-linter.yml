@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Use CMake to configure code
         working-directory: czicompress
@@ -55,7 +55,7 @@ jobs:
         id: ml
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/flavors/
-        uses: oxsecurity/megalinter/flavors/dotnet@v8
+        uses: oxsecurity/megalinter/flavors/dotnet@v9
         env:
           # All available variables are described in documentation
           # https://megalinter.io/configuration/
@@ -70,7 +70,7 @@ jobs:
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
         if: ${{ success() || failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: MegaLinter reports
           path: |
