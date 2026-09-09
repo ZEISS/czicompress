@@ -9,7 +9,7 @@ cmake_policy(SET CMP0091 NEW) # enable new "MSVC runtime library selection" (htt
 # Note that the CMake-variables <Projectname>_VERSION_MAJOR, <Projectname>_VERSION_MINOR, ... are defined by this statement,
 #  which are used in the build (so that - if changing the name here, change also the usage of those variables).
 project ("czicompress"
-         VERSION 0.5.5)
+         VERSION 0.5.6)
 
 set(czicompress_VERSION_PATCH_FLAGS "")
 set(czicompress_VERSION_TWEAK_FLAGS "")
