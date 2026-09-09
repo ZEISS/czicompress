@@ -120,6 +120,7 @@ private:
   std::uint32_t width_;
   std::uint32_t height_;
   std::uint32_t stride_;
+  int lock_count_{0};
 
 public:
   CMemBitmapWrapper(libCZI::PixelType pixeltype, std::uint32_t width, std::uint32_t height)
@@ -171,6 +172,7 @@ public:
 
   libCZI::BitmapLockInfo Lock() override
   {
+    ++this->lock_count_;
     libCZI::BitmapLockInfo bitmapLockInfo{
         this->ptrData_,
         this->ptrData_,
@@ -181,7 +183,9 @@ public:
     return bitmapLockInfo;
   }
 
-  void Unlock() override {}
+  void Unlock() override { --this->lock_count_; }
+
+  int GetLockCount() const override { return this->lock_count_; }
 };
 
 std::shared_ptr<libCZI::IBitmapData> CreateGray8BitmapAndFill(std::uint32_t width, std::uint32_t height, uint8_t value)
