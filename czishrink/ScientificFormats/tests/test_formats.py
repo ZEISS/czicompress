@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import h5py
@@ -17,6 +18,106 @@ import scientific_worker as worker
 
 
 class Formats(unittest.TestCase):
+    def test_hdf5_checksum_only_datasets_are_compressed(self):
+        source = self.root / 'checksum.h5'
+        with h5py.File(source, 'w') as handle:
+            handle.create_dataset('pixels', data=np.zeros(20000), fletcher32=True)
+        output, _ = self.run_file(source, 'CompressUncompressed')
+        with h5py.File(output, 'r') as handle:
+            self.assertEqual(handle['pixels'].compression, 'gzip')
+            self.assertTrue(handle['pixels'].fletcher32)
+
+    def test_tiff_unrelocatable_pointer_datatypes_are_rejected(self):
+        for datatype, bigtiff in ((13, False), (18, True)):
+            with self.subTest(datatype=datatype):
+                source = self.root / f'pointer-{datatype}.tif'
+                tifffile.imwrite(source, np.zeros((128, 128), dtype='uint16'), bigtiff=bigtiff,
+                                 metadata=None, extratags=[(65001, datatype, 1, 123456, False)])
+                before = worker.file_hash(source)
+                destination = self.root / f'pointer-{datatype}-output.tif'
+                with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'IFD/IFD8'):
+                    worker.process(source, destination, 'CompressAll', 4)
+                self.assertFalse(destination.exists())
+                self.assertEqual(worker.file_hash(source), before)
+
+    def test_tiff_calibration_changes_fail_verification(self):
+        source, changed = self.root / 'calibrated.tif', self.root / 'changed.tif'
+        pixels = np.zeros((64, 64), dtype='uint16')
+        tifffile.imwrite(source, pixels, metadata=None, resolution=((200, 3), (400, 7)), resolutionunit='CENTIMETER')
+        for resolution, unit in ((((201, 3), (400, 7)), 'CENTIMETER'),
+                                  (((200, 3), (401, 7)), 'CENTIMETER'),
+                                  (((200, 3), (400, 7)), 'INCH')):
+            with self.subTest(resolution=resolution, unit=unit):
+                tifffile.imwrite(changed, pixels, metadata=None, resolution=resolution, resolutionunit=unit)
+                with self.assertRaisesRegex(ValueError, 'metadata tag changed'):
+                    worker.verify_tiff(source, changed)
+
+    def test_tiff_mixed_pages_are_explicitly_unsupported_in_uncompressed_modes(self):
+        source = self.root / 'mixed.tif'
+        with tifffile.TiffWriter(source) as writer:
+            writer.write(np.zeros((256, 256), dtype='uint16'), metadata=None)
+            writer.write(np.zeros((64, 64), dtype='uint16'), compression='deflate', metadata=None)
+        for mode in ('CompressUncompressed', 'CompressUncompressedAndZstd'):
+            destination = self.root / (mode + '.tif')
+            with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'Mixed compressed'):
+                worker.process(source, destination, mode, 4)
+            self.assertFalse(destination.exists())
+        output, result = self.run_file(source, 'CompressAll')
+        self.assertTrue(result['verified'])
+        worker.verify_tiff(source, output)
+
+    def test_tiff_already_compressed_is_copied_in_uncompressed_mode(self):
+        source = self.root / 'compressed.tif'
+        tifffile.imwrite(source, np.zeros((256, 256), dtype='uint16'), compression='deflate', metadata=None)
+        output, result = self.run_file(source, 'CompressUncompressed')
+        self.assertTrue(result['unchanged'])
+        self.assertEqual(worker.file_hash(source), worker.file_hash(output))
+
+    def test_tiff_pixel_verification_detects_float_payload_changes(self):
+        source, changed = self.root / 'bits.tif', self.root / 'changed-bits.tif'
+        bits = np.zeros((64, 64), dtype='uint32')
+        bits[0, 0] = 0x7FC00001
+        tifffile.imwrite(source, bits.view('float32'), metadata=None)
+        bits[0, 0] = 0x7FC00002
+        tifffile.imwrite(changed, bits.view('float32'), metadata=None)
+        with self.assertRaisesRegex(ValueError, 'pixel verification'):
+            worker.verify_tiff(source, changed)
+
+    def test_tiff_large_pages_use_disk_mapping_for_decode_and_verification(self):
+        source = self.root / 'large.tif'
+        tifffile.imwrite(source, np.zeros((4096, 4096), dtype='uint16'), rowsperstrip=32, metadata=None)
+        original = tifffile.TiffPage.asarray
+        calls = []
+        def bounded(page, **kwargs):
+            self.assertIsInstance(kwargs.get('out'), np.memmap)
+            self.assertEqual(kwargs.get('maxworkers'), 1)
+            calls.append(page.shape)
+            return original(page, **kwargs)
+        with mock.patch.object(tifffile.TiffPage, 'asarray', bounded):
+            output, result = self.run_file(source)
+        self.assertTrue(result['verified'])
+        self.assertGreaterEqual(len(calls), 6)
+        self.assertLess(output.stat().st_size, source.stat().st_size)
+
+    def test_tiff_oversized_codec_segment_fails_without_partial_output(self):
+        source, destination = self.root / 'segment.tif', self.root / 'segment-output.tif'
+        tifffile.imwrite(source, np.zeros((256, 256), dtype='uint16'), compression='deflate', metadata=None)
+        with mock.patch.object(worker, 'TIFF_MAX_SEGMENT_BYTES', 1024):
+            with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'bounded-memory'):
+                worker.process(source, destination, 'CompressAll', 4)
+        self.assertFalse(destination.exists())
+
+    def test_tiff_planar_rgb_and_bilevel_tiles_preserve_pixels(self):
+        planar = self.root / 'planar.tif'
+        pixels = np.arange(3 * 301 * 277, dtype='uint16').reshape(3, 301, 277)
+        tifffile.imwrite(planar, pixels, photometric='rgb', planarconfig='separate', metadata=None)
+        output, _ = self.run_file(planar)
+        worker.verify_tiff(planar, output)
+        bilevel = self.root / 'bilevel.tif'
+        tifffile.imwrite(bilevel, np.zeros((301, 277), dtype='bool'), metadata=None)
+        output, _ = self.run_file(bilevel)
+        worker.verify_tiff(bilevel, output)
+
     def test_read_only_sources_keep_data_and_permissions(self):
         hdf5 = self.root / 'readonly.h5'
         tiff = self.root / 'readonly.tiff'

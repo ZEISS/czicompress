@@ -39,6 +39,7 @@
   </ItemGroup>
 
 	<ItemGroup>
+    <Content Include="..\netczicompress.Installer\CziShrinkMSI\RemoveExeAndPdfComponents.xslt" Link="InstallerFilter.xslt" CopyToOutputDirectory="PreserveNewest" />
 		<ProjectReference Include="..\netczicompress\netczicompress.csproj" />
 	</ItemGroup>
 

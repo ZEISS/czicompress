@@ -76,9 +76,15 @@ public class FileProcessingFailedHandler : IProcessingDetailsSource
             using var copier = new CopyFileProcessor(new FileSystem());
             copier.ProcessFile(inFile.FullName, tempOutFile.FullName, reportProgress, cancellationToken);
             tempOutFile.Refresh();
+            cancellationToken.ThrowIfCancellationRequested();
             tempOutFile.MoveTo(outFile.FullName);
             this.lastDetails.Value = copier.LastDetails! with { Action = "Copied original after processing failure" };
             return true;
+        }
+        catch (OperationCanceledException)
+        {
+            _ = TryDelete(tempOutFile);
+            throw;
         }
         catch (Exception)
         {

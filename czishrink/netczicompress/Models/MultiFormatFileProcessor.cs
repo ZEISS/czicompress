@@ -27,12 +27,12 @@ public sealed class MultiFormatFileProcessor(CompressionMode mode, ProcessingOpt
             this.czi.ProcessFile(inputPath, outputPath, progressReport, token);
             using var input = File.OpenRead(inputPath);
             using var output = File.OpenRead(outputPath);
-            var inputSha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(input));
-            var outputSha = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(output));
+            var inputSha = FileIntegrity.ComputeSha256(input, token);
+            var outputSha = FileIntegrity.ComputeSha256(output, token);
             this.LastDetails = new ProcessingDetails(
                 "CZI",
                 mode.ToString(),
-                mode == CompressionMode.Decompress ? "Uncompressed" : "Zstandard",
+                "Native CZI engine (" + mode + ")",
                 mode == CompressionMode.Decompress ? "Decompressed" : "Processed by CZI engine",
                 "CZI lossless codec; decoded pixels not independently checked per file",
                 inputSha == outputSha,

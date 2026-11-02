@@ -12,8 +12,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
     <xsl:strip-space elements="*" />
 
-    <xsl:key name="FilterExe" match="wix:Component[ substring( wix:File/@Source, string-length( wix:File/@Source ) - 3 ) = '.exe' ]" use="@Id" />
-    <xsl:key name="FilterPdf" match="wix:Component[ substring( wix:File/@Source, string-length( wix:File/@Source ) - 3 ) = '.pdf' ]" use="@Id" />
+    <!-- Only these root files have hand-authored components; keep codec tools. -->
+    <xsl:key name="FilterExe" match="wix:Component[parent::wix:DirectoryRef[@Id = 'INSTALLFOLDER'] and (wix:File/@Source = 'CziShrink.exe' or substring(wix:File/@Source, string-length(wix:File/@Source) - 13) = '\CziShrink.exe' or substring(wix:File/@Source, string-length(wix:File/@Source) - 13) = '/CziShrink.exe')]" use="@Id" />
+    <xsl:key name="FilterPdf" match="wix:Component[parent::wix:DirectoryRef[@Id = 'INSTALLFOLDER'] and (wix:File/@Source = 'README.pdf' or substring(wix:File/@Source, string-length(wix:File/@Source) - 10) = '\README.pdf' or substring(wix:File/@Source, string-length(wix:File/@Source) - 10) = '/README.pdf')]" use="@Id" />
 
     <!-- Copy all elements and attributes -->
     <xsl:template match="@*|node()">

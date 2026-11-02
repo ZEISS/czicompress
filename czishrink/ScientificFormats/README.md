@@ -16,13 +16,20 @@ compared bit-for-bit in bounded blocks, including floating-point NaN payloads an
 signed zeros. External links/storage, virtual datasets and user-block metadata
 are rejected. Long filter lists use an options file; very long lists containing
 whitespace in dataset names are unsupported. Default compression modes leave
-already-filtered datasets alone; **Compress all data** recompresses supported data.
+already-compressed datasets alone; checksum/shuffle-only datasets remain eligible.
+**Compress all data** recompresses supported data.
 
 TIFF uses `tifffile`/`imagecodecs` for lossless Deflate and suitable predictors.
 Tests cover ordinary TIFF, BigTIFF, OME, multiple pages, SubIFD pyramids, private
 tags, palette/RGB data and floating-point bits. Every page's pixels and metadata
-are checked. Storage tags and offsets are regenerated. Unsupported proprietary
-layouts, EXIF/GPS pointers and implicit ImageJ hyperstacks fail explicitly.
+are checked, including resolution and calibration units. Storage tags and offsets
+are regenerated; unknown IFD/IFD8 pointers are rejected. Pixel processing uses
+private disk-backed mappings, bounded comparison blocks and 256-pixel output
+tiles. Compressed strips/tiles exceeding the 64 MiB decode limit are rejected;
+scratch disk space is needed for decoded pages. Unsupported proprietary layouts,
+EXIF/GPS pointers, volumetric pages and implicit ImageJ hyperstacks fail explicitly.
+In **Compress uncompressed**, fully compressed TIFFs are copied unchanged and
+mixed-compression TIFFs report unsupported; use **Compress all** for mixed files.
 
 Inputs are opened read-only. Private destination staging space prevents overwrites
 and preserves existing files. Dry Run bypasses staging. Cancellation kills and
