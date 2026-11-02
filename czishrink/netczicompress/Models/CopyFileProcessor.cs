@@ -37,6 +37,7 @@ public sealed class CopyFileProcessor(IFileSystem fileSystem) : IFileProcessor
         token.ThrowIfCancellationRequested();
         fileSystem.File.SetLastWriteTimeUtc(outputPath, fileSystem.File.GetLastWriteTimeUtc(inputPath));
         progressReport(100);
+        token.ThrowIfCancellationRequested();
     }
 
     public void Dispose()

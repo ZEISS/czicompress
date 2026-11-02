@@ -346,6 +346,7 @@ public class MultiThreadedFolderCompressor(
             processor.ProcessFile(inFile.FullName, temporaryOutFile.FullName, reportProgress, token);
             processedByProcessor = true;
             var elapsedTime = Stopwatch.GetElapsedTime(startTimestamp);
+            token.ThrowIfCancellationRequested();
             temporaryFile.MoveToOutFileIfExists();
             return MakeTheReturnValue(timeElapsed: elapsedTime, errorMessage: null);
         }

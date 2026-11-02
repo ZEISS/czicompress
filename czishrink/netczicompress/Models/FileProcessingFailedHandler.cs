@@ -70,8 +70,14 @@ public class FileProcessingFailedHandler
         {
             CopyWithProgress(inFile.FullName, tempOutFile.FullName, reportProgress, cancellationToken);
             tempOutFile.Refresh();
+            cancellationToken.ThrowIfCancellationRequested();
             tempOutFile.MoveTo(outFile.FullName);
             return true;
+        }
+        catch (OperationCanceledException)
+        {
+            _ = TryDelete(tempOutFile);
+            throw;
         }
         catch (Exception)
         {
