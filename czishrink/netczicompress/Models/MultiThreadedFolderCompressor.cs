@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -66,7 +66,7 @@ public class MultiThreadedFolderCompressor(
             {
                 var files = processingOptions.CopyOtherFiles
                     ? this.EnumerateAllFilesAsync(inputDir, inputDir, outputDir, recursive, mode != CompressionMode.NoOp, t)
-                    : this.EnumerateCziEntriesAsync(inputDir, recursive, t);
+                    : this.EnumerateCziEntriesAsync(inputDir, outputDir, recursive, t);
                 await foreach (var entry in files.WithCancellation(t).ConfigureAwait(false))
                 {
                     var file = entry.File;
@@ -230,12 +230,49 @@ public class MultiThreadedFolderCompressor(
         return outFile;
     }
 
-    private async IAsyncEnumerable<InputEntry> EnumerateCziEntriesAsync(
+    private async IAsyncEnumerable<IFileInfo> EnumerateCzisOutsideOutputAsync(
         IDirectoryInfo folder,
+        IDirectoryInfo outputDir,
         bool recursive,
         [EnumeratorCancellation] CancellationToken token)
     {
-        await foreach (var file in this.EnumerateCzisAsync(folder, recursive, token).ConfigureAwait(false))
+        // Own recursion so the scanner never enters our changing staging tree.
+        await foreach (var file in this.EnumerateCzisAsync(folder, false, token).ConfigureAwait(false))
+        {
+            yield return file;
+        }
+
+        if (!recursive)
+        {
+            yield break;
+        }
+
+        var options = new EnumerationOptions
+        {
+            IgnoreInaccessible = true,
+            AttributesToSkip = this.AttributesToSkip,
+        };
+        foreach (var child in folder.EnumerateDirectories("*", options))
+        {
+            if (SameDirectory(child, outputDir))
+            {
+                continue;
+            }
+
+            await foreach (var file in this.EnumerateCzisOutsideOutputAsync(child, outputDir, true, token).ConfigureAwait(false))
+            {
+                yield return file;
+            }
+        }
+    }
+
+    private async IAsyncEnumerable<InputEntry> EnumerateCziEntriesAsync(
+        IDirectoryInfo folder,
+        IDirectoryInfo outputDir,
+        bool recursive,
+        [EnumeratorCancellation] CancellationToken token)
+    {
+        await foreach (var file in this.EnumerateCzisOutsideOutputAsync(folder, outputDir, recursive, token).ConfigureAwait(false))
         {
             yield return new InputEntry(file);
         }
