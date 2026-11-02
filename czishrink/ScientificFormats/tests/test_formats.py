@@ -3,7 +3,9 @@
 import contextlib
 import io
 import os
+import shutil
 import stat
+from types import SimpleNamespace
 from pathlib import Path
 import sys
 import tempfile
@@ -18,6 +20,142 @@ import scientific_worker as worker
 
 
 class Formats(unittest.TestCase):
+    def reference_fixture(self):
+        source = self.root / 'references.h5'
+        with h5py.File(source, 'w') as handle:
+            a = handle.create_group('group_a')
+            handle.create_group('group_b')
+            first = handle.create_dataset('values_a', data=np.zeros((256, 256), dtype='uint16'))
+            handle.create_dataset('values_b', data=np.zeros((256, 256), dtype='uint16'))
+            for name in ('type_a', 'type_b'):
+                datatype = h5py.h5t.py_create(np.dtype('int32'))
+                datatype.commit(handle.id, name.encode())
+                datatype.close()
+            handle['alias_a'] = a
+            refs = handle.create_dataset('references', (4,), dtype=h5py.ref_dtype)
+            refs[:] = [a.ref, handle['type_a'].ref, first.ref, h5py.Reference()]
+            handle.create_dataset('scalar_reference', data=a.ref, dtype=h5py.ref_dtype)
+            handle.attrs['group_reference'] = a.ref
+            first.attrs['datatype_reference'] = handle['type_a'].ref
+            handle.create_dataset('region', data=[first.regionref[2:8, 3:10]], dtype=h5py.regionref_dtype)
+            first.attrs['selected_region'] = first.regionref[20:30, 40:50]
+            first.attrs['entire_region'] = first.regionref[...]
+            space = first.id.get_space()
+            try:
+                space.select_elements(np.array([[1, 1], [2, 2]], dtype='uint64'))
+                points = h5py.h5r.create(handle.id, b'/values_a', h5py.h5r.DATASET_REGION, space)
+                handle.create_dataset('region_points', data=[points], dtype=h5py.regionref_dtype)
+            finally:
+                space.close()
+        return source
+
+    def test_hdf5_group_datatype_null_region_and_attribute_references_roundtrip(self):
+        source = self.reference_fixture()
+        output, result = self.run_file(source)
+        self.assertTrue(result['verified'])
+        restored, _ = self.run_file(output, 'Decompress')
+        worker.verify_hdf5(source, restored)
+
+    def test_hdf5_changed_reference_targets_fail_even_if_h5diff_accepts(self):
+        source = self.reference_fixture()
+        changes = [
+            lambda f: f['references'].__setitem__(0, f['group_b'].ref),
+            lambda f: f['references'].__setitem__(1, f['type_b'].ref),
+            lambda f: f['references'].__setitem__(2, f['values_b'].ref),
+            lambda f: f['references'].__setitem__(3, f['group_a'].ref),
+            lambda f: f.attrs.__setitem__('group_reference', f['group_b'].ref),
+            lambda f: f['values_a'].attrs.__setitem__('datatype_reference', f['type_b'].ref),
+        ]
+        for index, change in enumerate(changes):
+            with self.subTest(change=index):
+                destination = self.root / f'changed-reference-{index}.h5'
+                shutil.copyfile(source, destination)
+                with h5py.File(destination, 'r+') as handle:
+                    change(handle)
+                with mock.patch.object(worker, '_run'), self.assertRaisesRegex(ValueError, 'reference (target|nullness) changed'):
+                    worker.verify_hdf5(source, destination)
+
+    def test_hdf5_group_reference_change_is_rejected_with_bundled_tools(self):
+        source = self.reference_fixture()
+        destination = self.root / 'group-reference-change.h5'
+        shutil.copyfile(source, destination)
+        with h5py.File(destination, 'r+') as handle:
+            handle.attrs['group_reference'] = handle['group_b'].ref
+        with self.assertRaises(ValueError):
+            worker.verify_hdf5(source, destination)
+
+    def test_hdf5_reordered_region_points_are_rejected(self):
+        source = self.reference_fixture()
+        destination = self.root / 'region-order-change.h5'
+        shutil.copyfile(source, destination)
+        with h5py.File(destination, 'r+') as handle:
+            space = handle['values_a'].id.get_space()
+            try:
+                space.select_elements(np.array([[2, 2], [1, 1]], dtype='uint64'))
+                handle['region_points'][0] = h5py.h5r.create(handle.id, b'/values_a', h5py.h5r.DATASET_REGION, space)
+            finally:
+                space.close()
+        with mock.patch.object(worker, '_run'), self.assertRaisesRegex(ValueError, 'reference region changed'):
+            worker.verify_hdf5(source, destination)
+
+    def test_hdf5_changed_region_and_region_attribute_are_rejected(self):
+        source = self.reference_fixture()
+        for attribute in (False, True):
+            with self.subTest(attribute=attribute):
+                destination = self.root / f'changed-region-{attribute}.h5'
+                shutil.copyfile(source, destination)
+                with h5py.File(destination, 'r+') as handle:
+                    data = handle['values_a']
+                    if attribute:
+                        data.attrs['selected_region'] = data.regionref[21:31, 40:50]
+                    else:
+                        handle['region'][0] = data.regionref[3:9, 3:10]
+                with mock.patch.object(worker, '_run'), self.assertRaisesRegex(ValueError, 'reference region changed'):
+                    worker.verify_hdf5(source, destination)
+
+    def test_hdf5_nested_reference_types_fail_before_repacking(self):
+        source = self.root / 'compound-reference.h5'
+        dtype = np.dtype([('target', h5py.ref_dtype)])
+        with h5py.File(source, 'w') as handle:
+            handle.create_dataset('values', data=np.zeros(20000))
+            records = np.zeros(1, dtype=dtype)
+            records['target'][0] = handle.create_group('target').ref
+            handle.create_dataset('compound', data=records)
+        destination = self.root / 'unsupported-reference.h5'
+        with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'Nested compound/array/VLEN'):
+            worker.process(source, destination, 'CompressAll', 4)
+        self.assertFalse(destination.exists())
+        for nested in (np.dtype((h5py.ref_dtype, (2,))), h5py.vlen_dtype(h5py.ref_dtype)):
+            with self.assertRaisesRegex(ValueError, 'Nested compound/array/VLEN'):
+                worker._hdf5_reference_kind(nested)
+
+    def test_hdf5_region_verification_limit_fails_closed(self):
+        source = self.reference_fixture()
+        with mock.patch.object(worker, '_run'), mock.patch.object(worker, 'HDF5_REFERENCE_BYTES', 8):
+            with self.assertRaisesRegex(ValueError, 'region exceeds bounded'):
+                worker.verify_hdf5(source, source)
+
+    def test_bigtiff_estimate_includes_edge_tile_padding_and_compression_growth(self):
+        page = SimpleNamespace(imagewidth=64, imagelength=64, shaped=(1, 1, 64, 64, 1), dtype=np.dtype('uint16'), tags={})
+        decompressed = worker._tiff_output_size_bound([page] * 40000, 'Decompress')
+        compressed = worker._tiff_output_size_bound([page] * 40000, 'CompressAll')
+        self.assertGreaterEqual(decompressed, 5242880000)
+        self.assertGreater(compressed, decompressed)
+        self.assertGreater(decompressed, worker.TIFF_CLASSIC_LIMIT)
+        page.tags = {65000: SimpleNamespace(valuebytecount=5 * 1024**3)}
+        self.assertGreater(worker._tiff_output_size_bound([page], 'Decompress'), worker.TIFF_CLASSIC_LIMIT)
+
+    def test_bigtiff_promotion_applies_to_compression_and_decompression(self):
+        source = self.root / 'classic.tif'
+        tifffile.imwrite(source, np.zeros((512, 512), dtype='uint16'), metadata=None)
+        for mode in ('Decompress', 'CompressAll', 'CompressUncompressed', 'CompressUncompressedAndZstd'):
+            destination = self.root / (mode + '-big.tif')
+            with mock.patch.object(worker, 'TIFF_CLASSIC_LIMIT', 1), contextlib.redirect_stdout(io.StringIO()):
+                worker.process(source, destination, mode, 4)
+            with tifffile.TiffFile(destination) as handle:
+                self.assertTrue(handle.is_bigtiff)
+            worker.verify_tiff(source, destination)
+
     def test_hdf5_checksum_only_datasets_are_compressed(self):
         source = self.root / 'checksum.h5'
         with h5py.File(source, 'w') as handle:

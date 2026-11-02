@@ -118,7 +118,7 @@ public sealed class ScientificFileProcessor(CompressionMode mode, CompressionLev
                         mode.ToString(),
                         copied ? "Byte copy" : Read("compression") ?? "Unknown",
                         copied ? Read("reason") ?? "Copied unchanged" : mode == CompressionMode.Decompress ? "Decompressed" : "Compressed",
-                        copied ? "SHA-256 byte-for-byte copy verified" : format is "H5" or "HDF5" ? "h5diff metadata and fixed-width dataset bytes verified" : "Decoded pixels and metadata verified",
+                        copied ? "SHA-256 byte-for-byte copy verified" : format is "H5" or "HDF5" ? "h5diff, reference targets/regions and fixed-width bytes verified" : "Decoded pixels and metadata verified",
                         result.TryGetProperty("container_byte_identical", out var identical) ? identical.GetBoolean() : null,
                         Read("input_sha256"),
                         Read("output_sha256"));

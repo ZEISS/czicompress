@@ -99,6 +99,8 @@ def hdf5_repack(source, destination, mode, level):
                         checksummed.add('/' + name)
 
         handle.visititems(choose)
+        if selected:
+            _validate_hdf5_reference_types(handle)
     if not selected:
         shutil.copyfile(source, destination)
         return {'unchanged': True, 'datasets': 0}
@@ -141,34 +143,157 @@ def hdf5_repack(source, destination, mode, level):
 
 
 def verify_hdf5(source, destination):
-    """Check metadata/references with h5diff and fixed-width values bit-for-bit."""
+    """Check metadata with h5diff, reference identities explicitly, and value bytes."""
     import h5py
     import numpy as np
     _run([_tool('h5diff'), '-q', str(source), str(destination)])
     with h5py.File(source, 'r') as first, h5py.File(destination, 'r') as second:
+        _validate_hdf5_reference_types(first)
+        objects = {'/': first}
+        first.visititems(lambda name, item: objects.__setitem__(name, item))
+        for name, left in objects.items():
+            right = second[name]
+            if set(left.attrs) != set(right.attrs):
+                raise ValueError('HDF5 attribute names changed: ' + name)
+            for key in left.attrs:
+                attribute = left.attrs.get_id(key)
+                try:
+                    kind = _hdf5_reference_kind(attribute.dtype)
+                finally:
+                    attribute.close()
+                if kind:
+                    other = right.attrs.get_id(key)
+                    try:
+                        if _hdf5_reference_kind(other.dtype) is not kind:
+                            raise ValueError('HDF5 reference attribute datatype changed: ' + name + '@' + key)
+                    finally:
+                        other.close()
+                    _verify_hdf5_references(first, second, left.attrs[key], right.attrs[key], kind, name + '@' + key)
         datasets = {}
         first.visititems(lambda name, item: datasets.__setitem__(name, item) if isinstance(item, h5py.Dataset) else None)
         for name, left in datasets.items():
             right = second[name]
             if left.shape != right.shape or left.dtype != right.dtype or left.maxshape != right.maxshape:
                 raise ValueError('HDF5 shape, datatype or maximum shape changed: ' + name)
-            # Variable-length data and references have process-local NumPy pointers;
-            # h5diff compares those semantically, rather than comparing pointers.
-            if left.dtype.hasobject or not left.size:
+            kind = _hdf5_reference_kind(left.dtype)
+            if _hdf5_reference_kind(right.dtype) is not kind:
+                raise ValueError('HDF5 reference datatype changed: ' + name)
+            # h5diff compares non-reference variable-length values semantically.
+            if (left.dtype.hasobject and not kind) or not left.size:
                 continue
             if not left.shape:
-                if np.asarray(left[()]).tobytes() != np.asarray(right[()]).tobytes():
+                if kind:
+                    _verify_hdf5_references(first, second, left[()], right[()], kind, name)
+                elif np.asarray(left[()]).tobytes() != np.asarray(right[()]).tobytes():
                     raise ValueError('HDF5 scalar bytes changed: ' + name)
                 continue
-            budget = max(1, (8 * 1024 * 1024) // max(1, left.dtype.itemsize))
+            budget = max(1, (HDF5_REFERENCE_BYTES if kind else 8 * 1024 * 1024) // max(1, left.dtype.itemsize))
             block = [1] * len(left.shape)
             for axis in reversed(range(len(block))):
                 block[axis] = min(left.shape[axis], budget)
                 budget = max(1, budget // block[axis])
             for start in itertools.product(*(range(0, length, step) for length, step in zip(left.shape, block))):
                 selection = tuple(slice(offset, min(offset + step, length)) for offset, step, length in zip(start, block, left.shape))
-                if left[selection].tobytes() != right[selection].tobytes():
+                if kind:
+                    _verify_hdf5_references(first, second, left[selection], right[selection], kind, name)
+                elif left[selection].tobytes() != right[selection].tobytes():
                     raise ValueError('HDF5 fixed-width dataset bytes changed: ' + name)
+
+
+HDF5_REFERENCE_BYTES = 256 * 1024
+
+
+def _contains_hdf5_references(dtype):
+    import h5py
+    import numpy as np
+    if h5py.check_dtype(ref=dtype):
+        return True
+    if dtype.fields:
+        return any(_contains_hdf5_references(dtype.fields[name][0]) for name in dtype.names)
+    if dtype.subdtype:
+        return _contains_hdf5_references(dtype.subdtype[0])
+    base = h5py.check_dtype(vlen=dtype)
+    return isinstance(base, np.dtype) and _contains_hdf5_references(base)
+
+
+def _hdf5_reference_kind(dtype):
+    import h5py
+    kind = h5py.check_dtype(ref=dtype)
+    if not kind and _contains_hdf5_references(dtype):
+        raise ValueError('Nested compound/array/VLEN HDF5 references require a dedicated verifier')
+    return kind
+
+
+def _validate_hdf5_reference_types(handle):
+    import h5py
+    import math
+    def check(name, item):
+        if isinstance(item, h5py.Dataset):
+            _hdf5_reference_kind(item.dtype)
+        for key in item.attrs:
+            attribute = item.attrs.get_id(key)
+            try:
+                if _hdf5_reference_kind(attribute.dtype):
+                    if attribute.shape is None:
+                        raise ValueError('Null-dataspace HDF5 reference attributes require a dedicated verifier')
+                    if math.prod(attribute.shape) * attribute.dtype.itemsize > HDF5_REFERENCE_BYTES:
+                        raise ValueError('HDF5 reference attribute exceeds the bounded verification limit: ' + name + '@' + key)
+            finally:
+                attribute.close()
+    check('/', handle)
+    handle.visititems(check)
+
+
+def _verify_hdf5_references(first, second, left, right, kind, label):
+    import h5py
+    import numpy as np
+    a, b = np.asarray(left), np.asarray(right)
+    if a.shape != b.shape:
+        raise ValueError('HDF5 reference shape changed: ' + label)
+    for before, after in zip(a.flat, b.flat):
+        if not isinstance(before, kind) or not isinstance(after, kind):
+            raise ValueError('HDF5 reference kind is unsupported: ' + label)
+        if bool(before) != bool(after):
+            raise ValueError('HDF5 reference nullness changed: ' + label)
+        if not before:
+            continue
+        source_target, output_target = first[before], second[after]
+        if source_target.name is None:
+            raise ValueError('Anonymous HDF5 reference target cannot be verified: ' + label)
+        expected = second[source_target.name]
+        # Compare identities inside the output file, including committed datatypes.
+        if type(source_target) is not type(output_target) or h5py.h5o.get_info(expected.id).addr != h5py.h5o.get_info(output_target.id).addr:
+            raise ValueError('HDF5 reference target changed: ' + label)
+        if kind is h5py.RegionReference:
+            _verify_hdf5_region(first, second, before, after, label)
+
+
+def _verify_hdf5_region(first, second, before, after, label):
+    import h5py
+    import numpy as np
+    left, right = h5py.h5r.get_region(before, first.id), h5py.h5r.get_region(after, second.id)
+    try:
+        if left.get_simple_extent_dims() != right.get_simple_extent_dims() or left.get_select_type() != right.get_select_type() or left.get_select_npoints() != right.get_select_npoints():
+            raise ValueError('HDF5 reference region changed: ' + label)
+        selection = left.get_select_type()
+        rank = len(left.get_simple_extent_dims())
+        if selection == h5py.h5s.SEL_HYPERSLABS:
+            if max(left.get_select_hyper_nblocks(), right.get_select_hyper_nblocks()) * 2 * rank * 8 > HDF5_REFERENCE_BYTES:
+                raise ValueError('HDF5 reference region exceeds bounded verification limit: ' + label)
+            a, b = left.get_select_hyper_blocklist(), right.get_select_hyper_blocklist()
+        elif selection == h5py.h5s.SEL_POINTS:
+            if left.get_select_npoints() * rank * 8 > HDF5_REFERENCE_BYTES:
+                raise ValueError('HDF5 reference region exceeds bounded verification limit: ' + label)
+            a, b = left.get_select_elem_pointlist(), right.get_select_elem_pointlist()
+        elif selection in (h5py.h5s.SEL_NONE, h5py.h5s.SEL_ALL):
+            return
+        else:
+            raise ValueError('Unsupported HDF5 reference region: ' + label)
+        if not np.array_equal(a, b):
+            raise ValueError('HDF5 reference region changed: ' + label)
+    finally:
+        left.close()
+        right.close()
 
 
 # These describe storage layout and are regenerated by the TIFF writer. Every
@@ -179,6 +304,21 @@ TIFF_WRITER_TAGS = {270, 282, 283, 296, 305, 306}
 TIFF_POINTER_TAGS = {34665, 34853, 40965, 513, 514}
 TIFF_BUFFER_BYTES = 8 * 1024 * 1024
 TIFF_MAX_SEGMENT_BYTES = 64 * 1024 * 1024
+TIFF_TILE_SIZE = 256
+TIFF_CLASSIC_LIMIT = 4 * 1024**3 - 32 * 1024**2
+
+
+def _tiff_output_size_bound(pages, mode):
+    """Conservative estimate including padded tiles, Deflate growth and metadata."""
+    total = 16
+    for page in pages:
+        count = ((page.imagewidth + TIFF_TILE_SIZE - 1) // TIFF_TILE_SIZE
+                 * ((page.imagelength + TIFF_TILE_SIZE - 1) // TIFF_TILE_SIZE) * page.shaped[0])
+        raw = TIFF_TILE_SIZE**2 * page.shaped[-1] * page.dtype.itemsize
+        payload = raw if mode == 'Decompress' else raw + raw // 100 + 1024
+        total += count * (payload + 64)
+        total += 4096 + sum(tag.valuebytecount + 32 for tag in page.tags.values())
+    return total
 
 
 def _pages(pages):
@@ -229,9 +369,9 @@ def _tiff_tiles(page, decoded):
     """Yield bounded tiles, including planar samples, without a whole-page copy."""
     shaped = decoded.reshape(page.shaped)
     for sample in range(page.shaped[0]):
-        for y in range(0, page.imagelength, 256):
-            for x in range(0, page.imagewidth, 256):
-                tile = shaped[sample, 0, y:y + 256, x:x + 256, :]
+        for y in range(0, page.imagelength, TIFF_TILE_SIZE):
+            for x in range(0, page.imagewidth, TIFF_TILE_SIZE):
+                tile = shaped[sample, 0, y:y + TIFF_TILE_SIZE, x:x + TIFF_TILE_SIZE, :]
                 yield tile[..., 0] if page.shaped[-1] == 1 else tile
 
 
@@ -258,8 +398,7 @@ def tiff_repack(source, destination, mode, level):
             if all(compressed):
                 shutil.copyfile(source, destination)
                 return {'unchanged': True, 'pages': len(all_pages)}
-        uncompressed_size = sum(page.size * page.dtype.itemsize for page in all_pages)
-        bigtiff = original.is_bigtiff or (mode == 'Decompress' and uncompressed_size > 4 * 1024**3 - 32 * 1024**2)
+        bigtiff = original.is_bigtiff or _tiff_output_size_bound(all_pages, mode) >= TIFF_CLASSIC_LIMIT
         completed = 0
         with tifffile.TiffWriter(destination, bigtiff=bigtiff, byteorder=original.byteorder, ome=False, imagej=False) as writer:
             def write(page):
@@ -275,7 +414,7 @@ def tiff_repack(source, destination, mode, level):
                 with _decoded_tiff_page(page, destination.parent) as decoded:
                     writer.write(
                         _tiff_tiles(page, decoded), shape=page.shape, dtype=page.dtype,
-                        tile=(256, 256), maxworkers=1, buffersize=TIFF_BUFFER_BYTES,
+                        tile=(TIFF_TILE_SIZE, TIFF_TILE_SIZE), maxworkers=1, buffersize=TIFF_BUFFER_BYTES,
                         photometric=page.photometric, planarconfig=page.planarconfig,
                         bitspersample=page.bitspersample, extrasamples=page.extrasamples or None,
                         compression=None if mode == 'Decompress' else 'deflate',

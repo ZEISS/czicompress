@@ -11,7 +11,10 @@ original extensions and can be read by software supporting the chosen codec.
 Levels are clamped to 1–9 for these formats; CZI retains its original range.
 
 HDF5 uses official HDF5 1.14.6 tools with gzip and shuffle. `h5diff` checks decoded
-data, attributes and references; fixed-width dataset values are additionally
+data and attributes; Python additionally checks object/region reference targets
+and selections in datasets and attributes. Nested reference containers and
+oversized reference attributes/selections are rejected when repacking.
+Fixed-width dataset values are additionally
 compared bit-for-bit in bounded blocks, including floating-point NaN payloads and
 signed zeros. External links/storage, virtual datasets and user-block metadata
 are rejected. Long filter lists use an options file; very long lists containing
@@ -25,8 +28,10 @@ tags, palette/RGB data and floating-point bits. Every page's pixels and metadata
 are checked, including resolution and calibration units. Storage tags and offsets
 are regenerated; unknown IFD/IFD8 pointers are rejected. Pixel processing uses
 private disk-backed mappings, bounded comparison blocks and 256-pixel output
-tiles. Compressed strips/tiles exceeding the 64 MiB decode limit are rejected;
-scratch disk space is needed for decoded pages. Unsupported proprietary layouts,
+tiles. BigTIFF selection accounts for tile padding, metadata and compression
+growth in both compression and decompression modes. Compressed strips/tiles
+exceeding the 64 MiB decode limit are rejected; scratch disk space is needed for
+decoded pages. Unsupported proprietary layouts,
 EXIF/GPS pointers, volumetric pages and implicit ImageJ hyperstacks fail explicitly.
 In **Compress uncompressed**, fully compressed TIFFs are copied unchanged and
 mixed-compression TIFFs report unsupported; use **Compress all** for mixed files.
