@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -63,7 +63,7 @@ public class MultiThreadedFolderCompressor(
             {
                 var files = processingOptions.HasScientificFormats
                     ? this.EnumerateAdditionalFormatsAsync(inputDir, outputDir, recursive, t)
-                    : this.EnumerateCzisAsync(inputDir, recursive, t);
+                    : this.EnumerateCzisOutsideOutputAsync(inputDir, outputDir, recursive, t);
                 await foreach (var file in files.WithCancellation(t).ConfigureAwait(false))
                 {
                     if (!processingOptions.ProcessesExtension(file.Extension))
@@ -223,6 +223,42 @@ public class MultiThreadedFolderCompressor(
         var outputPath = outputFileSystem.Path.Combine(outputDir.FullName, relativePath);
         var outFile = outputFileSystem.FileInfo.New(outputPath);
         return outFile;
+    }
+
+    private async IAsyncEnumerable<IFileInfo> EnumerateCzisOutsideOutputAsync(
+        IDirectoryInfo folder,
+        IDirectoryInfo outputDir,
+        bool recursive,
+        [EnumeratorCancellation] CancellationToken token)
+    {
+        // Own recursion so the scanner never enters our changing staging tree.
+        await foreach (var file in this.EnumerateCzisAsync(folder, false, token).ConfigureAwait(false))
+        {
+            yield return file;
+        }
+
+        if (!recursive)
+        {
+            yield break;
+        }
+
+        var options = new EnumerationOptions
+        {
+            IgnoreInaccessible = true,
+            AttributesToSkip = this.AttributesToSkip,
+        };
+        foreach (var child in folder.EnumerateDirectories("*", options))
+        {
+            if (SameDirectory(child, outputDir))
+            {
+                continue;
+            }
+
+            await foreach (var file in this.EnumerateCzisOutsideOutputAsync(child, outputDir, true, token).ConfigureAwait(false))
+            {
+                yield return file;
+            }
+        }
     }
 
     private async IAsyncEnumerable<IFileInfo> EnumerateAdditionalFormatsAsync(
