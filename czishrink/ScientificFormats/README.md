@@ -33,8 +33,10 @@ growth in both compression and decompression modes. Compressed strips/tiles
 exceeding the 64 MiB decode limit are rejected; scratch disk space is needed for
 decoded pages. Unsupported proprietary layouts,
 EXIF/GPS pointers, volumetric pages and implicit ImageJ hyperstacks fail explicitly.
-In **Compress uncompressed**, fully compressed TIFFs are copied unchanged and
-mixed-compression TIFFs report unsupported; use **Compress all** for mixed files.
+In **Compress uncompressed**, fully compressed TIFFs are copied unchanged before
+rewrite-only metadata checks, including TIFFs with EXIF metadata. Their bytes are
+verified by SHA-256. Rewriting such metadata still requires a dedicated converter.
+Mixed-compression TIFFs report unsupported; use **Compress all** for mixed files.
 
 Inputs are opened read-only. Private destination staging space prevents overwrites
 and preserves existing files. Dry Run bypasses staging. Cancellation kills and

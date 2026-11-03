@@ -5,6 +5,7 @@ import io
 import os
 import shutil
 import stat
+import struct
 from types import SimpleNamespace
 from pathlib import Path
 import sys
@@ -20,6 +21,36 @@ import scientific_worker as worker
 
 
 class Formats(unittest.TestCase):
+    def test_already_compressed_tiff_with_exif_is_copied_before_rewrite_checks(self):
+        source = self.root / 'compressed-exif.tif'
+        tifffile.imwrite(source, np.zeros((256, 256), dtype='uint16'), compression='lzw',
+                         metadata=None, extratags=[(65001, 'I', 1, 0, False)])
+        with tifffile.TiffFile(source) as handle:
+            tag_offset = handle.pages[0].tags[65001].offset
+            byteorder = handle.byteorder
+        with source.open('r+b') as stream:
+            stream.seek(0, 2)
+            exif_offset = stream.tell()
+            stream.write(struct.pack(byteorder + 'HI', 0, 0))
+            stream.seek(tag_offset)
+            stream.write(struct.pack(byteorder + 'H', 34665))
+            stream.seek(tag_offset + 8)
+            stream.write(struct.pack(byteorder + 'I', exif_offset))
+        before = worker.file_hash(source)
+        for mode in ('CompressUncompressed', 'CompressUncompressedAndZstd'):
+            destination = self.root / (mode + '-exif.tif')
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = worker.process(source, destination, mode, 4)
+            self.assertEqual(result['reason'], 'Copied original: already compressed')
+            self.assertTrue(result['unchanged'])
+            self.assertEqual(worker.file_hash(destination), before)
+        for mode in ('CompressAll', 'Decompress'):
+            destination = self.root / (mode + '-exif.tif')
+            with contextlib.redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'EXIF/GPS'):
+                worker.process(source, destination, mode, 4)
+            self.assertFalse(destination.exists())
+        self.assertEqual(worker.file_hash(source), before)
+
     def reference_fixture(self):
         source = self.root / 'references.h5'
         with h5py.File(source, 'w') as handle:

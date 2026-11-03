@@ -381,6 +381,14 @@ def tiff_repack(source, destination, mode, level):
         all_pages = list(_pages(original.pages))
         if not all_pages:
             raise ValueError('TIFF has no image pages')
+        if mode in ('CompressUncompressed', 'CompressUncompressedAndZstd'):
+            compressed = [int(page.compression) != 1 for page in all_pages]
+            if any(compressed) and not all(compressed):
+                raise ValueError('Mixed compressed and uncompressed TIFF pages are unsupported in Compress uncompressed; use Compress all')
+            if all(compressed):
+                # No rewriting occurs: preserve every byte, including EXIF offsets.
+                shutil.copyfile(source, destination)
+                return {'unchanged': True, 'pages': len(all_pages), 'reason': 'Copied original: already compressed'}
         if any(getattr(original, flag, False) for flag in ('is_ndpi', 'is_lsm', 'is_scn', 'is_stk')):
             raise ValueError('This proprietary TIFF variant needs a dedicated metadata-preserving converter')
         if any(any(code in page.tags for code in TIFF_POINTER_TAGS) for page in all_pages):
@@ -391,13 +399,6 @@ def tiff_repack(source, destination, mode, level):
             raise ValueError('Volumetric TIFF pages require a dedicated layout-preserving converter')
         if original.is_imagej and len(original.pages) == 1 and original.series[0].size != original.pages[0].size:
             raise ValueError('Implicit ImageJ hyperstacks are not supported by this TIFF repacker')
-        if mode in ('CompressUncompressed', 'CompressUncompressedAndZstd'):
-            compressed = [int(page.compression) != 1 for page in all_pages]
-            if any(compressed) and not all(compressed):
-                raise ValueError('Mixed compressed and uncompressed TIFF pages are unsupported in Compress uncompressed; use Compress all')
-            if all(compressed):
-                shutil.copyfile(source, destination)
-                return {'unchanged': True, 'pages': len(all_pages)}
         bigtiff = original.is_bigtiff or _tiff_output_size_bound(all_pages, mode) >= TIFF_CLASSIC_LIMIT
         completed = 0
         with tifffile.TiffWriter(destination, bigtiff=bigtiff, byteorder=original.byteorder, ome=False, imagej=False) as writer:
@@ -487,7 +488,7 @@ def process(source, destination, mode, level, kind=None):
             result = tiff_repack(source, destination, mode, level)
         else:
             raise ValueError('Unsupported scientific format')
-        if mode != 'Decompress' and destination.stat().st_size >= source.stat().st_size:
+        if mode != 'Decompress' and not result.get('unchanged') and destination.stat().st_size >= source.stat().st_size:
             destination.unlink()
             shutil.copyfile(source, destination)
             result['unchanged'] = True
