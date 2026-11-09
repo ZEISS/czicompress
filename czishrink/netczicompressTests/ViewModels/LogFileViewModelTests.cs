@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -124,7 +124,7 @@ public class LogFileViewModelTests
         var strategyMock = fixture.Freeze<Mock<ILoggingStrategy>>();
         strategyMock.Setup(x => x.CreateLogFile(p)).Returns<FolderCompressorParameters>(_ =>
         {
-            var result = fs.FileInfo.New(fs.Path.GetTempFileName());
+            var result = fs.FileInfo.New(fs.Path.Combine(fs.Path.GetTempPath(), fs.Path.GetRandomFileName()));
             logFile = result;
             return result;
         });
@@ -182,7 +182,7 @@ public class LogFileViewModelTests
         var strategyMock = fixture.Freeze<Mock<ILoggingStrategy>>();
         strategyMock.Setup(x => x.CreateLogFile(p)).Returns<FolderCompressorParameters>(_ =>
         {
-            return fs.FileInfo.New(fs.Path.GetTempFileName());
+            return fs.FileInfo.New(fs.Path.Combine(fs.Path.GetTempPath(), fs.Path.GetRandomFileName()));
         });
         strategyMock.Setup(x => x.LoggerScheduler).Returns(ImmediateScheduler.Instance);
 
