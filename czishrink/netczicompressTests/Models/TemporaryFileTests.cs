@@ -4,236 +4,118 @@
 
 namespace netczicompressTests.Models;
 
-using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 
-/// <summary>
-/// Tests for <see cref="TemporaryFile"/>.
-/// </summary>
+/// <summary>Tests exclusive staging and preservation of unrelated files.</summary>
 public class TemporaryFileTests
 {
     [Fact]
-    public void WhenNoOutputFileExist_CreationOfTemporaryOutputDirSucceeds()
+    public void AllocationAndCleanupPreserveLegacyNamesAndFinalDestination()
     {
-        // ARRANGE
-        var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>());
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile);
-
-        // ASSERT
-        var expectedOutFileName = fileSystem.Path.GetFullPath("outFile");
-        var expectedTempOutFileName = expectedOutFileName + "~";
-        sut.GetFullOutFileName().Should().Be(expectedOutFileName);
-        sut.TemporaryFileCreationFailed.Should().BeFalse();
-        sut.Info.FullName.Should().Be(expectedTempOutFileName);
-        sut.Info.Exists.Should().BeFalse();
-    }
-
-    [Fact]
-    public void WhenNoOutputFileExistAndTemporaryFilesAreWritten_TemporaryFileShouldExistAndOutputFileNotYet()
-    {
-        // ARRANGE
-        var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>());
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile);
-        sut.Info.Create(); // simulates the compression processing
-
-        // ASSERT
-        sut.GetOutputFile().Exists.Should().BeFalse();
-        sut.MoveToOutFileIfExists();
-        sut.GetOutputFile().Exists.Should().BeTrue();
-    }
-
-    [Fact]
-    public void WhenNoOutputFileExistAndTemporaryFilesAreWrittenAndMoved_OutFileShouldExistAndTemporaryFileNotMore()
-    {
-        // ARRANGE
-        var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>());
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile);
-        sut.Info.Create(); // simulates the compression processing
-        sut.MoveToOutFileIfExists(); // simulates the compression processing
-
-        // ASSERT
-        var expectedTempOutFileName = fileSystem.Path.GetFullPath("outFile") + "~";
-
-        // the sut's temporary output file will be renamed upon the move,
-        // so we need to create a new file info from the original file name.
-        var tempOutFile = fileSystem.FileInfo.New(expectedTempOutFileName);
-        tempOutFile.Exists.Should().BeFalse();
-        sut.DeleteAllOutFiles();
-        sut.GetOutputFile().Exists.Should().BeFalse();
-    }
-
-    [Fact]
-    public void WhenOutputFileExistsAndCanBeDeleted_CreationOfTemporaryOutputFileSucceeds()
-    {
-        // ARRANGE
-        var fileSystem = CreateFileSystem();
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile);
-
-        // ASSERT
-        var expectedOutFileName = fileSystem.Path.GetFullPath("outFile");
-        var expectedTempOutFileName = expectedOutFileName + "~";
-        sut.GetFullOutFileName().Should().Be(expectedOutFileName);
-        sut.TemporaryFileCreationFailed.Should().BeFalse();
-        sut.Info.FullName.Should().Be(expectedTempOutFileName);
-        sut.Info.Exists.Should().BeFalse();
-    }
-
-    [Fact]
-    public void WhenFourTemporaryOutputFileExistAndCannotBeDeleted_CreationOfTemporaryOutputFileSucceeds()
-    {
-        // ARRANGE
-        var fileSystem = CreateFileSystem(readOnlyLevel: 2);
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile);
-
-        // ASSERT
-        var expectedOutFileName = fileSystem.Path.GetFullPath("outFile");
-        var expectedTempOutFileName = expectedOutFileName + "~4";
-        sut.GetFullOutFileName().Should().Be(expectedOutFileName);
-        sut.TemporaryFileCreationFailed.Should().BeFalse();
-        sut.Info.FullName.Should().Be(expectedTempOutFileName);
-        sut.Info.Exists.Should().BeFalse();
-    }
-
-    [Fact]
-    public void WhenFourTemporaryOutputFileExistAndCannotBeDeletedAfterMove_OutputFileShouldExistAndTemporaryFileNoMote()
-    {
-        // ARRANGE
-        var fileSystem = CreateFileSystem(readOnlyLevel: 2);
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile);
-        sut.Info.Create(); // simulates the compression processing
-        var tempOutFileName = sut.Info.FullName;
-        sut.MoveToOutFileIfExists();
-
-        // ASSERT
-        sut.GetOutputFile().Exists.Should().BeTrue();
-
-        // the sut's temporary output file will be renamed upon the move,
-        // so we need to create a new file info from the original file name.
-        fileSystem.FileInfo.New(tempOutFileName).Exists.Should().BeFalse();
-    }
-
-    [Fact]
-    public void WhenFourTemporaryOutputFileExistAndTwoCannotBeDeleted_CreationOfTemporaryOutputFileSucceeds()
-    {
-        // ARRANGE
-        var fileSystem = CreateFileSystem(readOnlyLevel: 1);
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile);
-
-        // ASSERT
-        var expectedOutFileName = fileSystem.Path.GetFullPath("outFile");
-        var expectedTempOutFileName = expectedOutFileName + "~2";
-        sut.GetFullOutFileName().Should().Be(expectedOutFileName);
-        sut.TemporaryFileCreationFailed.Should().BeFalse();
-        sut.Info.FullName.Should().Be(expectedTempOutFileName);
-        sut.Info.Exists.Should().BeFalse();
-    }
-
-    [Fact]
-    public void WhenFourTemporaryOutputFileExistAndTwoCannotBeDeletedAfterMove_OutputFileShouldExistAndTemporaryFileNoMote()
-    {
-        // ARRANGE
-        var fileSystem = CreateFileSystem(readOnlyLevel: 1);
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile);
-        sut.Info.Create(); // simulates the compression processing
-        var tempOutFileName = sut.Info.FullName;
-        sut.MoveToOutFileIfExists();
-
-        // ASSERT
-        sut.GetOutputFile().Exists.Should().BeTrue();
-        fileSystem.FileInfo.New(tempOutFileName).Exists.Should().BeFalse();
-    }
-
-    [Fact]
-    public void WhenMaximumTriesToCreateTemporaryFileAreReached_CreationOfTemporaryOutputFileFails()
-    {
-        // ARRANGE
-        var fileSystem = CreateFileSystem(readOnlyLevel: 2);
-        var outFile = fileSystem.FileInfo.New("outFile");
-
-        // ACT
-        var sut = new TemporaryFileOverridenDelete(outFile, 4);
-
-        // ASSERT
-        sut.TemporaryFileCreationFailed.Should().BeTrue();
-    }
-
-    private static MockFileSystem CreateFileSystem(uint readOnlyLevel = 0)
-    {
-        // var outFileName = "outFile";
-        var tempOutFile = "outFile~";
-        var tempOutFile1 = "outFile~1";
-        var tempOutFile2 = "outFile~2";
-        var tempOutFile3 = "outFile~3";
-
-        // var outFileMock = new MockFileData("this is the outfile.");
-        var tempOutFileMock = new MockFileData("this is the temporary outfile.");
-        var tempOutFileMock1 = new MockFileData("this is the temporary outfile 1.");
-        var tempOutFileMock2 = new MockFileData("this is the temporary outfile 2.");
-        var tempOutFileMock3 = new MockFileData("this is the temporary outfile 3.");
-
-        if (readOnlyLevel >= 1)
+        var fs = new MockFileSystem();
+        fs.AddFile("destination.czi", new MockFileData("valuable final"));
+        fs.AddFile("destination.czi~", new MockFileData("valuable tilde file"));
+        fs.AddFile("destination.czi~1", new MockFileData("valuable numbered file"));
+        using (var temporary = new TemporaryFile(fs.FileInfo.New("destination.czi")))
         {
-            tempOutFileMock.Attributes = FileAttributes.ReadOnly;
-            tempOutFileMock1.Attributes = FileAttributes.ReadOnly;
+            temporary.TemporaryFileCreationFailed.Should().BeFalse();
+            temporary.Info.Exists.Should().BeFalse();
+            temporary.Info.DirectoryName.Should().NotBe(fs.Path.GetFullPath("."));
+            fs.File.WriteAllText(temporary.Info.FullName, "our partial output");
+            temporary.DeleteAllOutFiles();
         }
 
-        if (readOnlyLevel >= 2)
-        {
-            tempOutFileMock2.Attributes = FileAttributes.ReadOnly;
-            tempOutFileMock3.Attributes = FileAttributes.ReadOnly;
-        }
-
-        var files = new Dictionary<string, MockFileData>
-        {
-            { tempOutFile, tempOutFileMock },
-            { tempOutFile1, tempOutFileMock1 },
-            { tempOutFile2, tempOutFileMock2 },
-            { tempOutFile3, tempOutFileMock3 },
-        };
-
-        var result = new MockFileSystem(files);
-        return result;
+        fs.File.ReadAllText("destination.czi").Should().Be("valuable final");
+        fs.File.ReadAllText("destination.czi~").Should().Be("valuable tilde file");
+        fs.File.ReadAllText("destination.czi~1").Should().Be("valuable numbered file");
+        fs.AllFiles.Should().HaveCount(3);
+        fs.AllDirectories.Where(path => fs.Path.GetFileName(path).StartsWith(".czishrink-", StringComparison.Ordinal)).Should().BeEmpty();
     }
 
-    private class TemporaryFileOverridenDelete : TemporaryFile
+    [Fact]
+    public void SeparateAllocationsForTheSameDestinationUseSeparateWorkspaces()
     {
-        public TemporaryFileOverridenDelete(IFileInfo outfile, int maxNumberOfTriesToCreate = 5)
-            : base(outfile, maxNumberOfTriesToCreate)
+        var fs = new MockFileSystem();
+        using var first = new TemporaryFile(fs.FileInfo.New("image.czi"));
+        using var second = new TemporaryFile(fs.FileInfo.New("image.czi"));
+        first.Info.DirectoryName.Should().NotBe(second.Info.DirectoryName);
+        fs.File.WriteAllText(first.Info.FullName, "first partial");
+        fs.File.WriteAllText(second.Info.FullName, "second partial");
+        first.DeleteAllOutFiles();
+        fs.File.ReadAllText(second.Info.FullName).Should().Be("second partial");
+        second.DeleteAllOutFiles();
+    }
+
+    [Fact]
+    public void MovingThenDisposingKeepsTheCompletedOutputAndReleasesStaging()
+    {
+        var fs = new MockFileSystem();
+        string stagingPath;
+        using (var temporary = new TemporaryFile(fs.FileInfo.New("image.czi")))
         {
+            stagingPath = temporary.Info.DirectoryName!;
+            fs.File.WriteAllText(temporary.Info.FullName, "complete data");
+            temporary.MoveToOutFileIfExists();
         }
 
-        public IFileInfo GetOutputFile()
-        {
-            return this.OutFile;
-        }
+        fs.File.ReadAllText("image.czi").Should().Be("complete data");
+        fs.Directory.Exists(stagingPath).Should().BeFalse();
+        fs.AllFiles.Should().ContainSingle();
+    }
 
-        public string GetFullOutFileName()
-        {
-            return this.OutFile.FullName;
-        }
+    [Fact]
+    public void DestinationAppearingBeforeMoveIsNeverOverwrittenOrDeleted()
+    {
+        var fs = new MockFileSystem();
+        using var temporary = new TemporaryFile(fs.FileInfo.New("image.czi"));
+        fs.File.WriteAllText(temporary.Info.FullName, "our partial");
+        fs.File.WriteAllText("image.czi", "another writer's output");
+
+        Action move = temporary.MoveToOutFileIfExists;
+        move.Should().Throw<IOException>();
+        temporary.DeleteAllOutFiles();
+
+        fs.File.ReadAllText("image.czi").Should().Be("another writer's output");
+    }
+
+    [Fact]
+    public void ExhaustedAllocationCannotDeleteTheUnownedFinalDestination()
+    {
+        var fs = new MockFileSystem();
+        fs.AddFile("image.czi", new MockFileData("valuable original destination"));
+        using var temporary = new TemporaryFile(fs.FileInfo.New("image.czi"), 0);
+        temporary.TemporaryFileCreationFailed.Should().BeTrue();
+        temporary.DeleteAllOutFiles();
+        temporary.MoveToOutFileIfExists();
+        fs.File.ReadAllText("image.czi").Should().Be("valuable original destination");
+    }
+
+    [Fact]
+    public void ConstructorFailureReleasesItsReservationAndEmptyWorkspace()
+    {
+        var fs = new MockFileSystem();
+        fs.AddFile("valuable.txt", new MockFileData("keep this unrelated file"));
+        var destination = new Mock<System.IO.Abstractions.IFileInfo>();
+        destination.SetupGet(file => file.FileSystem).Returns(fs);
+        destination.SetupGet(file => file.DirectoryName).Returns(fs.Path.GetFullPath("."));
+        destination.SetupGet(file => file.Name).Throws(new InvalidOperationException("Cannot read destination name"));
+
+        Action allocate = () => new TemporaryFile(destination.Object);
+
+        allocate.Should().Throw<InvalidOperationException>();
+        fs.File.ReadAllText("valuable.txt").Should().Be("keep this unrelated file");
+        fs.AllFiles.Should().ContainSingle();
+        fs.AllDirectories.Where(path => fs.Path.GetFileName(path).StartsWith(".czishrink-", StringComparison.Ordinal)).Should().BeEmpty();
+    }
+
+    [Fact]
+    public void DisposingNeverRecursivelyDeletesUnexpectedWorkspaceContents()
+    {
+        var fs = new MockFileSystem();
+        using var temporary = new TemporaryFile(fs.FileInfo.New("image.czi"));
+        string unexpected = fs.Path.Combine(temporary.Info.DirectoryName!, "unexpected.txt");
+        fs.File.WriteAllText(unexpected, "keep this file");
+        temporary.Dispose();
+        fs.File.ReadAllText(unexpected).Should().Be("keep this file");
     }
 }

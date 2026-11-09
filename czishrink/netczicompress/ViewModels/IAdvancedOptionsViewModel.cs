@@ -25,4 +25,9 @@ public interface IAdvancedOptionsViewModel
     /// Gets or sets a value indicating whether failed files should be copied to the destination folder.
     /// </summary>
     public bool CopyFailedFiles { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether non-CZI files and empty folders should also be copied.
+    /// </summary>
+    public bool CopyOtherFiles { get; set; }
 }

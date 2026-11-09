@@ -23,6 +23,7 @@ jobs:
     runs-on: ${{matrix.config.os}}
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+      HAS_CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN != '' }}
 
     strategy:
       fail-fast: false
@@ -105,7 +106,10 @@ jobs:
           -p:Exclude='[netczicompress]netczicompress.Views.*'
 
       - name: Upload coverage reports for czishrink to Codecov
-        if: ${{ (matrix.config.os == 'ubuntu-latest') && (matrix.build == 'Debug') }}
+        # Upstream coverage remains mandatory; configured forks can upload too.
+        if: >-
+          ${{ matrix.config.os == 'ubuntu-latest' && matrix.build == 'Debug'
+              && (github.repository == 'ZEISS/czicompress' || env.HAS_CODECOV_TOKEN == 'true') }}
         uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
@@ -113,6 +117,14 @@ jobs:
           files: coverage.cobertura.xml
           verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}  # required
+
+      - name: Explain skipped Codecov upload on an unconfigured fork
+        if: >-
+          ${{ matrix.config.os == 'ubuntu-latest' && matrix.build == 'Debug'
+              && github.repository != 'ZEISS/czicompress' && env.HAS_CODECOV_TOKEN != 'true' }}
+        run: |
+          echo "Skipping Codecov upload: this fork has no CODECOV_TOKEN."
+          echo "Tests and coverage collection still run; reports remain in the test-results artifact."
 
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v4

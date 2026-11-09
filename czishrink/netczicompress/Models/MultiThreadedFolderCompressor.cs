@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
@@ -30,9 +31,23 @@ public class MultiThreadedFolderCompressor(
     // Public only for testing. MockFileSystem does not support AttributesToSkip
     public FileAttributes AttributesToSkip { get; init; } = FileAttributes.Hidden;
 
+    // Public only for testing. MockFileSystem does not support skipping reparse points.
+    public FileAttributes OtherFilesAttributesToSkip { get; init; } = FileAttributes.ReparsePoint;
+
     /// <inheritdoc/>
     public IFolderCompressorRun PrepareNewRun(FolderCompressorParameters parameters, CancellationToken token)
     {
+        if (parameters.ProcessingOptions.CopyOtherFiles)
+        {
+            ProcessingPathValidation.RejectLinkedDirectories(parameters.InputDir);
+            ProcessingPathValidation.RejectLinkedDirectories(parameters.OutputDir);
+        }
+
+        if (parameters.ProcessingOptions.CopyOtherFiles && SameDirectory(parameters.InputDir, parameters.OutputDir))
+        {
+            throw new ArgumentException("Input and output folders must be different when copying other files.", nameof(parameters));
+        }
+
         return new AsyncEnumerableToObservableActionAdapter<CompressorMessage>(CoreAsync(token), token);
 
         async IAsyncEnumerable<CompressorMessage> CoreAsync([EnumeratorCancellation] CancellationToken t = default)
@@ -44,11 +59,31 @@ public class MultiThreadedFolderCompressor(
             var maxNumberOfThreads = executionOptions.ThreadCount.Value;
 
             var processors = new List<IFileProcessor>(maxNumberOfThreads);
+            using var processorLifetime = Disposable.Create(() =>
+            {
+                foreach (var processor in processors)
+                {
+                    processor.Dispose();
+                }
+            });
+            using IFileProcessor copyProcessor = mode == CompressionMode.NoOp
+                ? new NoOpFileProcessor()
+                : new CopyFileProcessor(inputDir.FileSystem);
+            var activeTasks = new List<Task<CompressorMessage.FileFinished>>(maxNumberOfThreads);
             try
             {
-                var activeTasks = new List<Task<CompressorMessage.FileFinished>>(maxNumberOfThreads);
-                await foreach (var file in this.EnumerateCzisAsync(inputDir, recursive, t).WithCancellation(t).ConfigureAwait(false))
+                var files = processingOptions.CopyOtherFiles
+                    ? this.EnumerateAllFilesAsync(inputDir, inputDir, outputDir, recursive, mode != CompressionMode.NoOp, t)
+                    : this.EnumerateCziEntriesAsync(inputDir, outputDir, recursive, t);
+                await foreach (var entry in files.WithCancellation(t).ConfigureAwait(false))
                 {
+                    var file = entry.File;
+                    if (entry.Error != null)
+                    {
+                        yield return new CompressorMessage.FileFinished(file, 0, 0, null, entry.Error);
+                        continue;
+                    }
+
                     if (file.CreationTimeUtc >= startTime)
                     {
                         // skip files that we may have created ourselves
@@ -89,11 +124,12 @@ public class MultiThreadedFolderCompressor(
                     {
                         try
                         {
+                            bool isCzi = string.Equals(thisFile.Extension, ".czi", StringComparison.OrdinalIgnoreCase);
                             return this.ProcessFile(
-                                p,
+                                isCzi ? p : copyProcessor,
                                 thisFile,
                                 outFile,
-                                processingOptions.CopyFailedFiles,
+                                isCzi && processingOptions.CopyFailedFiles,
                                 progressObservable.OnNext,
                                 t);
                         }
@@ -120,10 +156,9 @@ public class MultiThreadedFolderCompressor(
             }
             finally
             {
-                foreach (var processor in processors)
-                {
-                    processor.Dispose();
-                }
+                // Directory enumeration or creation can fail while files are still being processed.
+                // Wait for those tasks before releasing their native processors.
+                await Task.WhenAll(activeTasks).ConfigureAwait(false);
             }
         }
     }
@@ -148,10 +183,23 @@ public class MultiThreadedFolderCompressor(
     private static void EnsureParentDirectoryExists(IFileInfo outFile)
     {
         var outputDir = outFile.Directory;
+        if (outputDir != null)
+        {
+            ProcessingPathValidation.RejectLinkedDirectories(outputDir);
+        }
+
         if (outputDir?.Exists == false)
         {
             outputDir.Create();
         }
+    }
+
+    private static bool SameDirectory(IDirectoryInfo first, IDirectoryInfo second)
+    {
+        return string.Equals(
+            Path.TrimEndingDirectorySeparator(first.FullName),
+            Path.TrimEndingDirectorySeparator(second.FullName),
+            OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
     }
 
     private static async Task<int> WaitForTaskToComplete(IReadOnlyList<Task> tasks)
@@ -180,6 +228,115 @@ public class MultiThreadedFolderCompressor(
         return outFile;
     }
 
+    private async IAsyncEnumerable<IFileInfo> EnumerateCzisOutsideOutputAsync(
+        IDirectoryInfo folder,
+        IDirectoryInfo outputDir,
+        bool recursive,
+        [EnumeratorCancellation] CancellationToken token)
+    {
+        // Own recursion so the scanner never enters our changing staging tree.
+        await foreach (var file in this.EnumerateCzisAsync(folder, false, token).ConfigureAwait(false))
+        {
+            yield return file;
+        }
+
+        if (!recursive)
+        {
+            yield break;
+        }
+
+        var options = new EnumerationOptions
+        {
+            IgnoreInaccessible = true,
+            AttributesToSkip = this.AttributesToSkip,
+        };
+        foreach (var child in folder.EnumerateDirectories("*", options))
+        {
+            if (SameDirectory(child, outputDir))
+            {
+                continue;
+            }
+
+            await foreach (var file in this.EnumerateCzisOutsideOutputAsync(child, outputDir, true, token).ConfigureAwait(false))
+            {
+                yield return file;
+            }
+        }
+    }
+
+    private async IAsyncEnumerable<InputEntry> EnumerateCziEntriesAsync(
+        IDirectoryInfo folder,
+        IDirectoryInfo outputDir,
+        bool recursive,
+        [EnumeratorCancellation] CancellationToken token)
+    {
+        await foreach (var file in this.EnumerateCzisOutsideOutputAsync(folder, outputDir, recursive, token).ConfigureAwait(false))
+        {
+            yield return new InputEntry(file);
+        }
+    }
+
+    private async IAsyncEnumerable<InputEntry> EnumerateAllFilesAsync(
+        IDirectoryInfo folder,
+        IDirectoryInfo inputDir,
+        IDirectoryInfo outputDir,
+        bool recursive,
+        bool createDirectories,
+        [EnumeratorCancellation] CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+        if (SameDirectory(folder, outputDir))
+        {
+            // Do not copy our own output or reports when the destination is inside the input tree.
+            yield break;
+        }
+
+        if (createDirectories)
+        {
+            var relativePath = inputDir.FileSystem.Path.GetRelativePath(inputDir.FullName, folder.FullName);
+            var destination = outputDir.FileSystem.DirectoryInfo.New(outputDir.FileSystem.Path.Combine(outputDir.FullName, relativePath));
+            string? error = null;
+            try
+            {
+                ProcessingPathValidation.RejectLinkedDirectories(destination);
+                destination.Create();
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                error = $"Could not create output folder {destination.FullName}: {ex.Message}";
+            }
+
+            if (error != null)
+            {
+                // Report even empty blocked folders, then let each affected file
+                // report its own failure without preventing unrelated siblings.
+                yield return new InputEntry(inputDir.FileSystem.FileInfo.New(folder.FullName), error);
+            }
+        }
+
+        var opts = new EnumerationOptions
+        {
+            IgnoreInaccessible = true,
+            AttributesToSkip = this.OtherFilesAttributesToSkip,
+        };
+        await foreach (var file in folder.EnumerateFilesAsync("*", opts, token).ConfigureAwait(false))
+        {
+            yield return new InputEntry(file);
+        }
+
+        if (recursive)
+        {
+            foreach (var directory in folder.EnumerateDirectories("*", opts))
+            {
+                await foreach (var file in this.EnumerateAllFilesAsync(
+                    directory, inputDir, outputDir, true, createDirectories, token).ConfigureAwait(false))
+                {
+                    yield return file;
+                }
+            }
+        }
+    }
+
     private CompressorMessage.FileFinished ProcessFile(
         IFileProcessor processor,
         IFileInfo inFile,
@@ -189,6 +346,7 @@ public class MultiThreadedFolderCompressor(
         CancellationToken token)
     {
         TemporaryFile? temporaryFile = null;
+        using var temporaryFileLifetime = Disposable.Create(() => temporaryFile?.Dispose());
         bool processedByProcessor = false;
         try
         {
@@ -203,17 +361,20 @@ public class MultiThreadedFolderCompressor(
                     errorMessage: $"Output file {outFile} already exists.");
             }
 
-            if (processor.NeedsExistingOutputDirectory)
+            if (!processor.NeedsExistingOutputDirectory)
             {
-                EnsureParentDirectoryExists(outFile);
+                // Dry Run must never allocate or clean up any temporary path.
+                var timestamp = Stopwatch.GetTimestamp();
+                processor.ProcessFile(inFile.FullName, outFile.FullName, reportProgress, token);
+                return MakeTheReturnValue(errorMessage: null, timeElapsed: Stopwatch.GetElapsedTime(timestamp));
             }
 
+            EnsureParentDirectoryExists(outFile);
             temporaryFile = new TemporaryFile(outFile, maxTriesToCreateTemporaryFiles);
             if (temporaryFile.TemporaryFileCreationFailed)
             {
-                var tempOutFile = temporaryFile.Info;
                 return MakeTheReturnValue(
-                    errorMessage: $"Could not delete existing temporary file {tempOutFile}.");
+                    errorMessage: $"Could not reserve temporary output for {outFile}.");
             }
 
             var temporaryOutFile = temporaryFile.Info;
@@ -221,10 +382,11 @@ public class MultiThreadedFolderCompressor(
             processor.ProcessFile(inFile.FullName, temporaryOutFile.FullName, reportProgress, token);
             processedByProcessor = true;
             var elapsedTime = Stopwatch.GetElapsedTime(startTimestamp);
+            token.ThrowIfCancellationRequested();
             temporaryFile.MoveToOutFileIfExists();
             return MakeTheReturnValue(timeElapsed: elapsedTime, errorMessage: null);
         }
-        catch (Exception ex) when (ex is IOException or OperationCanceledException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or OperationCanceledException)
         {
             // Remove partially written file
             temporaryFile?.DeleteAllOutFiles();
@@ -254,4 +416,6 @@ public class MultiThreadedFolderCompressor(
             return new CompressorMessage.FileFinished(inFile, inSize, outSize, timeElapsed, errorMessage);
         }
     }
+
+    private sealed record InputEntry(IFileInfo File, string? Error = null);
 }

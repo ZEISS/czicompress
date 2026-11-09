@@ -1,4 +1,4 @@
-# CziShrink
+﻿# CziShrink
 An open source and cross-platform GUI for [CziCompress](https://github.com/ZEISS/czicompress), made with Avalonia UI and .NET.
 
 ## Table of contents
@@ -42,6 +42,24 @@ There is currently no way to manually set this.
 
 Input and output folders are selected, and the tool will operate on all CZI-documents within the input folder.
 The intent of the tool is to be a bulk-compression utility.
+
+Enable **Copy other files and folders** in the advanced options to also copy TIFFs and
+all other non-CZI files unchanged. The folder structure and empty folders are preserved;
+the subfolder setting controls whether nested folders are included. Existing destination
+files are skipped and reported in the error list and CSV. Copied files also appear in
+progress, the CSV report, and the overall statistics. Symbolic links and junctions are
+skipped, and an output folder inside the input tree is excluded from copying.
+Dry Run lists the selected files without copying files or creating their folders.
+Input/output paths with symbolic links, junctions or linked ancestors are rejected.
+Processing uses privately reserved staging folders; existing files, including names
+ending in `~`, are never reused as temporary output. A blocked destination subfolder
+is reported in the error list and CSV while unrelated folders continue processing.
+
+**Copy CZI files that fail processing** is a separate option: it tries to copy the
+original CZI unchanged if compression or decompression fails. It does not control
+whether TIFFs or other file types are included.
+
+Contributed by Amin Khosrozadeh, PhD ? Prof. Vassiliki Nikoletopoulou lab, DNF, UNIL.
 
 ## Parameters
 
@@ -105,7 +123,7 @@ In some cases you may see no log output until the operation has completed if a r
 - Is the compression lossy?
   - The tool uses [Zstandard](https://github.com/facebook/zstd) which is a fast and lossless compression algorithm.
 - What happens to files that the tool is not able to compress? Are they still copied to the output folder?
-  - The file is not copied to the output folder and a log entry detailing the error is produced.
+  - If **Copy CZI files that fail processing** is enabled, the app tries to copy the original CZI unchanged. The processing error is still logged, together with whether copying succeeded. Otherwise the failed CZI is not copied. Use **Copy other files and folders** to include TIFFs and other non-CZI files.
 
 
 ## Known Issues

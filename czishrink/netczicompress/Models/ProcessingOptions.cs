@@ -9,4 +9,5 @@ namespace netczicompress.Models;
 /// </summary>
 /// <param name="CompressionLevel">Level of compression to use, if applicable.</param>
 /// <param name="CopyFailedFiles">A value indicating whether failed files should be copied to the destination folder.</param>
-public record ProcessingOptions(CompressionLevel CompressionLevel, bool CopyFailedFiles = false);
+/// <param name="CopyOtherFiles">A value indicating whether non-CZI files and empty folders should also be copied.</param>
+public record ProcessingOptions(CompressionLevel CompressionLevel, bool CopyFailedFiles = false, bool CopyOtherFiles = false);

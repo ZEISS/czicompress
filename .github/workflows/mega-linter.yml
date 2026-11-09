@@ -32,7 +32,8 @@ jobs:
           # CMake configures the project and generates the necessary files for building.
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          # CLI11 still requests pre-3.5 policies; allow configuration with CMake 4.
+          cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Extract include paths and defines for CZIcompress.cpp
         id: extract_flags

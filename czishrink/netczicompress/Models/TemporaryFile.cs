@@ -7,142 +7,134 @@ namespace netczicompress.Models;
 using System.IO.Abstractions;
 
 /// <summary>
-/// Creates and handles temporary files according to the following logic:
-/// <list type="bullet">
-/// <item> The target filename "outfile_name" is given.</item>
-/// <item> The basic temporary filename is "outfile_name" + "~".</item>
-/// <item> If the basic temporary filename can be used (file does not yet exist or can be deleted)
-///        then it will be used.</item>
-/// <item> If it cannot be used, we (now recursively) try with another file name "outfile_name" + "~" + i,
-///        with i being an index starting at 1.</item>
-/// <item> There is a maximum number of tries, so the index is bounded by "maximum number of tries - 1".</item>
-/// </list>
+/// Reserves a private staging directory beside the destination. Existing files,
+/// including legacy names ending in '~', are never reused or deleted.
 /// </summary>
-public class TemporaryFile
+public sealed class TemporaryFile : IDisposable
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Models.TemporaryFile"/> class.
-    ///
-    /// The <see cref="OutFile"/> is set and <see cref="Info"/> (not the file on the hard disk)
-    /// immediately created, if possible.
-    /// By this <see cref="TemporaryFileCreationFailed"/> is set accordingly.
-    /// </summary>
-    /// <param name="outFile">The basic output file name.</param>
-    /// <param name="maxNumberOfTriesToCreate">The maximum number or tries.</param>
-    public TemporaryFile(
-        IFileInfo outFile,
-        int maxNumberOfTriesToCreate = 100)
+    private readonly IFileInfo outFile;
+    private readonly IDirectoryInfo? workspace;
+    private readonly Stream? reservation;
+
+    /// <summary>Initializes a new instance of the <see cref="TemporaryFile"/> class.</summary>
+    /// <param name="outFile">The final destination file.</param>
+    /// <param name="maxNumberOfTriesToCreate">The maximum reservation attempts.</param>
+    public TemporaryFile(IFileInfo outFile, int maxNumberOfTriesToCreate = 100)
     {
-        this.OutFile = outFile;
-        this.MaxNumberOfTriesToCreate = maxNumberOfTriesToCreate;
-        this.Info = this.TryCreate();
+        this.outFile = outFile;
+        this.Info = outFile;
+        var fs = outFile.FileSystem;
+        for (int attempt = 0; attempt < maxNumberOfTriesToCreate; attempt++)
+        {
+            var directoryPath = fs.Path.Combine(outFile.DirectoryName!, $".czishrink-{Guid.NewGuid():N}");
+            var reservationPath = directoryPath + ".lock";
+            Stream? pendingReservation = null;
+            IDirectoryInfo? pendingWorkspace = null;
+            try
+            {
+                try
+                {
+                    // CreateNew is atomic. DeleteOnClose releases only our reservation.
+                    pendingReservation = fs.FileStream.New(reservationPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 1, FileOptions.DeleteOnClose);
+                }
+                catch (IOException) when (fs.File.Exists(reservationPath) || fs.Directory.Exists(reservationPath))
+                {
+                    continue;
+                }
+
+                if (fs.Directory.Exists(directoryPath) || fs.File.Exists(directoryPath))
+                {
+                    continue;
+                }
+
+                pendingWorkspace = fs.Directory.CreateDirectory(directoryPath);
+                var info = fs.FileInfo.New(fs.Path.Combine(directoryPath, outFile.Name));
+                this.workspace = pendingWorkspace;
+                this.Info = info;
+                this.reservation = pendingReservation;
+
+                // The completed object now owns the lease; failed attempts close it below.
+                pendingReservation = null;
+                return;
+            }
+            finally
+            {
+                using (pendingReservation)
+                {
+                    if (pendingReservation != null)
+                    {
+                        try
+                        {
+                            pendingWorkspace?.Delete(recursive: false);
+                        }
+                        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                        {
+                            // Never remove unexpected files while cleaning up a failed allocation.
+                        }
+                    }
+                }
+            }
+        }
+
+        this.TemporaryFileCreationFailed = true;
     }
 
-    /// <summary>
-    /// Gets a value indicating whether the temporary file creation failed.
-    /// </summary>
-    public bool TemporaryFileCreationFailed { get; private set; }
+    /// <summary>Gets a value indicating whether a private staging directory could not be reserved.</summary>
+    public bool TemporaryFileCreationFailed { get; }
 
-    /// <summary>
-    /// Gets the created temporary file.
-    /// </summary>
+    /// <summary>Gets the output path inside the owned staging directory.</summary>
     public IFileInfo Info { get; }
 
-    /// <summary>
-    /// Gets the created final output file.
-    /// </summary>
-    protected IFileInfo OutFile { get; }
-
-    /// <summary>
-    /// Gets the maximum number of tries for the temporary file creation.
-    /// </summary>
-    private int MaxNumberOfTriesToCreate { get; }
-
-    /// <summary>
-    /// If the temporary file exists, moves the temporary file to the final output file.
-    /// Mind that the <see cref="IFileSystemInfo.FullName"/> attribute of the temporary file will
-    /// be adapted not the <see cref="IFileSystemInfo.Exists"/> flag.
-    /// </summary>
+    /// <summary>Moves our completed output without overwriting a destination.</summary>
     public void MoveToOutFileIfExists()
     {
-        this.Info.Refresh(); // mind that the file might have not existed when the variable was created.
-        if (!this.Info.Exists)
+        this.Info.Refresh();
+        if (!this.TemporaryFileCreationFailed && this.Info.Exists)
+        {
+            this.Info.MoveTo(this.outFile.FullName);
+            this.Info.Refresh();
+            this.outFile.Refresh();
+        }
+    }
+
+    /// <summary>Deletes only the file owned by this operation.</summary>
+    public void DeleteAllOutFiles()
+    {
+        if (this.reservation == null)
         {
             return;
         }
 
-        this.Info.MoveTo(this.OutFile.FullName);
-        this.Info.Refresh(); // mind that the move changes the full name, not the `Exits` flag.
-        this.OutFile.Refresh();
-    }
-
-    /// <summary>
-    /// Deletes the basic output file and the temporary file.
-    /// </summary>
-    public void DeleteAllOutFiles()
-    {
-        _ = this.TryDelete(this.OutFile);
-        _ = this.TryDelete(this.Info);
-    }
-
-    /// <summary>
-    /// Tries to create the temporary file.
-    /// <list type="bullet">
-    /// <item> Create the temporary filename.</item>
-    /// <item> If it can be used, return it.</item>
-    /// <item> If not, append an increasing index until the file can be deleted or used.</item>
-    /// <item> If the maximum number of tries is reached, set "failed" and return the latest try.</item>
-    /// </list>
-    /// </summary>
-    /// <returns>The temporary file info.</returns>
-    private IFileInfo TryCreate()
-    {
-        var outFileName = this.OutFile.FullName;
-        var tempOutFileName = this.GetBasicTempFileName(outFileName);
-        IFileInfo temporaryFile = this.OutFile.FileSystem.FileInfo.New(tempOutFileName);
-        var postfixIndex = 1;
-        while (temporaryFile.Exists && !this.TryDelete(temporaryFile))
-        {
-            if (postfixIndex + 1 > this.MaxNumberOfTriesToCreate)
-            {
-                this.TemporaryFileCreationFailed = true;
-                return temporaryFile;
-            }
-
-            temporaryFile = this.CreateWithIndex(this.OutFile, tempOutFileName, postfixIndex);
-            ++postfixIndex;
-        }
-
-        this.TemporaryFileCreationFailed = false;
-        return temporaryFile;
-    }
-
-    private bool TryDelete(IFileInfo file)
-    {
         try
         {
-            file.Refresh();
-            if (file.Exists)
+            this.Info.Refresh();
+            if (this.Info.Exists)
             {
-                file.Delete();
-                file.Refresh();
+                this.Info.Delete();
             }
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            return false;
+            // A locked partial output can remain; never delete another path instead.
         }
 
-        return true;
+        this.outFile.Refresh();
     }
 
-    private string GetBasicTempFileName(string outFileName)
+    /// <summary>Releases staging space, leaving completed output intact.</summary>
+    public void Dispose()
     {
-        return outFileName + "~";
-    }
-
-    private IFileInfo CreateWithIndex(IFileInfo outFile, string tempOutFileName, int index)
-    {
-        return outFile.FileSystem.FileInfo.New($"{tempOutFileName}{index}");
+        using (this.reservation)
+        {
+            try
+            {
+                // Never recursively delete: unexpected contents must remain untouched.
+                this.workspace?.Delete(recursive: false);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // An unexpected or locked file must not be removed by cleanup.
+            }
+        }
     }
 }

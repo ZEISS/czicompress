@@ -9,7 +9,7 @@ namespace netczicompressTests.Models;
 /// </summary>
 public class ProgramNameAndVersionTests
 {
-    private static readonly (int Major, int Minor) Version = (1, 2);
+    private static readonly (int Major, int Minor) Version = (1, 3);
 
     [Fact]
     public void ToString_WhenCalled_ReturnsExpected()
