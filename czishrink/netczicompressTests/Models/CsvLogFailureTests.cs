@@ -47,6 +47,46 @@ public class CsvLogFailureTests
         writer.CloseCalls.Should().Be(1);
     }
 
+    [Theory]
+    [InlineData("write", false)]
+    [InlineData("flush", false)]
+    [InlineData("close", false)]
+    [InlineData("write", true)]
+    [InlineData("flush", true)]
+    [InlineData("close", true)]
+    public void FatalRuntimeFailuresPropagateInsteadOfBeingRecordedAsLoggingFailures(string stage, bool wrapped)
+    {
+        // Construct an exception object; do not exhaust memory in this test.
+        var fatal = new OutOfMemoryException("Synthetic fatal runtime failure");
+        Exception failure = wrapped ? new AggregateException(new IOException("Ordinary failure"), fatal) : fatal;
+        using var writer = new FaultingWriter
+        {
+            FailWrite = stage == "write",
+            FailFlush = stage == "flush",
+            FailClose = stage == "close",
+            FailureOverride = failure,
+        };
+        var logger = stage == "write" ? null : new CsvLogFileWriter(writer);
+        Action operation = () =>
+        {
+            if (logger == null)
+            {
+                _ = new CsvLogFileWriter(writer);
+            }
+            else
+            {
+                logger.OnCompleted();
+            }
+        };
+
+        Record.Exception(operation).Should().BeSameAs(failure);
+        logger?.LastError.Should().BeNull();
+        if (stage == "flush")
+        {
+            writer.CloseCalls.Should().Be(1);
+        }
+    }
+
     private sealed class FaultingWriter : StringWriter
     {
         public bool FailFlush { get; init; }
@@ -54,6 +94,8 @@ public class CsvLogFailureTests
         public bool FailClose { get; init; }
 
         public bool FailWrite { get; init; }
+
+        public Exception? FailureOverride { get; init; }
 
         public int CloseCalls { get; private set; }
 
@@ -65,7 +107,7 @@ public class CsvLogFailureTests
         {
             if (this.FailWrite)
             {
-                throw this.WriteError;
+                throw this.FailureOverride ?? this.WriteError;
             }
 
             base.Write(value);
@@ -75,7 +117,7 @@ public class CsvLogFailureTests
         {
             if (this.FailFlush)
             {
-                throw this.FlushError;
+                throw this.FailureOverride ?? this.FlushError;
             }
 
             base.Flush();
@@ -87,7 +129,7 @@ public class CsvLogFailureTests
             base.Close();
             if (this.FailClose)
             {
-                throw new IOException("Close failed");
+                throw this.FailureOverride ?? new IOException("Close failed");
             }
         }
     }

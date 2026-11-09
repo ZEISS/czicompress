@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -92,7 +92,7 @@ public class CsvLogFileWriter : IObserver<CompressorMessage.FileFinished>
             {
                 this.Writer.Flush();
             }
-            catch (Exception flushError)
+            catch (Exception flushError) when (FailureDiagnostics.IsRecoverable(flushError))
             {
                 this.RecordFailure(flushError, primaryError);
             }
@@ -102,7 +102,7 @@ public class CsvLogFileWriter : IObserver<CompressorMessage.FileFinished>
                 {
                     this.Writer.Close();
                 }
-                catch (Exception closeError)
+                catch (Exception closeError) when (FailureDiagnostics.IsRecoverable(closeError))
                 {
                     this.RecordFailure(closeError, primaryError);
                 }
@@ -130,7 +130,7 @@ public class CsvLogFileWriter : IObserver<CompressorMessage.FileFinished>
             {
                 this.Writer.Write(line);
             }
-            catch (Exception writeError)
+            catch (Exception writeError) when (FailureDiagnostics.IsRecoverable(writeError))
             {
                 this.RecordFailure(writeError, null);
                 this.Complete(writeError);

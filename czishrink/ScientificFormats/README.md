@@ -41,8 +41,9 @@ Mixed-compression TIFFs report unsupported; use **Compress all** for mixed files
 Inputs are opened read-only. Private destination staging space prevents overwrites
 and preserves existing files. Dry Run bypasses staging. Cancellation kills and
 waits for the worker and its child tools. Observer failures also stop and wait
-for the worker before releasing scratch space. Cleanup failures are traced without
-replacing an earlier processing error; locked scratch files may remain. CSV writer
+for the worker before releasing scratch space. Recoverable cleanup failures are
+traced without replacing an earlier processing error; locked scratch files may
+remain. Fatal runtime errors, including wrapped errors, are not suppressed. CSV writer
 failures are traced and available through `CsvLogFileWriter.LastError`; close is
 always attempted. A larger compression result is replaced
 with a verified original-file copy. Per-file reports append method, verification,

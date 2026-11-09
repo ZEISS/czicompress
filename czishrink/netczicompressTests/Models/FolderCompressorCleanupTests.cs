@@ -5,6 +5,7 @@ namespace netczicompressTests.Models;
 
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Runtime.CompilerServices;
@@ -191,9 +192,9 @@ public class FolderCompressorCleanupTests
             new ExecutionOptions(new ThreadCount { Value = 1 }),
             new ProcessingOptions(CompressionLevel.Default));
         var run = compressor.PrepareNewRun(parameters, CancellationToken.None);
-        IDisposable? progress = null;
+        using var progress = new SerialDisposable();
         using var subscription = run.Output.OfType<CompressorMessage.FileStarting>().Subscribe(
-            message => progress = message.ProgressPercent.Subscribe(percent =>
+            message => progress.Disposable = message.ProgressPercent.Subscribe(percent =>
             {
                 if (percent == 100)
                 {
@@ -203,16 +204,9 @@ public class FolderCompressorCleanupTests
             _ => { });
         Task completion = run.Output.ToTask();
         run.Start();
-        try
-        {
-            var error = await Record.ExceptionAsync(() => completion.WaitAsync(TimeSpan.FromSeconds(10)));
-            error.Should().BeSameAs(workerFails ? primary : secondary);
-            processor.Verify(value => value.Dispose(), Times.Once);
-        }
-        finally
-        {
-            progress?.Dispose();
-        }
+        var error = await Record.ExceptionAsync(() => completion.WaitAsync(TimeSpan.FromSeconds(10)));
+        error.Should().BeSameAs(workerFails ? primary : secondary);
+        processor.Verify(value => value.Dispose(), Times.Once);
     }
 
     private sealed class ControlledEnumeratorCompressor(

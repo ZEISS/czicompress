@@ -61,6 +61,7 @@ public class MultiThreadedFolderCompressor(
             var processors = new List<IFileProcessor>(maxNumberOfThreads);
             var activeTasks = new List<Task<CompressorMessage.FileFinished>>(maxNumberOfThreads);
             bool completedNormally = false;
+            using var processorLifetime = Disposable.Create(() => DisposeProcessors(processors, completedNormally));
             try
             {
                 var files = processingOptions.HasScientificFormats || processingOptions.CopyOtherFiles
@@ -150,7 +151,7 @@ public class MultiThreadedFolderCompressor(
                             {
                                 progressObservable.OnNext(100);
                             }
-                            catch (Exception notificationError) when (processingFailure != null)
+                            catch (Exception notificationError) when (processingFailure != null && FailureDiagnostics.IsRecoverable(notificationError))
                             {
                                 FailureDiagnostics.Record(notificationError, processingFailure);
                             }
@@ -179,30 +180,11 @@ public class MultiThreadedFolderCompressor(
                 {
                     await Task.WhenAll(activeTasks).ConfigureAwait(false);
                 }
-                catch (Exception waitError)
+                catch (Exception waitError) when (FailureDiagnostics.IsRecoverable(waitError))
                 {
                     // Normal worker failures are observed above. This cleanup wait
                     // must not replace the original processing or enumeration error.
                     FailureDiagnostics.Record(waitError);
-                }
-
-                var disposalErrors = new List<Exception>();
-                foreach (var processor in processors)
-                {
-                    try
-                    {
-                        processor.Dispose();
-                    }
-                    catch (Exception disposalError)
-                    {
-                        disposalErrors.Add(disposalError);
-                        FailureDiagnostics.Record(disposalError);
-                    }
-                }
-
-                if (completedNormally && disposalErrors.Count != 0)
-                {
-                    throw new AggregateException("One or more file processors could not be disposed.", disposalErrors);
                 }
             }
         }
@@ -223,6 +205,28 @@ public class MultiThreadedFolderCompressor(
         };
 
         return folder.EnumerateFilesAsync("*.czi", opts, token);
+    }
+
+    private static void DisposeProcessors(IEnumerable<IFileProcessor> processors, bool throwOnError)
+    {
+        var disposalErrors = new List<Exception>();
+        foreach (var processor in processors)
+        {
+            try
+            {
+                processor.Dispose();
+            }
+            catch (Exception disposalError) when (FailureDiagnostics.IsRecoverable(disposalError))
+            {
+                disposalErrors.Add(disposalError);
+                FailureDiagnostics.Record(disposalError);
+            }
+        }
+
+        if (throwOnError && disposalErrors.Count != 0)
+        {
+            throw new AggregateException("One or more file processors could not be disposed.", disposalErrors);
+        }
     }
 
     private static void EnsureParentDirectoryExists(IFileInfo outFile)

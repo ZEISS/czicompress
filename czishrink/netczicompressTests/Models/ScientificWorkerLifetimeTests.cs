@@ -5,6 +5,7 @@ namespace netczicompressTests.Models;
 
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reactive.Disposables;
 
 /// <summary>Exercises actual worker lifetime and locked-scratch failure paths.</summary>
 public class ScientificWorkerLifetimeTests
@@ -61,32 +62,25 @@ public class ScientificWorkerLifetimeTests
     {
         using var fixture = new WorkerFixture(success ? "locked_success" : "locked_error");
         using var worker = new ScientificFileProcessor(CompressionMode.CompressAll, CompressionLevel.Default, fixture.Tools);
-        FileStream? locked = null;
-        try
+        using var locked = new SerialDisposable();
+        Action process = () => worker.ProcessFile(
+            fixture.Source,
+            fixture.Output,
+            _ => locked.Disposable = new FileStream(File.ReadAllText(Path.Join(fixture.Root, "lock-path.txt")), FileMode.Open, FileAccess.Read, FileShare.Read),
+            CancellationToken.None);
+        if (success)
         {
-            Action process = () => worker.ProcessFile(
-                fixture.Source,
-                fixture.Output,
-                _ => locked = new FileStream(File.ReadAllText(Path.Join(fixture.Root, "lock-path.txt")), FileMode.Open, FileAccess.Read, FileShare.Read),
-                CancellationToken.None);
-            if (success)
-            {
-                process.Should().NotThrow();
-                File.ReadAllBytes(fixture.Output).Should().Equal(File.ReadAllBytes(fixture.Source));
-                worker.LastDetails!.ContainerByteIdentical.Should().BeTrue();
-            }
-            else
-            {
-                process.Should().Throw<IOException>().WithMessage("Original synthetic codec failure");
-            }
+            process.Should().NotThrow();
+            File.ReadAllBytes(fixture.Output).Should().Equal(File.ReadAllBytes(fixture.Source));
+            worker.LastDetails!.ContainerByteIdentical.Should().BeTrue();
+        }
+        else
+        {
+            process.Should().Throw<IOException>().WithMessage("Original synthetic codec failure");
+        }
 
-            fixture.AssertWorkersExited();
-            Directory.GetDirectories(fixture.Root, ".czishrink-tools-*").Should().ContainSingle();
-        }
-        finally
-        {
-            locked?.Dispose();
-        }
+        fixture.AssertWorkersExited();
+        Directory.GetDirectories(fixture.Root, ".czishrink-tools-*").Should().ContainSingle();
     }
 
     private sealed class WorkerFixture : IDisposable
