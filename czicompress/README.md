@@ -35,8 +35,10 @@ The tool is based on [libczi](https://github.com/ZEISS/libczi.git).
 - [Credits to Third Party Components](#credits-to-third-party-components)
 - [Disclaimer](#disclaimer)
 
-## Download
-We have not yet published any Releases. Meanwhile, you can download binaries from the artifacts of the latest [Build workflow run](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml?query=branch%3Amain).
+## Download (Contributors only)
+We have not yet published any Releases. In general, you need to clone the git repository and [build from source](#build-and-test).
+
+As a contributor, you can download binaries from the artifacts of the latest [Build workflow run](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml?query=branch%3Amain).
 Click on the topmost successful run and download the binaries for your platform:
 * czicompress-windows-64-msvc-package-on-Release for Windows
 * czicompress-ubuntu-package-off-Release for Linux
