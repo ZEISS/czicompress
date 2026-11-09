@@ -24,6 +24,7 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
       HAS_CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN != '' }}
+      CZISHRINK_TEST_DIRECTORY: ${{ github.workspace }}/artifacts/test-fixtures
 
     strategy:
       fail-fast: false
@@ -87,6 +88,16 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore --locked-mode
 
+      - name: Prepare and validate optional HDF5 and TIFF tools
+        if: ${{ matrix.build == 'Release' && matrix.config.os == 'windows-latest' }}
+        shell: pwsh
+        run: |
+          ./ScientificFormats/prepare-windows-tools.ps1
+          $env:CZISHRINK_FORMAT_TOOLS = (Resolve-Path ../artifacts/hdf5-tiff-tools).Path
+          & "$env:CZISHRINK_FORMAT_TOOLS/python/python.exe" -B ScientificFormats/tests/test_formats.py -v
+          if ($LASTEXITCODE -ne 0) { throw 'Scientific codec validation failed' }
+          "CZISHRINK_TEST_PYTHON=$env:CZISHRINK_FORMAT_TOOLS/python/python.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: Build
         run: dotnet build --no-restore -c ${{ matrix.build }}
 
@@ -133,15 +144,6 @@ jobs:
           path: TestResults
         # Use always() to also publish test results when there are test failures
         if: ${{ always() }}
-
-      - name: Prepare and validate optional HDF5 and TIFF tools
-        if: ${{ matrix.build == 'Release' && matrix.config.os == 'windows-latest' }}
-        shell: pwsh
-        run: |
-          ./ScientificFormats/prepare-windows-tools.ps1
-          $env:CZISHRINK_FORMAT_TOOLS = (Resolve-Path ../artifacts/hdf5-tiff-tools).Path
-          & "$env:CZISHRINK_FORMAT_TOOLS/python/python.exe" -B ScientificFormats/tests/test_formats.py -v
-          if ($LASTEXITCODE -ne 0) { throw 'Scientific codec validation failed' }
 
       - name: Publish
         if: matrix.build == 'Release'

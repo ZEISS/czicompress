@@ -21,18 +21,18 @@ public sealed class ScientificFileProcessor(CompressionMode mode, CompressionLev
     public void ProcessFile(string inputPath, string outputPath, ReportProgress progressReport, CancellationToken token)
     {
         WorkerSlot.Wait(token);
+        bool releaseWorkerSlot = true;
         try
         {
             this.LastDetails = null;
-            this.RunWorker(inputPath, outputPath, progressReport, token);
-        }
-        catch (Win32Exception ex)
-        {
-            throw new IOException("The scientific processing runtime could not start. Keep the entire portable app folder together.", ex);
+            this.RunWorker(inputPath, outputPath, progressReport, token, ref releaseWorkerSlot);
         }
         finally
         {
-            WorkerSlot.Release();
+            if (releaseWorkerSlot)
+            {
+                WorkerSlot.Release();
+            }
         }
     }
 
@@ -40,7 +40,20 @@ public sealed class ScientificFileProcessor(CompressionMode mode, CompressionLev
     {
     }
 
-    private void RunWorker(string inputPath, string outputPath, ReportProgress progressReport, CancellationToken token)
+    private static void RequestStop(Process process, Exception? primaryFailure = null)
+    {
+        FailureDiagnostics.Try(
+            () =>
+            {
+                if (!process.HasExited)
+                {
+                    process.Kill(entireProcessTree: true);
+                }
+            },
+            primaryFailure);
+    }
+
+    private void RunWorker(string inputPath, string outputPath, ReportProgress progressReport, CancellationToken token, ref bool releaseWorkerSlot)
     {
         var root = toolsDirectory ?? Environment.GetEnvironmentVariable("CZISHRINK_FORMAT_TOOLS")
             ?? Path.Join(AppContext.BaseDirectory, "FormatTools");
@@ -69,73 +82,121 @@ public sealed class ScientificFileProcessor(CompressionMode mode, CompressionLev
         }
 
         start.Environment["PYTHONUTF8"] = "1";
-        var scratch = Path.Join(Path.GetDirectoryName(outputPath)!, $".czishrink-tools-{Guid.NewGuid():N}");
+        var destinationDirectory = Path.GetDirectoryName(Path.GetFullPath(outputPath))!;
+        var scratch = Path.Join(destinationDirectory, $".czishrink-tools-{Guid.NewGuid():N}");
         Directory.CreateDirectory(scratch);
-        using var cleanup = System.Reactive.Disposables.Disposable.Create(() => Directory.Delete(scratch, recursive: true));
         start.Environment["CZISHRINK_WORK_DIRECTORY"] = scratch;
-        using var process = Process.Start(start) ?? throw new IOException("Scientific format worker did not start.");
-        using var cancel = token.Register(() =>
+        Process? process = null;
+        Task<string>? stderr = null;
+        Exception? primaryFailure = null;
+        try
         {
             try
             {
-                if (!process.HasExited)
+                process = Process.Start(start) ?? throw new IOException("Scientific format worker did not start.");
+            }
+            catch (Win32Exception startupError)
+            {
+                throw new IOException("The scientific processing runtime could not start. Keep the entire portable app folder together.", startupError);
+            }
+
+            using var cancel = token.Register(() => RequestStop(process));
+            stderr = process.StandardError.ReadToEndAsync();
+            string? error = null;
+            bool receivedResult = false;
+            string? line;
+            while ((line = process.StandardOutput.ReadLine()) != null)
+            {
+                JsonDocument document;
+                try
                 {
-                    process.Kill(entireProcessTree: true);
+                    document = JsonDocument.Parse(line);
                 }
-            }
-            catch (InvalidOperationException)
-            {
-                // The worker may exit while cancellation is being delivered.
-            }
-        });
-        var stderr = process.StandardError.ReadToEndAsync();
-        string? error = null;
-        bool receivedResult = false;
-        string? line;
-        while ((line = process.StandardOutput.ReadLine()) != null)
-        {
-            try
-            {
-                using var document = JsonDocument.Parse(line);
-                if (document.RootElement.TryGetProperty("progress", out var progress))
+                catch (JsonException)
                 {
-                    progressReport(progress.GetInt32());
+                    // Third-party libraries may print informational lines.
+                    continue;
                 }
 
-                if (document.RootElement.TryGetProperty("error", out var failure))
+                using (document)
                 {
-                    error = failure.GetString();
-                }
+                    if (document.RootElement.TryGetProperty("progress", out var progress))
+                    {
+                        progressReport(progress.GetInt32());
+                    }
 
-                if (document.RootElement.TryGetProperty("result", out var result))
-                {
-                    receivedResult = true;
-                    var copied = result.TryGetProperty("unchanged", out var unchanged) && unchanged.GetBoolean();
-                    string? Read(string key) => result.TryGetProperty(key, out var value) ? value.GetString() : null;
-                    var format = Path.GetExtension(inputPath).TrimStart('.').ToUpperInvariant();
-                    this.LastDetails = new ProcessingDetails(
-                        format,
-                        mode.ToString(),
-                        copied ? "Byte copy" : Read("compression") ?? "Unknown",
-                        copied ? Read("reason") ?? "Copied unchanged" : mode == CompressionMode.Decompress ? "Decompressed" : "Compressed",
-                        copied ? "SHA-256 byte-for-byte copy verified" : format is "H5" or "HDF5" ? "h5diff, reference targets/regions and fixed-width bytes verified" : "Decoded pixels and metadata verified",
-                        result.TryGetProperty("container_byte_identical", out var identical) ? identical.GetBoolean() : null,
-                        Read("input_sha256"),
-                        Read("output_sha256"));
+                    if (document.RootElement.TryGetProperty("error", out var failure))
+                    {
+                        error = failure.GetString();
+                    }
+
+                    if (document.RootElement.TryGetProperty("warning", out var warning))
+                    {
+                        FailureDiagnostics.Record(new IOException(warning.GetString()));
+                    }
+
+                    if (document.RootElement.TryGetProperty("result", out var result))
+                    {
+                        receivedResult = true;
+                        var copied = result.TryGetProperty("unchanged", out var unchanged) && unchanged.GetBoolean();
+                        string? Read(string key) => result.TryGetProperty(key, out var value) ? value.GetString() : null;
+                        var format = Path.GetExtension(inputPath).TrimStart('.').ToUpperInvariant();
+                        this.LastDetails = new ProcessingDetails(
+                            format,
+                            mode.ToString(),
+                            copied ? "Byte copy" : Read("compression") ?? "Unknown",
+                            copied ? Read("reason") ?? "Copied unchanged" : mode == CompressionMode.Decompress ? "Decompressed" : "Compressed",
+                            copied ? "SHA-256 byte-for-byte copy verified" : format is "H5" or "HDF5" ? "h5diff, reference targets/regions and fixed-width bytes verified" : "Decoded pixels and metadata verified",
+                            result.TryGetProperty("container_byte_identical", out var identical) ? identical.GetBoolean() : null,
+                            Read("input_sha256"),
+                            Read("output_sha256"));
+                    }
                 }
             }
-            catch (JsonException)
+
+            process.WaitForExit();
+            var diagnostic = stderr.GetAwaiter().GetResult();
+            token.ThrowIfCancellationRequested();
+            if (process.ExitCode != 0 || !receivedResult || !File.Exists(outputPath))
             {
-                // Third-party libraries may print informational lines.
+                throw new IOException(error ?? $"Scientific processing failed: {diagnostic}");
             }
         }
-
-        process.WaitForExit();
-        var diagnostic = stderr.GetAwaiter().GetResult();
-        token.ThrowIfCancellationRequested();
-        if (process.ExitCode != 0 || !receivedResult || !File.Exists(outputPath))
+        catch (Exception error)
         {
-            throw new IOException(error ?? $"Scientific processing failed: {diagnostic}");
+            primaryFailure = error;
+            throw;
+        }
+        finally
+        {
+            bool stopped = process == null;
+            if (process != null)
+            {
+                RequestStop(process, primaryFailure);
+                stopped = FailureDiagnostics.Try(process.WaitForExit, primaryFailure);
+                if (stopped)
+                {
+                    if (stderr != null)
+                    {
+                        FailureDiagnostics.Try(() => _ = stderr.GetAwaiter().GetResult(), primaryFailure);
+                    }
+
+                    FailureDiagnostics.Try(process.Dispose, primaryFailure);
+                }
+            }
+
+            if (stopped)
+            {
+                // Only the privately generated child directory is a cleanup target.
+                FailureDiagnostics.Try(() => Directory.Delete(scratch, recursive: true), primaryFailure);
+            }
+            else
+            {
+                // Fail closed if the OS cannot confirm shutdown: do not delete live
+                // scratch data or allow another scientific worker into this slot.
+                releaseWorkerSlot = false;
+                FailureDiagnostics.Record(new IOException("Worker shutdown could not be confirmed. Scratch data was retained; restart the application before another scientific run."), primaryFailure);
+            }
         }
     }
 }

@@ -39,6 +39,7 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Fixtures\controlled_worker.py" Link="controlled_worker.py" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\netczicompress.Installer\CziShrinkMSI\RemoveExeAndPdfComponents.xslt" Link="InstallerFilter.xslt" CopyToOutputDirectory="PreserveNewest" />
 		<ProjectReference Include="..\netczicompress\netczicompress.csproj" />
 	</ItemGroup>

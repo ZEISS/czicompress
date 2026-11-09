@@ -40,7 +40,11 @@ Mixed-compression TIFFs report unsupported; use **Compress all** for mixed files
 
 Inputs are opened read-only. Private destination staging space prevents overwrites
 and preserves existing files. Dry Run bypasses staging. Cancellation kills and
-waits for the worker and its child tools. A larger compression result is replaced
+waits for the worker and its child tools. Observer failures also stop and wait
+for the worker before releasing scratch space. Cleanup failures are traced without
+replacing an earlier processing error; locked scratch files may remain. CSV writer
+failures are traced and available through `CsvLogFileWriter.LastError`; close is
+always attempted. A larger compression result is replaced
 with a verified original-file copy. Per-file reports append method, verification,
 SHA-256 hashes and destination while retaining the original eight CSV columns.
 Decoded data equivalence does not promise byte-identical container restoration.
@@ -79,6 +83,13 @@ directory. Missing runtimes produce explicit errors; CZI works without Python.
 $env:CZISHRINK_FORMAT_TOOLS = (Resolve-Path ../artifacts/hdf5-tiff-tools).Path
 & "$env:CZISHRINK_FORMAT_TOOLS/python/python.exe" -B ScientificFormats/tests/test_formats.py -v
 ```
+
+For the Windows process-lifetime regression tests, also set
+`CZISHRINK_TEST_PYTHON` to that local `python.exe` before running `dotnet test`.
+These tests use isolated synthetic workers to check cancellation, callback errors,
+child-process shutdown and locked scratch files. They explicitly skip without
+that Windows runtime. Other .NET tests cover enumeration, disposal, progress and
+CSV failure precedence.
 
 Linux developers can prepare a compatible Python environment at
 `$CZISHRINK_FORMAT_TOOLS/python/bin/python3`, install the pinned requirements,

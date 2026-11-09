@@ -26,6 +26,33 @@ def progress(percent):
     print(json.dumps({'progress': max(0, min(100, int(percent)))}), flush=True)
 
 
+def _cleanup_owned_file(path, primary=None):
+    """Remove only an operation-owned path; cleanup cannot replace its error."""
+    try:
+        Path(path).unlink(missing_ok=True)
+    except OSError as cleanup_error:
+        message = 'Could not remove temporary file ' + str(path) + ': ' + str(cleanup_error)
+        if primary is not None:
+            primary.add_note(message)
+        try:
+            print(json.dumps({'warning': message}), flush=True)
+        except (OSError, ValueError):
+            # The GUI may already have closed the pipe after aborting the worker.
+            pass
+
+
+@contextlib.contextmanager
+def _remove_file_after(path):
+    primary = None
+    try:
+        yield
+    except BaseException as error:
+        primary = error
+        raise
+    finally:
+        _cleanup_owned_file(path, primary)
+
+
 def file_hash(path):
     value = hashlib.sha256()
     with open(path, 'rb') as stream:
@@ -119,14 +146,13 @@ def hdf5_repack(source, destination, mode, level):
         if any(any(character.isspace() for character in name) for name in selected):
             raise ValueError('Long HDF5 filter lists with whitespace in dataset names are not supported')
         # h5repack's options file avoids the Windows command-line length limit.
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.h5repack-options', dir=os.environ.get('CZISHRINK_WORK_DIRECTORY', destination.parent),
-                                         encoding='utf-8', delete=False) as options:
-            for index in range(1, len(command), 2):
-                options.write(command[index] + ' ' + command[index + 1] + '\n')
-        try:
+        options = tempfile.NamedTemporaryFile(mode='w', suffix='.h5repack-options', dir=os.environ.get('CZISHRINK_WORK_DIRECTORY', destination.parent),
+                                               encoding='utf-8', delete=False)
+        with _remove_file_after(options.name):
+            with options:
+                for index in range(1, len(command), 2):
+                    options.write(command[index] + ' ' + command[index + 1] + '\n')
             _run([_tool('h5repack'), '-e', options.name, str(source), str(destination)])
-        finally:
-            Path(options.name).unlink()
     else:
         _run(command + [str(source), str(destination)])
     with h5py.File(destination, 'r') as handle:
@@ -509,9 +535,8 @@ def process(source, destination, mode, level, kind=None):
         os.chmod(destination, stat.S_IMODE(destination.stat().st_mode) | stat.S_IWUSR)
         progress(100)
         return result
-    except BaseException:
-        if destination.exists():
-            destination.unlink()
+    except BaseException as error:
+        _cleanup_owned_file(destination, error)
         raise
 
 

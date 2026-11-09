@@ -21,6 +21,51 @@ import scientific_worker as worker
 
 
 class Formats(unittest.TestCase):
+    def test_partial_output_cleanup_preserves_the_codec_error(self):
+        source, destination = self.root / 'synthetic.tif', self.root / 'partial.tif'
+        source.write_bytes(b'local synthetic input for a stubbed codec')
+        before = worker.file_hash(source)
+        primary = ValueError('Original codec failure')
+
+        def fail_codec(*args):
+            destination.write_bytes(b'owned partial output')
+            raise primary
+
+        captured = io.StringIO()
+        with mock.patch.object(worker, 'tiff_repack', side_effect=fail_codec), \
+             mock.patch.object(Path, 'unlink', side_effect=PermissionError('Cleanup blocked')), \
+             contextlib.redirect_stdout(captured), self.assertRaises(ValueError) as failed:
+            worker.process(source, destination, 'CompressAll', 1)
+        self.assertIs(failed.exception, primary)
+        self.assertTrue(any('Cleanup blocked' in note for note in primary.__notes__))
+        self.assertIn('warning', captured.getvalue())
+        self.assertEqual(worker.file_hash(source), before)
+
+    def test_hdf5_options_cleanup_preserves_repack_error(self):
+        source = self.root / 'many-datasets.h5'
+        with h5py.File(source, 'w') as handle:
+            for index in range(450):
+                handle.create_dataset(f'group/long_recording_dataset_name_{index:04d}', data=np.zeros(4, dtype='uint16'))
+        primary = ValueError('Original h5repack failure')
+        with mock.patch.object(worker, '_run', side_effect=primary), \
+             mock.patch.object(Path, 'unlink', side_effect=PermissionError('Options cleanup blocked')), \
+             contextlib.redirect_stdout(io.StringIO()), self.assertRaises(ValueError) as failed:
+            worker.hdf5_repack(source, self.root / 'output.h5', 'CompressAll', 1)
+        self.assertIs(failed.exception, primary)
+        self.assertTrue(any('Options cleanup blocked' in note for note in primary.__notes__))
+
+    def test_secondary_cleanup_and_closed_warning_pipe_do_not_fail_success(self):
+        with mock.patch.object(Path, 'unlink', side_effect=PermissionError('Cleanup blocked')), \
+             contextlib.redirect_stdout(io.StringIO()):
+            with worker._remove_file_after(self.root / 'owned-options-file'):
+                result = 'operation completed'
+        self.assertEqual(result, 'operation completed')
+        primary = ValueError('Original processing failure')
+        with mock.patch.object(Path, 'unlink', side_effect=PermissionError('Cleanup blocked')), \
+             mock.patch('builtins.print', side_effect=BrokenPipeError('GUI pipe closed')):
+            worker._cleanup_owned_file(self.root / 'owned-partial-file', primary)
+        self.assertTrue(any('Cleanup blocked' in note for note in primary.__notes__))
+
     def test_already_compressed_tiff_with_exif_is_copied_before_rewrite_checks(self):
         source = self.root / 'compressed-exif.tif'
         tifffile.imwrite(source, np.zeros((256, 256), dtype='uint16'), compression='lzw',

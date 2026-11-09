@@ -59,14 +59,8 @@ public class MultiThreadedFolderCompressor(
             var maxNumberOfThreads = executionOptions.ThreadCount.Value;
 
             var processors = new List<IFileProcessor>(maxNumberOfThreads);
-            using var processorLifetime = Disposable.Create(() =>
-            {
-                foreach (var processor in processors)
-                {
-                    processor.Dispose();
-                }
-            });
             var activeTasks = new List<Task<CompressorMessage.FileFinished>>(maxNumberOfThreads);
+            bool completedNormally = false;
             try
             {
                 var files = processingOptions.HasScientificFormats
@@ -117,6 +111,7 @@ public class MultiThreadedFolderCompressor(
 
                     Task<CompressorMessage.FileFinished> Run(IFileProcessor p) => Task.Run(() =>
                     {
+                        Exception? processingFailure = null;
                         try
                         {
                             return this.ProcessFile(
@@ -128,11 +123,23 @@ public class MultiThreadedFolderCompressor(
                                 t,
                                 mode);
                         }
+                        catch (Exception error)
+                        {
+                            processingFailure = error;
+                            throw;
+                        }
                         finally
                         {
                             // Make sure that we deliver 100 percent progress.
                             // This is used by observers to detect completion.
-                            progressObservable.OnNext(100);
+                            try
+                            {
+                                progressObservable.OnNext(100);
+                            }
+                            catch (Exception notificationError) when (processingFailure != null)
+                            {
+                                FailureDiagnostics.Record(notificationError, processingFailure);
+                            }
                         }
                     });
                 }
@@ -148,12 +155,41 @@ public class MultiThreadedFolderCompressor(
                 }
 
                 t.ThrowIfCancellationRequested();
+                completedNormally = true;
             }
             finally
             {
                 // Directory enumeration or creation can fail while files are still being processed.
                 // Wait for those tasks before releasing their native processors.
-                await Task.WhenAll(activeTasks).ConfigureAwait(false);
+                try
+                {
+                    await Task.WhenAll(activeTasks).ConfigureAwait(false);
+                }
+                catch (Exception waitError)
+                {
+                    // Normal worker failures are observed above. This cleanup wait
+                    // must not replace the original processing or enumeration error.
+                    FailureDiagnostics.Record(waitError);
+                }
+
+                var disposalErrors = new List<Exception>();
+                foreach (var processor in processors)
+                {
+                    try
+                    {
+                        processor.Dispose();
+                    }
+                    catch (Exception disposalError)
+                    {
+                        disposalErrors.Add(disposalError);
+                        FailureDiagnostics.Record(disposalError);
+                    }
+                }
+
+                if (completedNormally && disposalErrors.Count != 0)
+                {
+                    throw new AggregateException("One or more file processors could not be disposed.", disposalErrors);
+                }
             }
         }
     }
