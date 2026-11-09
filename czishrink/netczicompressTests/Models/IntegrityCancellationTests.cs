@@ -35,14 +35,14 @@ public class IntegrityCancellationTests
     [Fact]
     public void FallbackCancellationNeverPublishesOutput()
     {
-        string root = Path.Combine(Environment.GetEnvironmentVariable("CZISHRINK_TEST_DIRECTORY") ?? Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        string root = Path.Join(Environment.GetEnvironmentVariable("CZISHRINK_TEST_DIRECTORY") ?? Path.GetTempPath(), Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
         try
         {
             var fs = new FileSystem();
-            string input = Path.Combine(root, "input.h5");
-            string output = Path.Combine(root, "output.h5");
-            string temporary = Path.Combine(root, "temporary.h5");
+            string input = Path.Join(root, "input.h5");
+            string output = Path.Join(root, "output.h5");
+            string temporary = Path.Join(root, "temporary.h5");
             File.WriteAllText(input, "valuable original");
             using var cancellation = new CancellationTokenSource();
             var handler = new FileProcessingFailedHandler();

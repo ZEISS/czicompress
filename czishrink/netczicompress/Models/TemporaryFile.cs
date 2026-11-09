@@ -28,11 +28,10 @@ public sealed class TemporaryFile : IDisposable
         {
             var directoryPath = fs.Path.Combine(outFile.DirectoryName!, $".czishrink-{Guid.NewGuid():N}");
             var reservationPath = directoryPath + ".lock";
-            Stream lease;
             try
             {
                 // CreateNew is atomic. DeleteOnClose releases only our reservation.
-                lease = fs.FileStream.New(reservationPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 1, FileOptions.DeleteOnClose);
+                this.reservation = fs.FileStream.New(reservationPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 1, FileOptions.DeleteOnClose);
             }
             catch (IOException) when (fs.File.Exists(reservationPath) || fs.Directory.Exists(reservationPath))
             {
@@ -43,18 +42,19 @@ public sealed class TemporaryFile : IDisposable
             {
                 if (fs.Directory.Exists(directoryPath) || fs.File.Exists(directoryPath))
                 {
-                    lease.Dispose();
+                    this.reservation.Dispose();
+                    this.reservation = null;
                     continue;
                 }
 
                 this.workspace = fs.Directory.CreateDirectory(directoryPath);
                 this.Info = fs.FileInfo.New(fs.Path.Combine(directoryPath, outFile.Name));
-                this.reservation = lease;
                 return;
             }
             catch
             {
-                lease.Dispose();
+                this.Dispose();
+                this.reservation = null;
                 throw;
             }
         }

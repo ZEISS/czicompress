@@ -43,9 +43,9 @@ public sealed class ScientificFileProcessor(CompressionMode mode, CompressionLev
     private void RunWorker(string inputPath, string outputPath, ReportProgress progressReport, CancellationToken token)
     {
         var root = toolsDirectory ?? Environment.GetEnvironmentVariable("CZISHRINK_FORMAT_TOOLS")
-            ?? Path.Combine(AppContext.BaseDirectory, "FormatTools");
-        var python = Path.Combine(root, "python", OperatingSystem.IsWindows() ? "python.exe" : "bin/python3");
-        var script = Path.Combine(root, "scientific_worker.py");
+            ?? Path.Join(AppContext.BaseDirectory, "FormatTools");
+        var python = Path.Join(root, "python", OperatingSystem.IsWindows() ? "python.exe" : "bin/python3");
+        var script = Path.Join(root, "scientific_worker.py");
         if (!File.Exists(python) || !File.Exists(script))
         {
             throw new IOException("Scientific format tools are missing. Keep the FormatTools folder beside CziShrink.exe.");
@@ -69,7 +69,7 @@ public sealed class ScientificFileProcessor(CompressionMode mode, CompressionLev
         }
 
         start.Environment["PYTHONUTF8"] = "1";
-        var scratch = Path.Combine(Path.GetDirectoryName(outputPath)!, $".czishrink-tools-{Guid.NewGuid():N}");
+        var scratch = Path.Join(Path.GetDirectoryName(outputPath)!, $".czishrink-tools-{Guid.NewGuid():N}");
         Directory.CreateDirectory(scratch);
         using var cleanup = System.Reactive.Disposables.Disposable.Create(() => Directory.Delete(scratch, recursive: true));
         start.Environment["CZISHRINK_WORK_DIRECTORY"] = scratch;

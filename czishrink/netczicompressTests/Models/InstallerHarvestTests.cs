@@ -36,7 +36,7 @@ public class InstallerHarvestTests
             </Wix>
             """;
         var transform = new XslCompiledTransform();
-        transform.Load(Path.Combine(AppContext.BaseDirectory, "InstallerFilter.xslt"));
+        transform.Load(Path.Join(AppContext.BaseDirectory, "InstallerFilter.xslt"));
         using var reader = new StringReader(xml);
         using var input = XmlReader.Create(reader);
         using var output = new StringWriter();

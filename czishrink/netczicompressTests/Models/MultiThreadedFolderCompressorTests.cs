@@ -471,7 +471,7 @@ public class MultiThreadedFolderCompressorTests
             from p in processors
             from argsPair in p.GetProcessedFileArgs()
             select (argsPair.InputFile, Path.GetFileName(Path.GetDirectoryName(argsPair.OutputFile))!.StartsWith(".czishrink-", StringComparison.Ordinal)
-                ? Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(argsPair.OutputFile))!, Path.GetFileName(argsPair.OutputFile))
+                ? Path.Join(Path.GetDirectoryName(Path.GetDirectoryName(argsPair.OutputFile))!, Path.GetFileName(argsPair.OutputFile))
                 : argsPair.OutputFile);
 
         var expectedFileNamePairs =

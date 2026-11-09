@@ -56,7 +56,7 @@ ZEISS viewer validation remains a manual follow-up.
 
 ## Windows build and tests
 
-Use the SDK in `../global.json` (8.0.403). Run `./prepare-windows-tools.ps1` from
+Use the SDK in `../global.json` (8.0.427). Run `./prepare-windows-tools.ps1` from
 PowerShell. It prepares an isolated Python 3.13.17 runtime, four pinned packages,
 and official HDF5 tools under `../../artifacts/hdf5-tiff-tools` without a system
 installation or administrator access. Dependencies retain their bundled licenses.

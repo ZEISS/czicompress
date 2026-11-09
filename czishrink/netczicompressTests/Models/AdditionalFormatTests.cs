@@ -92,11 +92,11 @@ public class AdditionalFormatTests
     [Fact]
     public async Task ReadOnlyFallbackReportsTheActualCopiedOutputSize()
     {
-        string root = Path.Combine(Environment.GetEnvironmentVariable("CZISHRINK_TEST_DIRECTORY") ?? Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-        string input = Path.Combine(root, "input");
-        string output = Path.Combine(root, "output");
+        string root = Path.Join(Environment.GetEnvironmentVariable("CZISHRINK_TEST_DIRECTORY") ?? Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        string input = Path.Join(root, "input");
+        string output = Path.Join(root, "output");
         Directory.CreateDirectory(input);
-        string source = Path.Combine(input, "recording.h5");
+        string source = Path.Join(input, "recording.h5");
         File.WriteAllText(source, "original recording bytes");
         File.SetAttributes(source, FileAttributes.ReadOnly);
         try
@@ -125,7 +125,7 @@ public class AdditionalFormatTests
             results[0].ErrorMessage.Should().Contain(FileProcessingFailedHandler.SuccessfulCopyMessage);
             results[0].SizeOutput.Should().Be(new FileInfo(source).Length);
             results[0].Details!.ContainerByteIdentical.Should().BeTrue();
-            File.ReadAllText(Path.Combine(output, "recording.h5")).Should().Be("original recording bytes");
+            File.ReadAllText(Path.Join(output, "recording.h5")).Should().Be("original recording bytes");
             File.GetAttributes(source).Should().HaveFlag(FileAttributes.ReadOnly);
         }
         finally
@@ -157,7 +157,7 @@ public class AdditionalFormatTests
     [Fact]
     public void MissingRuntimeIsReportedWithoutCreatingOutput()
     {
-        using var worker = new ScientificFileProcessor(CompressionMode.CompressAll, CompressionLevel.Default, Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N")));
+        using var worker = new ScientificFileProcessor(CompressionMode.CompressAll, CompressionLevel.Default, Path.Join(Path.GetTempPath(), Guid.NewGuid().ToString("N")));
         Action process = () => worker.ProcessFile("absent.h5", "absent-output.h5", _ => { }, CancellationToken.None);
         process.Should().Throw<IOException>().WithMessage("*tools are missing*");
         worker.LastDetails.Should().BeNull();

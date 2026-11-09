@@ -91,10 +91,28 @@ public class TemporaryFileTests
     }
 
     [Fact]
+    public void ConstructorFailureReleasesItsReservationAndEmptyWorkspace()
+    {
+        var fs = new MockFileSystem();
+        fs.AddFile("valuable.txt", new MockFileData("keep this unrelated file"));
+        var destination = new Mock<System.IO.Abstractions.IFileInfo>();
+        destination.SetupGet(file => file.FileSystem).Returns(fs);
+        destination.SetupGet(file => file.DirectoryName).Returns(fs.Path.GetFullPath("."));
+        destination.SetupGet(file => file.Name).Throws(new InvalidOperationException("Cannot read destination name"));
+
+        Action allocate = () => new TemporaryFile(destination.Object);
+
+        allocate.Should().Throw<InvalidOperationException>();
+        fs.File.ReadAllText("valuable.txt").Should().Be("keep this unrelated file");
+        fs.AllFiles.Should().ContainSingle();
+        fs.AllDirectories.Where(path => fs.Path.GetFileName(path).StartsWith(".czishrink-", StringComparison.Ordinal)).Should().BeEmpty();
+    }
+
+    [Fact]
     public void DisposingNeverRecursivelyDeletesUnexpectedWorkspaceContents()
     {
         var fs = new MockFileSystem();
-        var temporary = new TemporaryFile(fs.FileInfo.New("image.czi"));
+        using var temporary = new TemporaryFile(fs.FileInfo.New("image.czi"));
         string unexpected = fs.Path.Combine(temporary.Info.DirectoryName!, "unexpected.txt");
         fs.File.WriteAllText(unexpected, "keep this file");
         temporary.Dispose();
