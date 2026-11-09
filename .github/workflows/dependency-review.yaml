@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: "Dependency Review"
-        uses: actions/dependency-review-action@v4
+        uses: actions/dependency-review-action@v5
         with:
           # Add more licenses as required. Do not add copy-left licenses or licenses incompatible with MIT (for czicompress) and GPL-3.0-or-later (for czishrink)
           # AGPL-3.0 is for megalinter which is not shipped (only used in CI/CD)
