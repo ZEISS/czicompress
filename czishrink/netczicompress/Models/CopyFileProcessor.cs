@@ -19,8 +19,9 @@ public sealed class CopyFileProcessor(IFileSystem fileSystem) : IFileProcessor
     public void ProcessFile(string inputPath, string outputPath, ReportProgress progressReport, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
-        using var input = fileSystem.FileStream.New(inputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using (var output = fileSystem.FileStream.New(outputPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+        using var input = fileSystem.FileStream.New(inputPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan);
+        long inputLength = input.Length;
+        using (var output = fileSystem.FileStream.New(outputPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
         {
             byte[] buffer = new byte[1024 * 1024];
             long bytesCopied = 0;
@@ -30,7 +31,7 @@ public sealed class CopyFileProcessor(IFileSystem fileSystem) : IFileProcessor
                 token.ThrowIfCancellationRequested();
                 output.Write(buffer, 0, bytesRead);
                 bytesCopied += bytesRead;
-                progressReport(input.Length == 0 ? 100 : (int)(100.0 * bytesCopied / input.Length));
+                progressReport(inputLength == 0 ? 100 : (int)(100.0 * bytesCopied / inputLength));
             }
         }
 
