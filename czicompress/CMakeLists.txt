@@ -29,7 +29,7 @@ include(FetchContent)
 FetchContent_Declare(
   libczi
   GIT_REPOSITORY https://github.com/ZEISS/libczi.git
-  GIT_TAG        f8f0ccc12f8193a22bf5a093f4f29f75ffc05a7a
+  GIT_TAG        d74e581e75fbb088dc18a9e46f1d490470150758
 )
 
 if(NOT libCZI_POPULATED)
