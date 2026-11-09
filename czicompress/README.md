@@ -36,7 +36,7 @@ The tool is based on [libczi](https://github.com/ZEISS/libczi.git).
 - [Disclaimer](#disclaimer)
 
 ## Download (Contributors only)
-We have not yet published any Releases. In general you need to clone the git repository and [build from source](#build-and-test).
+We have not yet published any Releases. In general, you need to clone the git repository and [build from source](#build-and-test).
 
 As a contributor, you can download binaries from the artifacts of the latest [Build workflow run](https://github.com/ZEISS/czicompress/actions/workflows/czicompress_cmake.yml?query=branch%3Amain).
 Click on the topmost successful run and download the binaries for your platform:
