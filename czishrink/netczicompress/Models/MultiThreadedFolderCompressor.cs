@@ -58,8 +58,14 @@ public class MultiThreadedFolderCompressor(
 
             var maxNumberOfThreads = executionOptions.ThreadCount.Value;
 
-            using var processorLifetime = new CompositeDisposable();
             var processors = new List<IFileProcessor>(maxNumberOfThreads);
+            using var processorLifetime = Disposable.Create(() =>
+            {
+                foreach (var processor in processors)
+                {
+                    processor.Dispose();
+                }
+            });
             var activeTasks = new List<Task<CompressorMessage.FileFinished>>(maxNumberOfThreads);
             try
             {
@@ -98,7 +104,6 @@ public class MultiThreadedFolderCompressor(
                     if (activeTasks.Count < maxNumberOfThreads)
                     {
                         var processor = createProcessor(mode, processingOptions);
-                        processorLifetime.Add(processor);
                         processors.Add(processor);
                         activeTasks.Add(Run(processor));
                     }
@@ -300,6 +305,7 @@ public class MultiThreadedFolderCompressor(
         CompressionMode mode)
     {
         TemporaryFile? temporaryFile = null;
+        using var temporaryFileLifetime = Disposable.Create(() => temporaryFile?.Dispose());
         bool processedByProcessor = false;
         ProcessingDetails? details = null;
         try
@@ -363,10 +369,6 @@ public class MultiThreadedFolderCompressor(
                     token);
             details = fileProcessingFailedHandler.LastDetails;
             return MakeTheReturnValue(failure);
-        }
-        finally
-        {
-            temporaryFile?.Dispose();
         }
 
         CompressorMessage.FileFinished MakeTheReturnValue(string? errorMessage, TimeSpan? timeElapsed = null)

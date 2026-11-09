@@ -28,34 +28,51 @@ public sealed class TemporaryFile : IDisposable
         {
             var directoryPath = fs.Path.Combine(outFile.DirectoryName!, $".czishrink-{Guid.NewGuid():N}");
             var reservationPath = directoryPath + ".lock";
+            Stream? pendingReservation = null;
+            IDirectoryInfo? pendingWorkspace = null;
             try
             {
-                // CreateNew is atomic. DeleteOnClose releases only our reservation.
-                this.reservation = fs.FileStream.New(reservationPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 1, FileOptions.DeleteOnClose);
-            }
-            catch (IOException) when (fs.File.Exists(reservationPath) || fs.Directory.Exists(reservationPath))
-            {
-                continue;
-            }
-
-            try
-            {
-                if (fs.Directory.Exists(directoryPath) || fs.File.Exists(directoryPath))
+                try
                 {
-                    this.reservation.Dispose();
-                    this.reservation = null;
+                    // CreateNew is atomic. DeleteOnClose releases only our reservation.
+                    pendingReservation = fs.FileStream.New(reservationPath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None, 1, FileOptions.DeleteOnClose);
+                }
+                catch (IOException) when (fs.File.Exists(reservationPath) || fs.Directory.Exists(reservationPath))
+                {
                     continue;
                 }
 
-                this.workspace = fs.Directory.CreateDirectory(directoryPath);
-                this.Info = fs.FileInfo.New(fs.Path.Combine(directoryPath, outFile.Name));
+                if (fs.Directory.Exists(directoryPath) || fs.File.Exists(directoryPath))
+                {
+                    continue;
+                }
+
+                pendingWorkspace = fs.Directory.CreateDirectory(directoryPath);
+                var info = fs.FileInfo.New(fs.Path.Combine(directoryPath, outFile.Name));
+                this.workspace = pendingWorkspace;
+                this.Info = info;
+                this.reservation = pendingReservation;
+
+                // The completed object now owns the lease; failed attempts close it below.
+                pendingReservation = null;
                 return;
             }
-            catch
+            finally
             {
-                this.Dispose();
-                this.reservation = null;
-                throw;
+                using (pendingReservation)
+                {
+                    if (pendingReservation != null)
+                    {
+                        try
+                        {
+                            pendingWorkspace?.Delete(recursive: false);
+                        }
+                        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                        {
+                            // Never remove unexpected files while cleaning up a failed allocation.
+                        }
+                    }
+                }
             }
         }
 
@@ -107,18 +124,17 @@ public sealed class TemporaryFile : IDisposable
     /// <summary>Releases staging space, leaving completed output intact.</summary>
     public void Dispose()
     {
-        try
+        using (this.reservation)
         {
-            // Never recursively delete: unexpected contents must remain untouched.
-            this.workspace?.Delete(recursive: false);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            // An unexpected or locked file must not be removed by cleanup.
-        }
-        finally
-        {
-            this.reservation?.Dispose();
+            try
+            {
+                // Never recursively delete: unexpected contents must remain untouched.
+                this.workspace?.Delete(recursive: false);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // An unexpected or locked file must not be removed by cleanup.
+            }
         }
     }
 }
