@@ -24,7 +24,6 @@ jobs:
     env:
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
       HAS_CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN != '' }}
-      CZISHRINK_TEST_DIRECTORY: ${{ github.workspace }}/artifacts/test-fixtures
 
     strategy:
       fail-fast: false
@@ -49,6 +48,8 @@ jobs:
           $global_json = Get-Content -Path "./global.json" | ConvertFrom-Json
           $dotnetversion = $global_json.sdk.version
           "dotnetversion=$dotnetversion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          $fixtures = [IO.Path]::GetFullPath((Join-Path $env:GITHUB_WORKSPACE 'artifacts/test-fixtures'))
+          "CZISHRINK_TEST_DIRECTORY=$fixtures" | Out-File -FilePath $env:GITHUB_ENV -Append
         shell: pwsh
 
       - name: Setup .NET

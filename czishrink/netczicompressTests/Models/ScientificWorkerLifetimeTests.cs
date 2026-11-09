@@ -164,7 +164,20 @@ public class ScientificWorkerLifetimeTests
                 throw new IOException("Refusing to clean a path outside the owned local test fixture.");
             }
 
-            Directory.Delete(this.Root, recursive: true);
+            // Windows may briefly retain a mapped DLL after a killed process exits.
+            var cleanupTime = Stopwatch.StartNew();
+            while (true)
+            {
+                try
+                {
+                    Directory.Delete(this.Root, recursive: true);
+                    break;
+                }
+                catch (Exception error) when ((error is IOException or UnauthorizedAccessException) && cleanupTime.Elapsed < TimeSpan.FromSeconds(5))
+                {
+                    Thread.Sleep(50);
+                }
+            }
         }
     }
 }
