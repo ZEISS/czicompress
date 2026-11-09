@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
@@ -57,6 +58,7 @@ public class MultiThreadedFolderCompressor(
 
             var maxNumberOfThreads = executionOptions.ThreadCount.Value;
 
+            using var processorLifetime = new CompositeDisposable();
             var processors = new List<IFileProcessor>(maxNumberOfThreads);
             using IFileProcessor copyProcessor = mode == CompressionMode.NoOp
                 ? new NoOpFileProcessor()
@@ -101,6 +103,7 @@ public class MultiThreadedFolderCompressor(
                     if (activeTasks.Count < maxNumberOfThreads)
                     {
                         var processor = createProcessor(mode, processingOptions);
+                        processorLifetime.Add(processor);
                         processors.Add(processor);
                         activeTasks.Add(Run(processor));
                     }
@@ -150,17 +153,7 @@ public class MultiThreadedFolderCompressor(
             {
                 // Directory enumeration or creation can fail while files are still being processed.
                 // Wait for those tasks before releasing their native processors.
-                try
-                {
-                    await Task.WhenAll(activeTasks).ConfigureAwait(false);
-                }
-                finally
-                {
-                    foreach (var processor in processors)
-                    {
-                        processor.Dispose();
-                    }
-                }
+                await Task.WhenAll(activeTasks).ConfigureAwait(false);
             }
         }
     }
