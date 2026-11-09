@@ -1345,6 +1345,7 @@
           "Avalonia.ReactiveUI": "[11.2.3, )",
           "Avalonia.Themes.Fluent": "[11.2.3, )",
           "MessageBox.Avalonia": "[3.1.6.13, )",
+          "Microsoft.DotNet.ILCompiler": "[8.0.33, )",
           "Microsoft.Extensions.Logging.Abstractions": "[8.0.2, )",
           "Projektanker.Icons.Avalonia.FontAwesome": "[9.6.0, )",
           "ReactiveUI.Fody": "[19.5.41, )",
@@ -1445,6 +1446,12 @@
           "DialogHost.Avalonia": "0.8.1",
           "Markdown.Avalonia": "11.0.2"
         }
+      },
+      "Microsoft.DotNet.ILCompiler": {
+        "type": "CentralTransitive",
+        "requested": "[8.0.33, )",
+        "resolved": "8.0.33",
+        "contentHash": "Jw7z+J2FuzfXxC2LkDN9HhkJ7ljy9++aT4CA59kPwkurTF1GDJ0hhcRjA/QagVyQkfe+xh3C/DHKrem1Vzw+hg=="
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "CentralTransitive",

@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="netczicompress.Views.AdvancedOptionsView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -19,7 +19,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid ColumnDefinitions="Auto,20,60*" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+    <Grid ColumnDefinitions="Auto,20,60*" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
         <Label
             Grid.Row="0"
             Grid.Column="0"
@@ -68,11 +68,23 @@
             ParsingNumberStyle="Integer"
             ToolTip.Tip="CZI uses Zstandard levels 0–22. HDF5 and TIFF use lossless Deflate levels 1–9; values outside that range are clamped. Higher levels take more time."
             Value="{Binding CompressionLevel, Converter={StaticResource CompressionLevelToDecimalConverter}}" />
-        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Process HDF5 (.h5, .hdf5)</Label>
-        <CheckBox Grid.Row="1" Grid.Column="2" IsChecked="{Binding ProcessHdf5}"
+        <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Process HDF5 (.h5, .hdf5)</Label>
+        <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding ProcessHdf5}"
                   ToolTip.Tip="Repack with the official HDF5 tools using lossless gzip and shuffle. Verifies datasets and attributes with h5diff. External and virtual datasets are reported as unsupported." />
-        <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">Process TIFF / OME-TIFF</Label>
-        <CheckBox Grid.Row="4" Grid.Column="2" IsChecked="{Binding ProcessTiff}"
+        <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center">Process TIFF / OME-TIFF</Label>
+        <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding ProcessTiff}"
                   ToolTip.Tip="Lossless Deflate compression, with page, pixel and metadata verification. Unsupported proprietary metadata layouts are reported as errors." />
+        <Label
+            Grid.Row="1"
+            Grid.Column="0"
+            VerticalAlignment="Center">
+            Copy other files and folders
+        </Label>
+        <CheckBox
+            Grid.Row="1"
+            Grid.Column="2"
+            VerticalAlignment="Center"
+            IsChecked="{Binding CopyOtherFiles}"
+            ToolTip.Tip="Copy files not selected for processing unchanged, preserving the folder structure and empty folders. Follows the subfolders setting. Existing destination files are skipped. Dry Run only lists files." />
     </Grid>
 </UserControl>

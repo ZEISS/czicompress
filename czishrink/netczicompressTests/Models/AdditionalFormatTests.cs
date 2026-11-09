@@ -52,6 +52,60 @@ public class AdditionalFormatTests
         }
     }
 
+    [Theory]
+    [InlineData(false, false, false)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    [InlineData(true, true, false)]
+    [InlineData(false, false, true)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, true)]
+    [InlineData(true, true, true)]
+    public async Task CopyOtherFilesCopiesOnlyUnselectedFormatsAndDryRunCreatesNothing(bool hdf5, bool tiff, bool dryRun)
+    {
+        var fs = new MockFileSystem();
+        string input = fs.Path.GetFullPath("input");
+        string output = fs.Path.GetFullPath("output");
+        var names = new[] { "image.czi", "recording.h5", "image.tiff", "notes.txt" };
+        foreach (string name in names)
+        {
+            fs.AddFile(fs.Path.Combine(input, name), new MockFileData("original " + name) { Attributes = FileAttributes.ReadOnly });
+        }
+
+        fs.Directory.CreateDirectory(fs.Path.Combine(input, "empty"));
+        var mode = dryRun ? CompressionMode.NoOp : CompressionMode.CompressAll;
+        var messages = await Run(fs, input, output, hdf5, tiff, mode, copyOtherFiles: true);
+
+        messages.Should().HaveCount(4).And.OnlyContain(message => message.ErrorMessage == null);
+        if (dryRun)
+        {
+            fs.Directory.Exists(output).Should().BeFalse();
+        }
+        else
+        {
+            fs.Directory.Exists(fs.Path.Combine(output, "empty")).Should().BeTrue();
+            foreach (string name in names)
+            {
+                bool selected = name.EndsWith(".czi", StringComparison.Ordinal)
+                    || (hdf5 && name.EndsWith(".h5", StringComparison.Ordinal))
+                    || (tiff && name.EndsWith(".tiff", StringComparison.Ordinal));
+                fs.File.ReadAllText(fs.Path.Combine(output, name)).Should().Be(selected ? "processed" : "original " + name);
+                if (!selected)
+                {
+                    var message = messages.Single(value => value.InputFile.Name == name);
+                    message.Details!.ContainerByteIdentical.Should().BeTrue();
+                    message.Details.InputSha256.Should().Be(message.Details.OutputSha256);
+                }
+            }
+        }
+
+        foreach (string name in names)
+        {
+            fs.File.ReadAllText(fs.Path.Combine(input, name)).Should().Be("original " + name);
+            fs.File.GetAttributes(fs.Path.Combine(input, name)).Should().HaveFlag(FileAttributes.ReadOnly);
+        }
+    }
+
     [Fact]
     public async Task NestedOutputAndBlockedFolderDoNotPreventSiblingProcessing()
     {
@@ -164,7 +218,7 @@ public class AdditionalFormatTests
     }
 
     private static async Task<List<CompressorMessage.FileFinished>> Run(
-        IFileSystem fs, string input, string output, bool hdf5, bool tiff, CompressionMode mode = CompressionMode.CompressAll)
+        IFileSystem fs, string input, string output, bool hdf5, bool tiff, CompressionMode mode = CompressionMode.CompressAll, bool copyOtherFiles = false)
     {
         var processor = new Mock<IFileProcessor>();
         processor.SetupGet(p => p.NeedsExistingOutputDirectory).Returns(true);
@@ -180,15 +234,15 @@ public class AdditionalFormatTests
         {
             MatchExtensionCasing = MatchCasing.PlatformDefault,
             AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
-            AdditionalFormatsAttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+            OtherFilesAttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
         };
         var parameters = new FolderCompressorParameters(
             fs.DirectoryInfo.New(input),
             fs.DirectoryInfo.New(output),
             true,
             mode,
-            new ExecutionOptions(new ThreadCount { Value = 1 }),
-            new ProcessingOptions(CompressionLevel.Default) { ProcessHdf5 = hdf5, ProcessTiff = tiff });
+            new ExecutionOptions(new ThreadCount { Value = copyOtherFiles ? 2 : 1 }),
+            new ProcessingOptions(CompressionLevel.Default, CopyOtherFiles: copyOtherFiles) { ProcessHdf5 = hdf5, ProcessTiff = tiff });
         var run = compressor.PrepareNewRun(parameters, CancellationToken.None);
         List<CompressorMessage.FileFinished> messages = new();
         using var subscription = run.Output.OfType<CompressorMessage.FileFinished>().Subscribe(messages.Add);

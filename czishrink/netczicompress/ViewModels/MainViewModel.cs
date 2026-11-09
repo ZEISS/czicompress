@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -135,6 +135,10 @@ public class MainViewModel : ViewModelBase,
 
     /// <inheritdoc/>
     [Reactive]
+    public bool CopyOtherFiles { get; set; } = false;
+
+    /// <inheritdoc/>
+    [Reactive]
     public bool ProcessHdf5 { get; set; }
 
     /// <inheritdoc/>
@@ -243,7 +247,7 @@ public class MainViewModel : ViewModelBase,
 
     private (ProcessingOptions ProcessingOptions, ExecutionOptions ExecutionOptions) CollectAdvancedCompressionOptions()
     {
-        ProcessingOptions processingOptions = new(this.CompressionLevel, this.CopyFailedFiles)
+        ProcessingOptions processingOptions = new(this.CompressionLevel, this.CopyFailedFiles, this.CopyOtherFiles)
         {
             ProcessHdf5 = this.ProcessHdf5,
             ProcessTiff = this.ProcessTiff,

@@ -32,20 +32,20 @@ public class MultiThreadedFolderCompressor(
     public FileAttributes AttributesToSkip { get; init; } = FileAttributes.Hidden;
 
     // Public only for testing. MockFileSystem does not support skipping reparse points.
-    public FileAttributes AdditionalFormatsAttributesToSkip { get; init; } = FileAttributes.ReparsePoint;
+    public FileAttributes OtherFilesAttributesToSkip { get; init; } = FileAttributes.ReparsePoint;
 
     /// <inheritdoc/>
     public IFolderCompressorRun PrepareNewRun(FolderCompressorParameters parameters, CancellationToken token)
     {
-        if (parameters.ProcessingOptions.HasScientificFormats)
+        if (parameters.ProcessingOptions.HasScientificFormats || parameters.ProcessingOptions.CopyOtherFiles)
         {
             ProcessingPathValidation.RejectLinkedDirectories(parameters.InputDir);
             ProcessingPathValidation.RejectLinkedDirectories(parameters.OutputDir);
         }
 
-        if (parameters.ProcessingOptions.HasScientificFormats && SameDirectory(parameters.InputDir, parameters.OutputDir))
+        if ((parameters.ProcessingOptions.HasScientificFormats || parameters.ProcessingOptions.CopyOtherFiles) && SameDirectory(parameters.InputDir, parameters.OutputDir))
         {
-            throw new ArgumentException("Input and output folders must be different when processing additional formats.", nameof(parameters));
+            throw new ArgumentException("Input and output folders must be different when copying other files or processing additional formats.", nameof(parameters));
         }
 
         return new AsyncEnumerableToObservableActionAdapter<CompressorMessage>(CoreAsync(token), token);
@@ -63,12 +63,19 @@ public class MultiThreadedFolderCompressor(
             bool completedNormally = false;
             try
             {
-                var files = processingOptions.HasScientificFormats
-                    ? this.EnumerateAdditionalFormatsAsync(inputDir, outputDir, recursive, t)
-                    : this.EnumerateCzisOutsideOutputAsync(inputDir, outputDir, recursive, t);
-                await foreach (var file in files.WithCancellation(t).ConfigureAwait(false))
+                var files = processingOptions.HasScientificFormats || processingOptions.CopyOtherFiles
+                    ? this.EnumerateAllFilesAsync(inputDir, inputDir, outputDir, recursive, processingOptions.CopyOtherFiles && mode != CompressionMode.NoOp, t)
+                    : this.EnumerateCziEntriesAsync(inputDir, outputDir, recursive, t);
+                await foreach (var entry in files.WithCancellation(t).ConfigureAwait(false))
                 {
-                    if (!processingOptions.ProcessesExtension(file.Extension))
+                    var file = entry.File;
+                    if (entry.Error != null)
+                    {
+                        yield return new CompressorMessage.FileFinished(file, 0, 0, null, entry.Error);
+                        continue;
+                    }
+
+                    if (!processingOptions.ProcessesExtension(file.Extension) && !processingOptions.CopyOtherFiles)
                     {
                         continue;
                     }
@@ -114,11 +121,18 @@ public class MultiThreadedFolderCompressor(
                         Exception? processingFailure = null;
                         try
                         {
+                            bool selectedFormat = processingOptions.ProcessesExtension(thisFile.Extension);
+
+                            // Copy processors carry per-file verification details; do not
+                            // share one instance between concurrently running files.
+                            using IFileProcessor? copyProcessor = selectedFormat ? null : mode == CompressionMode.NoOp
+                                ? new NoOpFileProcessor()
+                                : new CopyFileProcessor(inputDir.FileSystem);
                             return this.ProcessFile(
-                                p,
+                                copyProcessor ?? p,
                                 thisFile,
                                 outFile,
-                                processingOptions.CopyFailedFiles,
+                                selectedFormat && processingOptions.CopyFailedFiles,
                                 progressObservable.OnNext,
                                 t,
                                 mode);
@@ -295,10 +309,24 @@ public class MultiThreadedFolderCompressor(
         }
     }
 
-    private async IAsyncEnumerable<IFileInfo> EnumerateAdditionalFormatsAsync(
+    private async IAsyncEnumerable<InputEntry> EnumerateCziEntriesAsync(
         IDirectoryInfo folder,
         IDirectoryInfo outputDir,
         bool recursive,
+        [EnumeratorCancellation] CancellationToken token)
+    {
+        await foreach (var file in this.EnumerateCzisOutsideOutputAsync(folder, outputDir, recursive, token).ConfigureAwait(false))
+        {
+            yield return new InputEntry(file);
+        }
+    }
+
+    private async IAsyncEnumerable<InputEntry> EnumerateAllFilesAsync(
+        IDirectoryInfo folder,
+        IDirectoryInfo inputDir,
+        IDirectoryInfo outputDir,
+        bool recursive,
+        bool createDirectories,
         [EnumeratorCancellation] CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -308,22 +336,45 @@ public class MultiThreadedFolderCompressor(
             yield break;
         }
 
+        if (createDirectories)
+        {
+            var relativePath = inputDir.FileSystem.Path.GetRelativePath(inputDir.FullName, folder.FullName);
+            var destination = outputDir.FileSystem.DirectoryInfo.New(outputDir.FileSystem.Path.Combine(outputDir.FullName, relativePath));
+            string? error = null;
+            try
+            {
+                ProcessingPathValidation.RejectLinkedDirectories(destination);
+                destination.Create();
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                error = $"Could not create output folder {destination.FullName}: {ex.Message}";
+            }
+
+            if (error != null)
+            {
+                // Report even empty blocked folders, then let each affected file
+                // report its own failure without preventing unrelated siblings.
+                yield return new InputEntry(inputDir.FileSystem.FileInfo.New(folder.FullName), error);
+            }
+        }
+
         var opts = new EnumerationOptions
         {
             IgnoreInaccessible = true,
-            AttributesToSkip = this.AdditionalFormatsAttributesToSkip,
+            AttributesToSkip = this.OtherFilesAttributesToSkip,
         };
         await foreach (var file in folder.EnumerateFilesAsync("*", opts, token).ConfigureAwait(false))
         {
-            yield return file;
+            yield return new InputEntry(file);
         }
 
         if (recursive)
         {
             foreach (var directory in folder.EnumerateDirectories("*", opts))
             {
-                await foreach (var file in this.EnumerateAdditionalFormatsAsync(
-                    directory, outputDir, true, token).ConfigureAwait(false))
+                await foreach (var file in this.EnumerateAllFilesAsync(
+                    directory, inputDir, outputDir, true, createDirectories, token).ConfigureAwait(false))
                 {
                     yield return file;
                 }
@@ -429,4 +480,6 @@ public class MultiThreadedFolderCompressor(
             };
         }
     }
+
+    private sealed record InputEntry(IFileInfo File, string? Error = null);
 }

@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -445,7 +445,7 @@ public class MultiThreadedFolderCompressorTests
             {
                 MatchExtensionCasing = MatchCasing.PlatformDefault, // CaseInsensitive is currently not supported by MockFileSystem
                 AttributesToSkip = FileAttributes.Hidden | FileAttributes.System, // AttributesToSkip is currently not supported by MockFileSystem
-                AdditionalFormatsAttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+                OtherFilesAttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
             };
         }
         else
@@ -496,7 +496,7 @@ public class MultiThreadedFolderCompressorTests
             MatchExtensionCasing =
                 MatchCasing.PlatformDefault, // CaseInsensitive is currently not supported by MockFileSystem
             AttributesToSkip = FileAttributes.System | FileAttributes.Hidden, // AttributesToSkip is not supported by MockFileSystem
-            AdditionalFormatsAttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+            OtherFilesAttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
         };
         return sut;
     }

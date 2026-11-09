@@ -1,6 +1,9 @@
 // SPDX-FileCopyrightText: 2026 Amin Khosrozadeh
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Contributor: Amin Khosrozadeh, PhD.
+// Affiliation: Prof. Vassiliki Nikoletopoulou lab, DNF, UNIL.
 
 namespace netczicompress.Models;
 
@@ -21,8 +24,9 @@ public sealed class CopyFileProcessor(IFileSystem fileSystem) : IFileProcessor, 
         token.ThrowIfCancellationRequested();
         this.LastDetails = null;
         using var sourceHash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
-        using var input = fileSystem.FileStream.New(inputPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using (var output = fileSystem.FileStream.New(outputPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+        using var input = fileSystem.FileStream.New(inputPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan);
+        long inputLength = input.Length;
+        using (var output = fileSystem.FileStream.New(outputPath, FileMode.CreateNew, FileAccess.Write, FileShare.None, 4096, FileOptions.SequentialScan))
         {
             byte[] buffer = new byte[1024 * 1024];
             long bytesCopied = 0;
@@ -33,7 +37,7 @@ public sealed class CopyFileProcessor(IFileSystem fileSystem) : IFileProcessor, 
                 output.Write(buffer, 0, bytesRead);
                 sourceHash.AppendData(buffer, 0, bytesRead);
                 bytesCopied += bytesRead;
-                progressReport(input.Length == 0 ? 100 : (int)(100.0 * bytesCopied / input.Length));
+                progressReport(inputLength == 0 ? 100 : (int)(100.0 * bytesCopied / inputLength));
             }
         }
 

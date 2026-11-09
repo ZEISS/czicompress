@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -33,6 +33,7 @@ public partial class MainViewModelTests
         SetFolders(sut, fs);
         var linked = fs.Directory.CreateDirectory(fs.Path.Combine(fs.Path.GetDirectoryName(sut.InputDirectory)!, Guid.NewGuid().ToString("N")));
         linked.Attributes |= FileAttributes.ReparsePoint;
+        sut.CopyOtherFiles = true;
         if (inputIsLinked)
         {
             sut.InputDirectory = linked.FullName;
@@ -193,7 +194,7 @@ public partial class MainViewModelTests
 
     [Theory]
     [AutoData]
-    public async Task StartCommands_WhenProcessingStarts_UsesCorrectParameters(OperationMode selectedMode, bool recursive, bool hdf5, bool tiff)
+    public async Task StartCommands_WhenProcessingStarts_UsesCorrectParameters(OperationMode selectedMode, bool recursive, bool copyOtherFiles, bool hdf5, bool tiff)
     {
         // ARRANGE
         IFixture fixture = CreateFixture();
@@ -205,6 +206,7 @@ public partial class MainViewModelTests
         SetFolders(sut, fs);
         sut.SelectedMode = selectedMode;
         sut.Recursive = recursive;
+        sut.CopyOtherFiles = copyOtherFiles;
         sut.ProcessHdf5 = hdf5;
         sut.ProcessTiff = tiff;
 
@@ -221,6 +223,7 @@ public partial class MainViewModelTests
                         object.ReferenceEquals(x.OutputDir.FileSystem, fs) &&
                         x.Recursive == recursive &&
                         x.Mode == selectedMode.Value &&
+                        x.ProcessingOptions.CopyOtherFiles == copyOtherFiles &&
                         x.ProcessingOptions.ProcessHdf5 == hdf5 && x.ProcessingOptions.ProcessTiff == tiff),
                 It.Is<CancellationToken>(t => !t.IsCancellationRequested)),
             Times.Once);
@@ -255,7 +258,7 @@ public partial class MainViewModelTests
         // ASSERT
         loggerMock.VerifySingleEntry(
             Microsoft.Extensions.Logging.LogLevel.Information,
-            $"Starting run: FolderCompressorParameters {{ InputDir = {sut.InputDirectory}, OutputDir = {sut.OutputDirectory}, Recursive = {recursive}, Mode = {selectedMode.Value}, ExecutionOptions = ExecutionOptions {{ ThreadCount = {sut.ThreadCount} }}, ProcessingOptions = ProcessingOptions {{ CompressionLevel = {sut.CompressionLevel}, CopyFailedFiles = {sut.CopyFailedFiles}, ProcessHdf5 = {sut.ProcessHdf5}, ProcessTiff = {sut.ProcessTiff}, HasScientificFormats = {hdf5 || tiff} }} }}");
+            $"Starting run: FolderCompressorParameters {{ InputDir = {sut.InputDirectory}, OutputDir = {sut.OutputDirectory}, Recursive = {recursive}, Mode = {selectedMode.Value}, ExecutionOptions = ExecutionOptions {{ ThreadCount = {sut.ThreadCount} }}, ProcessingOptions = ProcessingOptions {{ CompressionLevel = {sut.CompressionLevel}, CopyFailedFiles = {sut.CopyFailedFiles}, CopyOtherFiles = {sut.CopyOtherFiles}, ProcessHdf5 = {sut.ProcessHdf5}, ProcessTiff = {sut.ProcessTiff}, HasScientificFormats = {hdf5 || tiff} }} }}");
 
         // CLEANUP
         await sut.StopCommand.Execute(default);

@@ -25,6 +25,7 @@
 		<PackageReference Include="libczicompressc" />
 		<PackageReference Include="MessageBox.Avalonia" />
 		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" />
+		<PackageReference Include="Microsoft.DotNet.ILCompiler" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
 		<PackageReference Include="ReactiveUI.Fody" />
 		<PackageReference Include="System.IO.Abstractions" />

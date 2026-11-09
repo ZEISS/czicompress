@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2026 Amin Khosrozadeh
+// SPDX-FileCopyrightText: 2026 czicompress contributors
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 

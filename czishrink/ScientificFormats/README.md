@@ -54,7 +54,9 @@ HDF5-based BigDataViewer and OME-TIFF occur in microscopy workflows supported by
 [ZEISS arivis Pro](https://www.zeiss.com/microscopy/en/products/software/arivis-pro.html?hsLang=en).
 [BigDataViewer documents XML/HDF5 and a ZEISS Lightsheet Z.1 example](https://imagej.net/plugins/bdv/).
 For paired datasets, keep companion XML files and relative paths together; copying
-accompanying files is the separate feature proposed in PR #114. Generic HDF5/TIFF
+accompanying files is available through **Copy other files and folders**.
+Enabled HDF5/TIFF processing takes priority over copying; unselected formats are
+copied unchanged when that option is enabled. Generic HDF5/TIFF
 checks do not establish compatibility with every vendor-specific reader.
 ZEISS viewer validation remains a manual follow-up.
 

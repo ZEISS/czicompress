@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -25,6 +25,9 @@ public interface IAdvancedOptionsViewModel
     /// Gets or sets a value indicating whether failed files should be copied to the destination folder.
     /// </summary>
     public bool CopyFailedFiles { get; set; }
+
+    /// <summary>Gets or sets a value indicating whether unselected files and empty folders should be copied.</summary>
+    public bool CopyOtherFiles { get; set; }
 
     public bool ProcessHdf5 { get; set; }
 
