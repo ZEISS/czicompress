@@ -14,10 +14,11 @@ using System.Runtime.CompilerServices;
 public class FolderCompressorCleanupTests
 {
     [Theory]
-    [InlineData(true, true)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    public async Task CleanupWaitsForWorkersAndPreservesThePrimaryFailure(bool enumerationFails, bool workerFails)
+    [InlineData(true, true, false)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, false)]
+    [InlineData(true, false, true)]
+    public async Task CleanupWaitsForWorkersAndPreservesThePrimaryFailure(bool enumerationFails, bool workerFails, bool workerCancels)
     {
         var fs = new MockFileSystem();
         string input = fs.Path.GetFullPath("input");
@@ -56,6 +57,16 @@ public class FolderCompressorCleanupTests
             new ExecutionOptions(new ThreadCount { Value = 1 }),
             new ProcessingOptions(CompressionLevel.Default));
         var run = compressor.PrepareNewRun(parameters, CancellationToken.None);
+        using var progress = new SerialDisposable();
+        using var subscription = run.Output.OfType<CompressorMessage.FileStarting>().Subscribe(
+            message => progress.Disposable = message.ProgressPercent.Subscribe(percent =>
+            {
+                if (workerCancels && percent == 100)
+                {
+                    throw new OperationCanceledException("Worker progress canceled");
+                }
+            }),
+            _ => { });
         Task completion = run.Output.ToTask();
         run.Start();
         try

@@ -173,7 +173,7 @@ public class MultiThreadedFolderCompressor(
                 {
                     await allWorkers.ConfigureAwait(false);
                 }
-                catch (Exception waitError)
+                catch (Exception waitError) when (allWorkers.IsFaulted || FailureDiagnostics.IsRecoverable(waitError))
                 {
                     // Await exposes only one failure; another worker may have failed fatally.
                     var workerFailures = allWorkers.Exception ?? waitError;
