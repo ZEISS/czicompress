@@ -295,7 +295,7 @@
           "Projektanker.Icons.Avalonia.FontAwesome": "[9.6.2, )",
           "ReactiveUI.Fody": "[19.5.41, )",
           "System.IO.Abstractions": "[22.3.0, )",
-          "libczicompressc": "[0.5.2, )"
+          "libczicompressc": "[0.5.7, )"
         }
       },
       "Avalonia": {
@@ -375,9 +375,9 @@
       },
       "libczicompressc": {
         "type": "CentralTransitive",
-        "requested": "[0.5.2, )",
-        "resolved": "0.5.2",
-        "contentHash": "McWFqV8iLbslwP9M7xg69qVVxrupzJRhJ7uG2aLQ8Kf3q/babhRF0G97fwBONrJQVzU3mLW3/vGJ6urdMviwuw=="
+        "requested": "[0.5.7, )",
+        "resolved": "0.5.7",
+        "contentHash": "2Ry0mJLCgG8jMwq5f8mQMQwJeEclpE56KhPWEpc+soeuNPqpxW6VNu+Wh2KJ23+pbMwDlXSE4MG85PWnTst5kg=="
       },
       "MessageBox.Avalonia": {
         "type": "CentralTransitive",
