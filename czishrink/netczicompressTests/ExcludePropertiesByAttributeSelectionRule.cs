@@ -1,4 +1,4 @@
-﻿// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
+// SPDX-FileCopyrightText: 2023 Carl Zeiss Microscopy GmbH
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -6,7 +6,7 @@ namespace netczicompressTests;
 
 using System.Collections.Generic;
 using System.Reflection;
-using global::FluentAssertions.Equivalency;
+using global::AwesomeAssertions.Equivalency;
 
 /// <summary>
 /// A selection rule that excludes all properties with a particular attribute.
@@ -34,7 +34,7 @@ public class ExcludePropertiesByAttributeSelectionRule : IMemberSelectionRule
 
     private bool IsPropertyWithExcludedAttribute(IMember member)
     {
-        var prop = member.ReflectedType.GetProperty(member.Name);
+        var prop = member.ReflectedType.GetProperty(member.Expectation.Name);
         var result = prop?.GetCustomAttributes(this.attributeType).Any() == true;
         return result;
     }
