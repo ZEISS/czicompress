@@ -77,7 +77,7 @@ public class FolderCompressorCleanupTests
         }
     }
 
-    [Theory]
+    [TwoWorkerTheory]
     [InlineData(true)]
     [InlineData(false)]
     public async Task EveryProcessorIsDisposedAndDisposalErrorsDoNotReplaceEarlierErrors(bool enumerationFails)
@@ -157,6 +157,89 @@ public class FolderCompressorCleanupTests
         }
     }
 
+    [TwoWorkerTheory]
+    [InlineData(true, true, true)]
+    [InlineData(true, true, false)]
+    [InlineData(true, false, true)]
+    [InlineData(true, false, false)]
+    [InlineData(false, true, true)]
+    [InlineData(false, true, false)]
+    [InlineData(false, false, true)]
+    [InlineData(false, false, false)]
+    public async Task CleanupPropagatesAllWorkerFailuresWhenAnyIsFatal(bool fatalFirst, bool wrapped, bool enumerationFails)
+    {
+        var fs = new MockFileSystem();
+        string input = fs.Path.GetFullPath("input");
+        var files = new[] { "first.czi", "second.czi" }.Select(name => fs.Path.Combine(input, name)).ToArray();
+        foreach (var file in files)
+        {
+            fs.AddFile(file, new MockFileData("unchanged source"));
+            fs.File.SetCreationTimeUtc(file, DateTime.UtcNow.AddDays(-1));
+        }
+
+        // Construct a fatal exception object without exhausting memory.
+        var fatal = new OutOfMemoryException("Synthetic fatal worker failure");
+        Exception fatalFailure = wrapped ? new InvalidOperationException("Wrapped fatal failure", fatal) : fatal;
+        var ordinary = new InvalidOperationException("Ordinary worker failure");
+        var failures = fatalFirst ? new[] { fatalFailure, ordinary } : new[] { ordinary, fatalFailure };
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var reached = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        int startedCount = 0;
+        var processors = failures.Select(failure =>
+        {
+            var processor = new Mock<IFileProcessor>();
+            processor.SetupGet(value => value.NeedsExistingOutputDirectory).Returns(false);
+            processor.Setup(value => value.ProcessFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ReportProgress>(), It.IsAny<CancellationToken>()))
+                .Callback(() =>
+                {
+                    if (Interlocked.Increment(ref startedCount) == 2)
+                    {
+                        started.TrySetResult();
+                    }
+
+                    release.Task.WaitAsync(TimeSpan.FromSeconds(10)).GetAwaiter().GetResult();
+                    throw failure;
+                });
+            return processor;
+        }).ToArray();
+        int created = 0;
+        var primary = enumerationFails ? new UnauthorizedAccessException("Enumeration failed") : null;
+        var compressor = new ControlledEnumeratorCompressor(
+            (_, _) => processors[created++].Object, files.Select(fs.FileInfo.New).ToArray(), started.Task, reached, primary);
+        var parameters = new FolderCompressorParameters(
+            fs.DirectoryInfo.New(input),
+            fs.DirectoryInfo.New(fs.Path.GetFullPath("output")),
+            false,
+            CompressionMode.CompressAll,
+            new ExecutionOptions(new ThreadCount { Value = 2 }),
+            new ProcessingOptions(CompressionLevel.Default));
+        var run = compressor.PrepareNewRun(parameters, CancellationToken.None);
+        Task completion = run.Output.ToTask();
+        run.Start();
+        try
+        {
+            await reached.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            release.SetResult();
+            var error = await Record.ExceptionAsync(() => completion.WaitAsync(TimeSpan.FromSeconds(10)));
+            error.Should().BeOfType<AggregateException>().Which.Flatten().InnerExceptions
+                .Should().HaveCount(2).And.Contain(ordinary).And.Contain(fatalFailure);
+            foreach (var processor in processors)
+            {
+                processor.Verify(value => value.Dispose(), Times.Once);
+            }
+
+            foreach (var file in files)
+            {
+                fs.File.ReadAllText(file).Should().Be("unchanged source");
+            }
+        }
+        finally
+        {
+            release.TrySetResult();
+        }
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
@@ -207,6 +290,17 @@ public class FolderCompressorCleanupTests
         var error = await Record.ExceptionAsync(() => completion.WaitAsync(TimeSpan.FromSeconds(10)));
         error.Should().BeSameAs(workerFails ? primary : secondary);
         processor.Verify(value => value.Dispose(), Times.Once);
+    }
+
+    private sealed class TwoWorkerTheoryAttribute : TheoryAttribute
+    {
+        public TwoWorkerTheoryAttribute()
+        {
+            if (ThreadCount.Maximum < 2)
+            {
+                this.Skip = "This scenario requires two concurrent workers.";
+            }
+        }
     }
 
     private sealed class ControlledEnumeratorCompressor(

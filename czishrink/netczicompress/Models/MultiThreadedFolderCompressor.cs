@@ -13,6 +13,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -167,15 +168,23 @@ public class MultiThreadedFolderCompressor(
             {
                 // Directory enumeration or creation can fail while files are still being processed.
                 // Wait for those tasks before releasing their native processors.
+                var allWorkers = Task.WhenAll(activeTasks);
                 try
                 {
-                    await Task.WhenAll(activeTasks).ConfigureAwait(false);
+                    await allWorkers.ConfigureAwait(false);
                 }
-                catch (Exception waitError) when (FailureDiagnostics.IsRecoverable(waitError))
+                catch (Exception waitError)
                 {
+                    // Await exposes only one failure; another worker may have failed fatally.
+                    var workerFailures = allWorkers.Exception ?? waitError;
+                    if (!FailureDiagnostics.IsRecoverable(workerFailures))
+                    {
+                        ExceptionDispatchInfo.Throw(workerFailures);
+                    }
+
                     // Normal worker failures are observed above. This cleanup wait
                     // must not replace the original processing or enumeration error.
-                    FailureDiagnostics.Record(waitError);
+                    FailureDiagnostics.Record(workerFailures);
                 }
             }
         }
