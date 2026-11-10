@@ -27,7 +27,7 @@ runs:
   using: "composite"
   steps:
     - name: Cache vcpkg
-      uses: actions/cache@v3
+      uses: actions/cache@v6
       if: inputs.package == 'ON'
       with:
         path: ${{inputs.path-cache}}

@@ -29,7 +29,7 @@ List of third-party software:
 ===============================================================================
 
 -------------------------------------------------------------------------------
-|  Catch2 3.4.0 (used under Boost Software License 1.0) https://discord.gg/4CWS9zD
+|  Catch2 3.16.1 (used under Boost Software License 1.0) https://discord.gg/4CWS9zD
 -------------------------------------------------------------------------------
 
 --- --- --- --- --- --- --- License text(s) --- --- --- --- --- --- --- --- ---
@@ -59,13 +59,13 @@ OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
 OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 -------------------------------------------------------------------------------
-|  CLIUtils/CLI11 v2.3.2 (used under BSD 3-clause "New" or "Revised" License) https://cliutils.gitlab.io/CLI11Tutorial
+|  CLIUtils/CLI11 v2.7.2 (used under BSD 3-clause "New" or "Revised" License) https://cliutils.gitlab.io/CLI11Tutorial
 -------------------------------------------------------------------------------
 
 --- --- --- --- --- --- --- Copyright notice(s) --- --- --- --- --- --- --- ---
-Copyright (c) 2017-2023 University of Cincinnati, developed by Henry Schreiner under NSF AWARD 1414736. All Rights Reserved.
+Copyright (c) 2017-2026 University of Cincinnati, developed by Henry Schreiner under NSF AWARD 1414736. All Rights Reserved.
 Copyright (c) 2012 - 2017, Lars Bilke. All Rights Reserved.
-Copyright (c) 2017-2023 University of Cincinnati, developed by Henry Schreiner.
+Copyright (c) 2017-2026 University of Cincinnati, developed by Henry Schreiner.
 
 --- --- --- --- --- --- --- License text(s) --- --- --- --- --- --- --- --- ---
 Copyright (c) <YEAR>, <OWNER>
@@ -1472,7 +1472,7 @@ AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 -------------------------------------------------------------------------------
-|  zstd 1.5.5 (used under BSD 3-clause "New" or "Revised" License) http://www.zstd.net
+|  zstd 1.5.7 (used under BSD 3-clause "New" or "Revised" License) http://www.zstd.net
 -------------------------------------------------------------------------------
 
 --- --- --- --- --- --- --- Copyright notice(s) --- --- --- --- --- --- --- ---

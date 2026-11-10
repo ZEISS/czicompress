@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Use CMake to configure code
         working-directory: czicompress
@@ -32,8 +32,7 @@ jobs:
           # CMake configures the project and generates the necessary files for building.
           mkdir -p build
           cd build
-          # CLI11 still requests pre-3.5 policies; allow configuration with CMake 4.
-          cmake .. -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Extract include paths and defines for CZIcompress.cpp
         id: extract_flags
@@ -71,7 +70,7 @@ jobs:
       # Upload MegaLinter artifacts
       - name: Archive production artifacts
         if: ${{ success() || failure() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: MegaLinter reports
           path: |
