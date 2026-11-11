@@ -24,7 +24,7 @@
     <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
     <PackageVersion Include="Fody" Version="6.9.3" />
     <PackageVersion Include="Microsoft.DotNet.ILCompiler" Version="10.0.14" />
-    <PackageVersion Include="libczicompressc" Version="0.5.2" />
+    <PackageVersion Include="libczicompressc" Version="0.5.7" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.3.1.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.14" />
@@ -37,10 +37,10 @@
     <PackageVersion Include="System.IO.Abstractions" Version="$(SystemIOAbstractionsVersion)" />
     <PackageVersion Include="System.IO.Abstractions.TestingHelpers" Version="$(SystemIOAbstractionsVersion)" />
     <PackageVersion Include="System.Reactive" Version="6.1.0" />
-    <PackageVersion Include="WixToolset.Util.wixext" Version="$(WixVersion)"/>
+    <PackageVersion Include="WixToolset.Util.wixext" Version="$(WixVersion)" />
     <PackageVersion Include="WixToolset.Heat" Version="$(WixVersion)" />
     <PackageVersion Include="WixToolset.Bal.wixext" Version="$(WixVersion)" />
-    <PackageVersion Include="WixToolset.UI.wixext" Version="$(WixVersion)"/>
+    <PackageVersion Include="WixToolset.UI.wixext" Version="$(WixVersion)" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
