@@ -25,20 +25,12 @@ public class CsvLogFileWriter : IObserver<CompressorMessage.FileFinished>
 
     public TextWriter Writer { get; }
 
-    public void OnCompleted()
-    {
-        lock (this.Writer)
-        {
-            this.isCompleted = true;
-            this.Writer.Flush();
-            this.Writer.Close();
-        }
-    }
+    /// <summary>Gets a logging failure without replacing the run's original error.</summary>
+    public Exception? LastError { get; private set; }
 
-    public void OnError(Exception error)
-    {
-        this.OnCompleted();
-    }
+    public void OnCompleted() => this.Complete(null);
+
+    public void OnError(Exception error) => this.Complete(error);
 
     public void OnNext(CompressorMessage.FileFinished value)
     {
@@ -75,6 +67,44 @@ public class CsvLogFileWriter : IObserver<CompressorMessage.FileFinished>
         this.Write("InputFile,SizeInput,SizeOutput,SizeRatio,SizeDelta,TimeToProcess,Status,ErrorMessage\r\n");
     }
 
+    private void Complete(Exception? primaryError)
+    {
+        lock (this.Writer)
+        {
+            if (this.isCompleted)
+            {
+                return;
+            }
+
+            this.isCompleted = true;
+            try
+            {
+                this.Writer.Flush();
+            }
+            catch (Exception flushError) when (FailureDiagnostics.IsRecoverable(flushError))
+            {
+                this.RecordFailure(flushError, primaryError);
+            }
+            finally
+            {
+                try
+                {
+                    this.Writer.Close();
+                }
+                catch (Exception closeError) when (FailureDiagnostics.IsRecoverable(closeError))
+                {
+                    this.RecordFailure(closeError, primaryError);
+                }
+            }
+        }
+    }
+
+    private void RecordFailure(Exception error, Exception? primaryError)
+    {
+        this.LastError = this.LastError == null ? error : new AggregateException(this.LastError, error);
+        FailureDiagnostics.Record(error, primaryError);
+    }
+
     private void Write(string line)
     {
         lock (this.Writer)
@@ -85,7 +115,15 @@ public class CsvLogFileWriter : IObserver<CompressorMessage.FileFinished>
                 return;
             }
 
-            this.Writer.Write(line);
+            try
+            {
+                this.Writer.Write(line);
+            }
+            catch (Exception writeError) when (FailureDiagnostics.IsRecoverable(writeError))
+            {
+                this.RecordFailure(writeError, null);
+                this.Complete(writeError);
+            }
         }
     }
 }

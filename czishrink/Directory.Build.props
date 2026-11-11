@@ -15,6 +15,6 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.4.0<!--feature/upgrade-libczicompressc-0_5_7--></VersionPrefix>
+    <VersionPrefix>1.4.1<!--fix/czi-cleanup-errors--></VersionPrefix>
   </PropertyGroup>
 </Project>

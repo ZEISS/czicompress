@@ -1,5 +1,9 @@
 # CziShrink version history
 
+## 1.4.1
+
+- Preserve the original errors during task and CSV log cleanup.
+
 ## 1.4.0
 
 - Upgrade to .NET 10 (LTS); .NET 8 reaches end of support in November 2026.
