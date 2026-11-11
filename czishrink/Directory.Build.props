@@ -5,19 +5,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <MSBuildCopyContentTransitively>True</MSBuildCopyContentTransitively>
     <Nullable>enable</Nullable>
-    
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeAnalysis.ruleset</CodeAnalysisRuleSet>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
     <!-- Nuget -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-
     <!-- Version -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.4.1</VersionPrefix>
+    <VersionPrefix>1.4.1<!--fix/czi-cleanup-errors--></VersionPrefix>
   </PropertyGroup>
 </Project>
